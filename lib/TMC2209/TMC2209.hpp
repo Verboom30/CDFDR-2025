@@ -1,7 +1,7 @@
-#ifndef __TMC2009_H_
-#define __TMC2009_H_
-
+#ifndef __TMC2209_H_
+#define __TMC2209_H_
 #include "mbed.h"
+#include "TMC2209_bitfields.hpp"
 class TMC2209Stepper 
 {
   public:  
@@ -43,4 +43,4 @@ class TMC2209Stepper
 };
 
 
-#endif // __TMC2009_H_
+#endif // __TMC2209_H_
