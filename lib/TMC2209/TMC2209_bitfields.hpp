@@ -1,7 +1,7 @@
 #ifndef __TMC2009_BITFIELDS_H_
 #define __TMC2009_BITFIELDS_H_
 #include "mbed.h"
-
+#pragma pack(push, 1)
 //###############################################
 //#      GENERAL CONFIGURATION REGISTERS        #
 //###############################################
@@ -100,7 +100,7 @@ namespace TMC2209_n {
               : 1,
               pdn_uart  : 1,
               step      : 1,
-              sel_a     : 1,
+              spread_en : 1,
               dir       : 1;
         uint16_t: 14;
         uint8_t version : 8;
@@ -232,7 +232,7 @@ struct MSCURACT_t {
 //***********************************/************************************
 // RW Register CHOPCONF: Addr 0x6C                                       /  
 //***********************************/************************************
-namespace TMC2208_n {
+namespace TMC2209_n {
   struct CHOPCONF_t {
     constexpr static uint8_t address = 0x6C;
     union {
@@ -257,7 +257,7 @@ namespace TMC2208_n {
 //***********************************/************************************
 // R Register DRV_STATUS: Addr 0x6F                                      /  
 //***********************************/************************************
-namespace TMC2208_n {
+namespace TMC2209_n {
   struct DRV_STATUS_t {
     constexpr static uint8_t address = 0x6F;
     union {
@@ -286,9 +286,31 @@ namespace TMC2208_n {
   };
 };
 //***********************************/************************************
-// R Register PWMCONF: Addr 0x71                                         /  
+// RW Register PWMCONF: Addr 0x70                                        /  
 //***********************************/************************************
-namespace TMC2208_n {
+namespace TMC2209_n {
+  struct PWMCONF_t {
+    constexpr static uint8_t address = 0x70;
+    union {
+      uint32_t sr;
+      struct {
+        uint8_t pwm_ofs             : 8,
+                pwm_grad            : 8,
+                pwm_freq            : 2;
+                bool pwm_autoscale  : 1,
+                pwm_autograd        : 1;
+        uint8_t freewheel           : 2,
+                                    : 2,
+                pwm_reg             : 4,
+                pwm_lim             : 4;
+      };
+    };
+  };
+};
+//***********************************/************************************
+// R Register PWM_SCALE: Addr 0x71                                        /  
+//***********************************/************************************
+namespace TMC2209_n {
  struct PWM_SCALE_t {
     constexpr static uint8_t address = 0x71;
     union {
