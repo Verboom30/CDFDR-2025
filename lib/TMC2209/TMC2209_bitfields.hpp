@@ -6,7 +6,7 @@
 //#      GENERAL CONFIGURATION REGISTERS        #
 //###############################################
 //***********************************/************************************
-// R/W Register GCONF: Addr x00      /                                   /
+// R/W Register GCONF: Addr 0x00     /                                   /
 //***********************************/************************************
 namespace TMC2209_n {
   struct GCONF_t {
@@ -29,7 +29,7 @@ namespace TMC2209_n {
   };
 }
 //***********************************/************************************
-// R+WC Register GCONF: Addr x01     /                                   /
+// R+WC Register GCONF: Addr 0x01    /                                   /
 //***********************************/************************************
 namespace TMC2209_n {
   struct GSTAT_t {
@@ -45,12 +45,12 @@ namespace TMC2209_n {
   };
 }
 //***********************************/************************************
-// R  Register IFCNT: Addr x02       /                                   /
+// R  Register IFCNT: Addr 0x02      /                                   /
 //***********************************/************************************
 struct IFCNT_t { constexpr static uint8_t address = 0x02; };
 
 //***********************************/************************************
-// W Register SLAVECONF: Addr x03        /                               /
+// W Register SLAVECONF: Addr 0x03   /                                   /
 //***********************************/************************************
 namespace TMC2209_n {
   struct SLAVECONF_t {
@@ -64,7 +64,7 @@ namespace TMC2209_n {
   };
 }
 //***********************************/************************************
-// W Register OTP_PROG: Addr x04     /                                   /
+// W Register OTP_PROG: Addr 0x04    /                                   /
 //***********************************/************************************
 namespace TMC2209_n {
   struct OTP_PROG_t {
@@ -80,11 +80,11 @@ namespace TMC2209_n {
   };
 }
 //***********************************/************************************
-// R Register OTP_READ: Addr x05     /                                   /
+// R Register OTP_READ: Addr 0x05    /                                   /
 //***********************************/************************************
 struct OTP_READ_t   { constexpr static uint8_t address = 0x05; };
 //***********************************/************************************
-// R Register IOIN: Addr x06         /                                   /
+// R Register IOIN: Addr 0x06        /                                   /
 //***********************************/************************************
 namespace TMC2209_n {
   struct IOIN_t {
@@ -109,7 +109,7 @@ namespace TMC2209_n {
   };
 }
 //***********************************/************************************
-// RW Register FACTORY_CONF: Addr x07                                   /
+// RW Register FACTORY_CONF: Addr 0x07                                   /
 //***********************************/************************************
 namespace TMC2209_n {
   struct FACTORY_CONF_t {
@@ -128,7 +128,7 @@ namespace TMC2209_n {
 //#      VELOCITY DEPENDENT DRIVER FEATURE CONTROL REGISTER SET        #
 //######################################################################
 //***********************************/************************************
-// W Register IHOLD_IRUN: Addr x10                                      /
+// W Register IHOLD_IRUN: Addr 0x10                                      /
 //***********************************/************************************
 struct IHOLD_IRUN_t {
   constexpr static uint8_t address = 0x10;
@@ -144,25 +144,25 @@ struct IHOLD_IRUN_t {
   };
 };
 //***********************************/************************************
-// W Register TPOWER DOWN: Addr x11                                     /
+// W Register TPOWER DOWN: Addr 0x11                                     /
 //***********************************/************************************
 struct TPOWER_DOWN_t   { constexpr static uint8_t address = 0x11; };
 //***********************************/************************************
-// R Register TSTEP: Addr x12                                            /
+// R Register TSTEP: Addr 0x12                                           /
 //***********************************/************************************
 struct TSTEP_t { 
   constexpr static uint8_t address = 0x12; 
   uint32_t sr : 20;
 };
 //***********************************/************************************
-// W Register TPWMTHRS: Addr x13                                         /
+// W Register TPWMTHRS: Addr 0x13                                        /
 //***********************************/************************************
 struct TPWMTHRS_t {
   constexpr static uint8_t address = 0x13;
   uint32_t sr : 20;
 };
 //***********************************/************************************
-// W Register VACTUAL: Addr x22                                          /
+// W Register VACTUAL: Addr 0x22                                         /
 //***********************************/************************************
 namespace TMC2209_n {
   struct VACTUAL_t {
@@ -170,4 +170,59 @@ namespace TMC2209_n {
     uint32_t sr;
   };
 }
+//######################################################################
+//#      COOLSTEP AND STALLGUARD CONTROL REGISTER SET                  #
+//######################################################################
+//***********************************/************************************
+// W Register TCOOLTHRS: Addr 0x14                                       /
+//***********************************/************************************
+struct TCOOLTHRS_t {
+  constexpr static uint8_t address = 0x14;
+  uint32_t sr : 20;
+};
+//***********************************/************************************
+// W Register SGTHRS: Addr 0x40                                          /  
+//***********************************/************************************
+struct SGTHRS_t {
+  constexpr static uint8_t address = 0x40;
+  uint32_t sr : 8;
+};
+//***********************************/************************************
+// R Register SG_RESULT: Addr 0x41                                       /  
+//***********************************/************************************
+struct SG_RESULT_t {
+  constexpr static uint8_t address = 0x41;
+  uint32_t sr : 10;
+};
+//***********************************/************************************
+// W Register COOLCONF: Addr 0x42                                        /  
+//***********************************/************************************
+struct COOLCONF_t {
+  constexpr static uint8_t address = 0x42;
+  uint32_t sr : 16;
+};
+//######################################################################
+//#      MICROSTEPPING CONTROL REGISTER SET                            #
+//######################################################################
+//***********************************/************************************
+// R Register MSCNT: Addr 0x6A                                           /  
+//***********************************/************************************
+struct MSCNT_t {
+  constexpr static uint8_t address = 0x6A;
+  uint32_t sr : 10;
+};
+//***********************************/************************************
+// R Register MSCURACT: Addr 0x6B                                           /  
+//***********************************/************************************
+struct MSCURACT_t {
+  constexpr static uint8_t address = 0x6B;
+  union {
+    uint32_t sr : 25;
+    struct {
+      uint8_t cur_b : 9,
+              : 7,
+              cur_a : 9;
+    };
+  };
+};
 #endif // __TMC2009_BITFIELDS_H_
