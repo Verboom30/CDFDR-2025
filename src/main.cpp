@@ -4,10 +4,10 @@
 #include <inttypes.h>
 
 #define R_SENSE 0.11f   // R-Sense in OHM. Match to your driver
-#define RMSCURRENT 500  // RMS current of Stepper Coil in mA
-#define MICROSTEPS 256  // # of microsteps
+#define RMSCURRENT 1500  // RMS current of Stepper Coil in mA
+#define MICROSTEPS 8  // # of microsteps
 
-TMC2209Stepper StepperA(TMC_UART_TX, TMC_UART_RX, R_SENSE, 0x00);
+TMC2209Stepper StepperA(PIN_STEP,PIN_DIR,TMC_UART_TX, TMC_UART_RX, R_SENSE, 0x00);
 
 
 int main()
@@ -29,12 +29,20 @@ int main()
                                       // 1110, 800
                                       // working: 800 12V/0,6Amax,  Speed up to 5200=4U/min
   StepperA.microsteps(MICROSTEPS);    // Set microsteps to 1:Fullstep ... 256: 1/256th
-  StepperA.en_spreadCycle(true);      // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
+  StepperA.en_spreadCycle(false);      // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
   StepperA.pwm_autoscale(true);       // Needed for stealthChop
 
+  StepperA.setSpeed(10000);
+  StepperA.setAcceleration(4000);
+  StepperA.setDeceleration(4000);
+  StepperA.stop();
+  StepperA.setPositionZero();
+
   //printf("Read Uart 0x%08"PRIx32"\n",StepperA.IOIN());
-  while (1)
-  {
-  /* code */
-  }
+  StepperA.move(10000);
+  while(!StepperA.stopped());
+  // while (1)
+  // {
+  // /* code */
+  // }
 }

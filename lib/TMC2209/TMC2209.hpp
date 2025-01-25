@@ -2,15 +2,16 @@
 #define __TMC2209_H_
 #include "mbed.h"
 #include "TMC2209_bitfields.hpp"
+#include "Stepper/Stepper.hpp"
 #define INIT_REGISTER(REG) REG##_t REG##_register = REG##_t
 #define INIT2209_REGISTER(REG) TMC2209_n::REG##_t REG##_register = TMC2209_n::REG##_t
-class TMC2209Stepper 
+class TMC2209Stepper : public Stepper 
 {
   public:  
     //***********************************/************************************
     //                         Constructors                                 //
     //***********************************/************************************    
-    TMC2209Stepper (PinName Uart_TX_pin, PinName Uart_RX_pin, float RS, uint8_t Slave_Addr);
+    TMC2209Stepper (PinName step_pin, PinName dir_pin,PinName Uart_TX_pin, PinName Uart_RX_pin, float RS, uint8_t Slave_Addr);
     //***********************************/************************************
     //                             Public Methods                           //
     //***********************************/************************************

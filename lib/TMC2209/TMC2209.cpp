@@ -4,7 +4,9 @@
 //                         Constructors                                 //
 //***********************************/************************************
 
-TMC2209Stepper::TMC2209Stepper(PinName Uart_TX_pin, PinName Uart_RX_pin, float RS, uint8_t Slave_Addr) : Rsense(RS)
+TMC2209Stepper::TMC2209Stepper(PinName step_pin, PinName dir_pin, PinName Uart_TX_pin, PinName Uart_RX_pin, float RS, uint8_t Slave_Addr) :
+  Stepper(step_pin,dir_pin),
+  Rsense(RS)
 {
   BufferedSerial *SWSerialObj = new BufferedSerial(Uart_TX_pin, Uart_RX_pin);
   SWSerial = SWSerialObj;
