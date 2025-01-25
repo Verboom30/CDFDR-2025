@@ -45,6 +45,63 @@ Holonome::Holonome(PinName Uart_TX_pin, PinName Uart_RX_pin,
 //                                Get Set                               //
 //***********************************/************************************
 
+bool Holonome::setupSteppers(void)
+{
+
+  StepperA->begin();
+  StepperB->begin();
+  StepperC->begin();
+
+  //read and check version - must be 0x21
+  uint8_t tmc_versionA = StepperA->version();
+  uint8_t tmc_versionB = StepperB->version();
+  uint8_t tmc_versionC = StepperC->version();
+  printf("TMC-VersionA: %02X\r\n",tmc_versionA);
+  printf("TMC-VersionB: %02X\r\n",tmc_versionB);
+  printf("TMC-VersionC: %02X\r\n",tmc_versionC);
+  if (tmc_versionA != 0x21 or tmc_versionB != 0x21 or tmc_versionC != 0x21) {
+    printf("Wrong TMC-Version(not 0x21) or communication error!! STOPPING!!!\r\n");
+    if (StepperA->CRCerror or StepperB->CRCerror or StepperC->CRCerror) {
+      printf("CRC-Error!!!\r\n");
+      return false;
+    }
+  }
+  //***********************************/************************************
+  // StepperA                                                              /
+  //***********************************/************************************
+  StepperA->toff(TOFF);                // Enables driver in software - 3, 5 ????
+  StepperA->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
+                                       // 1110, 800
+                                       // working: 800 12V/0,6Amax,  Speed up to 5200=4U/min
+  StepperA->microsteps(MICROSTEPS);    // Set microsteps to 1:Fullstep ... 256: 1/256th
+  StepperA->en_spreadCycle(EN_SPREADCYCLE);     // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
+  StepperA->pwm_autoscale(PWM_AUTOSCALE);       // Needed for stealthChop
+
+  //***********************************/************************************
+  // StepperB                                                              /
+  //***********************************/************************************
+  StepperB->toff(TOFF);                // Enables driver in software - 3, 5 ????
+  StepperB->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
+                                       // 1110, 800
+                                       // working: 800 12V/0,6Amax,  Speed up to 5200=4U/min
+  StepperB->microsteps(MICROSTEPS);    // Set microsteps to 1:Fullstep ... 256: 1/256th
+  StepperB->en_spreadCycle(EN_SPREADCYCLE);     // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
+  StepperB->pwm_autoscale(PWM_AUTOSCALE);       // Needed for stealthChop
+
+
+  //***********************************/************************************
+  // StepperC                                                              /
+  //***********************************/************************************
+  StepperC->toff(TOFF);                 // Enables driver in software - 3, 5 ????
+  StepperC->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
+                                       // 1110, 800
+                                       // working: 800 12V/0,6Amax,  Speed up to 5200=4U/min
+  StepperC->microsteps(MICROSTEPS);    // Set microsteps to 1:Fullstep ... 256: 1/256th
+  StepperC->en_spreadCycle(EN_SPREADCYCLE);     // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
+  StepperC->pwm_autoscale(PWM_AUTOSCALE);       // Needed for stealthChop
+  return true;
+}
+
 float Holonome::getSpeedA(void)
 {
     return StepperA->getSpeed();

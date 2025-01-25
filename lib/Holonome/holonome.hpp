@@ -19,7 +19,14 @@
 #define ACC    4.0
 #define DEC    4.0
 
-class Holonome
+#define R_SENSE 0.11f        // R-Sense in OHM. Match to your driver
+#define RMSCURRENT 1500      // RMS current of Stepper Coil in mA
+#define MICROSTEPS 8         // # of microsteps
+#define TOFF 5               // Enables driver in software - 3, 5
+#define EN_SPREADCYCLE false // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
+#define PWM_AUTOSCALE true   // Needed for stealthChop
+
+class Holonome 
 {
     public:
         Holonome(PinName Uart_TX_pin, PinName Uart_RX_pin, 
@@ -32,6 +39,7 @@ class Holonome
         TMC2209Stepper* StepperB = nullptr;
         TMC2209Stepper* StepperC = nullptr;
 
+        bool    setupSteppers(void);
         void    getPosition(void);
         float   getPositionX(void);
         float   getPositionY(void);
