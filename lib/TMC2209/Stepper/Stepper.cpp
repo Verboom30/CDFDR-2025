@@ -5,12 +5,24 @@
 //***********************************/************************************
 Stepper::Stepper(PinName clk, PinName dir): _clk(clk) , _dir(dir)
 {
+
+    
     _clk = 1;
+    _dir = 0;
     _state = STOP;
     _pos = 0;
     _steps = 0;
-    _spd = 400;
+    _spd = 0;
     _dt0 = 0;
+    _n=0;
+    _nStartDec=0;
+    _dtn=0;
+    _dtmin=0;
+    _dt0=0;
+    _i=0;
+    _acc =0;
+    _dec =0;
+    _Pos_Cible_Done = 1;
 }
 
 //***********************************/************************************
@@ -18,8 +30,10 @@ Stepper::Stepper(PinName clk, PinName dir): _clk(clk) , _dir(dir)
 //***********************************/************************************
 void Stepper::setSpeed(float speed)
 {
+    //stop();   
     _spd = (speed<0) ? -speed : speed;  //speed must be unsigned
     if(_spd)_dtmin = 1000000/_spd;      //fin min delay (max spd)
+    //handler();  
 }
 
 float Stepper::getSpeed(void)
@@ -29,6 +43,7 @@ float Stepper::getSpeed(void)
 
 void Stepper::setAcceleration(float acc)
 {
+  
     _acc = (acc<0) ? -acc : acc;            //acceleration must be unsigned
     if(_acc)_dt0 = 676000 * sqrt(2.0/_acc); //Equation 15 [µs] instead Equation 7
 }
@@ -48,9 +63,25 @@ float Stepper::getDeceleration(void)
     return _dec;
 }
 
+void Stepper::setPosition(int position)
+{
+    _pos = position;
+}
 void Stepper::setPositionZero(void)
 {
+    _state = STOP;
     _pos = 0;
+    _steps = 0;
+    _spd = 0;
+    _dt0 = 0;
+    _n=0;
+    _nStartDec=0;
+    _dtn=0;
+    _dtmin=0;
+    _dt0=0;
+    _i=0;
+    _acc =0;
+    _dec =0;
 }
 
 int Stepper::getPosition(void)
@@ -58,20 +89,39 @@ int Stepper::getPosition(void)
     return _pos;
 }
 
+int Stepper::getStep(void)
+{
+    return _steps;
+}
+
 bool Stepper::stopped(void)
 {
     return (_state == STOP) ? true : false;
 }
 
+bool Stepper::getPosCibleDone(void)
+{
+    return (_Pos_Cible_Done == 1) ? true : false;
+}
+
+
 //***********************************/************************************
 //                             Public Methods                           //
 //***********************************/************************************
+
+void Stepper::run(void)
+{
+    handler();    
+}
+
 void Stepper::stop(void)
 {   
     _clk = 1;
     remove();           //stop timer
     _state = STOP;      //update state machine 
     _steps = 0;         //reset total steps per move
+   
+    
 }
 
 void Stepper::rotate(bool direction)
@@ -95,6 +145,7 @@ void Stepper::move(int steps)
         _dir = CW;          //set output pin direction value
         _steps = steps;     //total steps per move
     }
+    _Pos_Cible_Done =0;
     handler();              //start thread
 }
 
@@ -108,7 +159,7 @@ void Stepper::goesTo(int position)
 //***********************************/************************************
 void Stepper::handler(void)
 {
-    static float i;
+   
     
     switch(_state)
     {
@@ -132,18 +183,18 @@ void Stepper::handler(void)
                 _nStartDec = (_steps * _dec) / (_dec + _acc);   //Equation 19 after how many step we must start decelerate  
                 if(_nStartDec > nToSpeed)_nStartDec = _steps - ((nToSpeed*_acc)/_dec);  //if speed can be reach Equation 17                
             }
-            i = _dtn;
+            _i = _dtn;
         break;
         
         case ACCEL:
             //_dtn -=  (_dtn*2.0) / ((_n<<2)+1);   //Equation 20 find next delay
-            i-= i*2.0 / ((_n<<2)+1);
-            _dtn = i;
+            _i-= _i*2.0 / ((_n<<2)+1);
+            _dtn = _i;
             
             if((unsigned int)_dtn <= _dtmin) //if max speed reached
             {
                  _dtn = _dtmin;
-                 i = _dtn;
+                 _i = _dtn;
                 _state = CRUISE;    //constant phase
             }
             if(_steps && _dec && _n >= _nStartDec)_state = DECEL; //chech when must start decelerate
@@ -155,8 +206,8 @@ void Stepper::handler(void)
         
         case DECEL:
             //_dtn +=  (_dtn*2) / (((_steps-_n)<<2)+1);  //Equation 20 find next delay
-            i+= (i*2.0) / (((_steps-_n)<<2)+1);
-            _dtn = i;
+            _i+= (_i*2.0) / (((_steps-_n)<<2)+1);
+            _dtn = _i;
         break;    
     }
     
@@ -169,7 +220,10 @@ void Stepper::handler(void)
     _pos += (_dir<<1)-1;                    //set new position +1 if cw; -1 if ccw
     _clk = 1;                              //toggle step out pin
 
-    if(_steps && _n >= _steps)stop();       //check for motor stop
+    if(_steps && _n >= _steps){
+        _Pos_Cible_Done = 1;
+        stop();       //check for motor stop
+    }
 }
 
 unsigned int Stepper::nTo(float speed,float acc)
@@ -179,3 +233,5 @@ unsigned int Stepper::nTo(float speed,float acc)
     
     return (!acc || !speed) ? 0 : (speed * speed) / (2 * acc); //Equation 16 step number n as a function of speed & acceleration
 }
+
+

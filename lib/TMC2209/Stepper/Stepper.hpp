@@ -61,6 +61,11 @@ public:
     /** Stop the motor as fast as possible
     */
     void stop(void);
+
+    /** Run the motor 
+     * 
+    */
+    void run(void);
     
     /**Set Rotation Speed
     * @param speed [steps/sec]
@@ -76,6 +81,8 @@ public:
     * @param dec deceleration [steps/sec²] (0 = infinite deceleration last step @ max speed)
     */
     void setDeceleration(float dec);
+
+    void setPosition(int position);
     
     /**Give Origin for motor absolute movement
     */
@@ -85,11 +92,18 @@ public:
     * @returns true if motor stopped
     */  
     bool stopped(void);
+
+    bool getPosCibleDone(void);
     
     /**Get absolute position from origin
     * @returns position [steps] from origin set by setPositionZero()
     */
     int getPosition(void);
+
+    /**Get absolute step
+    * @returns steps
+    */
+    int getStep(void);
     
     /**Get Acceleration
     * @returns acceleration [steps/sec²]
@@ -112,7 +126,7 @@ public:
     typedef enum {CW=1,CCW=0} direction;
     
 protected:
-    unsigned int nTo(float speed,float acc);
+    
      
 private:
     float _acc;                             //Acceleration [step/s²]
@@ -125,10 +139,13 @@ private:
     unsigned int _dt0;                      //initial delay [µs]
     unsigned int _dtmin;                    //delay minimum [µs]
     unsigned int _dtn;                             //current delay
+    int _Pos_Cible_Done;
+    float _i;
     int _pos;                               //motor position
     unsigned int _n;                        //steps counters
     unsigned int _nStartDec;                //steps to decelerate
     virtual void handler();
+    unsigned int nTo(float speed,float acc);
 
 };
 

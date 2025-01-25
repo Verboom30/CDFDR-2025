@@ -9,7 +9,6 @@
 
 TMC2209Stepper StepperA(PIN_STEP,PIN_DIR,TMC_UART_TX, TMC_UART_RX, R_SENSE, 0x00);
 
-
 int main()
 {
   printf("connecting to TMC-Module...\r\n");
