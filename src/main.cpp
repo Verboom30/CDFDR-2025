@@ -14,7 +14,7 @@ Holonome RobotHolonome(TMC_UART_TX, TMC_UART_RX,
 
 int main()
 {
-   //RobotHolonome.setupSteppers();
+   RobotHolonome.setupSteppers();
   // RobotHolonome.stop();
   // while(!RobotHolonome.waitAck());
   // RobotHolonome.setPositionZero();
