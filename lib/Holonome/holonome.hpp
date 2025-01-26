@@ -105,6 +105,11 @@ class Holonome
         // void routine_stepperB(void);
         // void routine_stepperC(void); 
         void routine_holonome(void);
+    protected:
+        //***********************************/************************************
+        //                          Protected Methods                           //
+        //***********************************/************************************
+         SerialTMC * SWSerial = nullptr;
         
         
 };

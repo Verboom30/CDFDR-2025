@@ -3,6 +3,7 @@
 #include "mbed.h"
 #include "TMC2209_bitfields.hpp"
 #include "Stepper/Stepper.hpp"
+#include "Serial/SerialTMC.hpp"
 #define INIT_REGISTER(REG) REG##_t REG##_register = REG##_t
 #define INIT2209_REGISTER(REG) TMC2209_n::REG##_t REG##_register = TMC2209_n::REG##_t
 class TMC2209Stepper : public Stepper 
@@ -11,16 +12,12 @@ class TMC2209Stepper : public Stepper
     //***********************************/************************************
     //                         Constructors                                 //
     //***********************************/************************************    
-    TMC2209Stepper (PinName step_pin, PinName dir_pin,PinName Uart_TX_pin, PinName Uart_RX_pin, float RS, uint8_t Slave_Addr);
+    TMC2209Stepper (PinName step_pin, PinName dir_pin, SerialTMC*SWSerial, float RS, uint8_t Slave_Addr);
     //***********************************/************************************
     //                             Public Methods                           //
     //***********************************/************************************
     void begin();
-    void beginSerial(uint32_t baudrate);
    
-    void write(uint8_t addr, uint32_t dataWrite);
-    uint32_t read(uint8_t addr);
-
     void rms_current(uint16_t mA);
     void microsteps(uint16_t ms);
 
@@ -122,7 +119,6 @@ class TMC2209Stepper : public Stepper
     uint8_t pwm_ofs_auto();
     uint8_t pwm_grad_auto();
 
-    bool CRCerror = false;
   protected:
     //***********************************/************************************
     //                          Protected Methods                           //
@@ -133,15 +129,13 @@ class TMC2209Stepper : public Stepper
 
     INIT_REGISTER(IHOLD_IRUN)            {{.sr=0}}; // IHOLD_IRUN_register 32b
     
-    BufferedSerial * SWSerial = nullptr;
+    SerialTMC * SWSerial = nullptr;
     
-    int16_t serial_single_read();
-    uint8_t serial_single_write(const uint8_t data);
-    uint8_t calcCRC(uint8_t datagram[], uint8_t len);
-    uint64_t ReadResquest(uint8_t datagram[], const uint8_t len, uint16_t timeout);
+   
 
     static constexpr uint8_t TMC_READ = 0x00, TMC_WRITE = 0x80;
-    static constexpr uint8_t  TMC2209_SYNC = 0x05, TMC2209_SLAVE_ADDR = 0x00;
+    static constexpr uint8_t  TMC2209_SYNC = 0x05;
+    const uint8_t TMC2209_SLAVE_ADDR;
     static constexpr uint8_t replyDelay = 2;  //ms
     static constexpr uint8_t max_retries = 2;
     static constexpr uint8_t abort_window = 5; //5ms timeout

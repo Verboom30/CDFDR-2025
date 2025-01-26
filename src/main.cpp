@@ -6,7 +6,7 @@
 
 
 
-Holonome RobotHolonome(TMC_UART_TX, TMC_UART_TX, 
+Holonome RobotHolonome(TMC_UART_TX, TMC_UART_RX, 
             STEP_A, DIR_A, 0x00,
             STEP_B, DIR_B, 0x01,
             STEP_C, DIR_C, 0x02,
@@ -14,11 +14,11 @@ Holonome RobotHolonome(TMC_UART_TX, TMC_UART_TX,
 
 int main()
 {
-  RobotHolonome.setupSteppers();
-  RobotHolonome.stop();
-  while(!RobotHolonome.waitAck());
-  RobotHolonome.setPositionZero();
-  while(!RobotHolonome.waitAck());
+   //RobotHolonome.setupSteppers();
+  // RobotHolonome.stop();
+  // while(!RobotHolonome.waitAck());
+  // RobotHolonome.setPositionZero();
+  // while(!RobotHolonome.waitAck());
 
  
 

@@ -8,35 +8,37 @@ Holonome::Holonome(PinName Uart_TX_pin, PinName Uart_RX_pin,
             PinName C_step_pin, PinName C_dir_pin, uint8_t C_Slave_Addr,
             float RS)
 {
+    SerialTMC *SWSerialObj = new SerialTMC(Uart_TX_pin, Uart_RX_pin);
+    SWSerial = SWSerialObj;
     // StepperA_thread.start(callback(this, &Holonome::routine_stepperA));
     // StepperB_thread.start(callback(this, &Holonome::routine_stepperB));
     // StepperC_thread.start(callback(this, &Holonome::routine_stepperC));
-    TMC2209Stepper* StepperAObj = new TMC2209Stepper(A_step_pin, A_dir_pin, Uart_TX_pin, Uart_RX_pin, RS, A_Slave_Addr);
-    TMC2209Stepper* StepperBObj = new TMC2209Stepper(B_step_pin, B_dir_pin, Uart_TX_pin, Uart_RX_pin, RS, B_Slave_Addr);
-    TMC2209Stepper* StepperCObj = new TMC2209Stepper(C_step_pin, C_dir_pin, Uart_TX_pin, Uart_RX_pin, RS, C_Slave_Addr);
-    StepperA = StepperAObj;
-    StepperB = StepperBObj;
-    StepperC = StepperCObj;
-    routine.start(callback(this, &Holonome::routine_holonome));
+    // TMC2209Stepper* StepperAObj = new TMC2209Stepper(A_step_pin, A_dir_pin, SWSerial, RS, A_Slave_Addr);
+    // TMC2209Stepper* StepperBObj = new TMC2209Stepper(B_step_pin, B_dir_pin, SWSerial, RS, B_Slave_Addr);
+    // TMC2209Stepper* StepperCObj = new TMC2209Stepper(C_step_pin, C_dir_pin, SWSerial, RS, C_Slave_Addr);
+    // StepperA = StepperAObj;
+    // StepperB = StepperBObj;
+    // StepperC = StepperCObj;
+    // routine.start(callback(this, &Holonome::routine_holonome));
 
-    _AckStpA =false;
-    _AckStpB =false;
-    _AckStpC =false;
-    _Cmd ="";
-    _Alpha = 0;
-    _positionY  =0;
-    _positionX  =0;
-    _positionY_Save  =0;
-    _positionX_Save  =0;
-    _cibleposX       =0;
-    _cibleposY       =0;
-    _Alpha_Save      =0;
-    _SpeedX     =0;
-    _SpeedY     =0;
-    _SpeedAlpha =0;
-    _MovepositionY =0;
-    _MovepositionX =0;
-    _MoveAlpha=0;
+    // _AckStpA =false;
+    // _AckStpB =false;
+    // _AckStpC =false;
+    // _Cmd ="";
+    // _Alpha = 0;
+    // _positionY  =0;
+    // _positionX  =0;
+    // _positionY_Save  =0;
+    // _positionX_Save  =0;
+    // _cibleposX       =0;
+    // _cibleposY       =0;
+    // _Alpha_Save      =0;
+    // _SpeedX     =0;
+    // _SpeedY     =0;
+    // _SpeedAlpha =0;
+    // _MovepositionY =0;
+    // _MovepositionX =0;
+    // _MoveAlpha=0;
 
    
 }
@@ -48,24 +50,30 @@ Holonome::Holonome(PinName Uart_TX_pin, PinName Uart_RX_pin,
 bool Holonome::setupSteppers(void)
 {
 
-  StepperA->begin();
-  StepperB->begin();
-  StepperC->begin();
-
+  
+  SWSerial->beginSerial(155200);
   //read and check version - must be 0x21
   uint8_t tmc_versionA = StepperA->version();
+  uint8_t CRCerrorA = SWSerial->CRCerror;
   uint8_t tmc_versionB = StepperB->version();
+  uint8_t CRCerrorB = SWSerial->CRCerror;
   uint8_t tmc_versionC = StepperC->version();
+  uint8_t CRCerrorC = SWSerial->CRCerror;
+
+
   printf("TMC-VersionA: %02X\r\n",tmc_versionA);
   printf("TMC-VersionB: %02X\r\n",tmc_versionB);
   printf("TMC-VersionC: %02X\r\n",tmc_versionC);
   if (tmc_versionA != 0x21 or tmc_versionB != 0x21 or tmc_versionC != 0x21) {
     printf("Wrong TMC-Version(not 0x21) or communication error!! STOPPING!!!\r\n");
-    if (StepperA->CRCerror or StepperB->CRCerror or StepperC->CRCerror) {
+    if (CRCerrorA or CRCerrorB or CRCerrorC) {
       printf("CRC-Error!!!\r\n");
       return false;
     }
   }
+  StepperA->begin();
+  StepperB->begin();
+  StepperC->begin();
   //***********************************/************************************
   // StepperA                                                              /
   //***********************************/************************************

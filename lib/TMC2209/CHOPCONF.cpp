@@ -1,13 +1,13 @@
 #include "TMC2209.hpp"
 
-#define SET_REG(SETTING) CHOPCONF_register.SETTING = B; TMC2209Stepper::write(CHOPCONF_register.address, CHOPCONF_register.sr)
+#define SET_REG(SETTING) CHOPCONF_register.SETTING = B; SWSerial->write(TMC2209_SLAVE_ADDR, CHOPCONF_register.address, CHOPCONF_register.sr)
 
 void TMC2209Stepper::CHOPCONF(uint32_t input) {
     CHOPCONF_register.sr = input;
-    write(CHOPCONF_register.address, CHOPCONF_register.sr);
+    SWSerial->write(TMC2209_SLAVE_ADDR,CHOPCONF_register.address, CHOPCONF_register.sr);
 }
 uint32_t TMC2209Stepper::CHOPCONF() {
-    return read(CHOPCONF_register.address);
+    return  SWSerial->read(TMC2209_SLAVE_ADDR,CHOPCONF_register.address);
 }
 void TMC2209Stepper::toff   ( uint8_t  B )  { SET_REG(toff);    }
 void TMC2209Stepper::hstrt  ( uint8_t  B )  { SET_REG(hstrt);   }

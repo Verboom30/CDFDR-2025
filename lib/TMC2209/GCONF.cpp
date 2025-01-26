@@ -1,13 +1,13 @@
 #include "TMC2209.hpp"
 
-#define SET_REG(SETTING) GCONF_register.SETTING = B; TMC2209Stepper::write(GCONF_register.address, GCONF_register.sr)
+#define SET_REG(SETTING) GCONF_register.SETTING = B; SWSerial->write(TMC2209_SLAVE_ADDR,GCONF_register.address, GCONF_register.sr)
 
 uint32_t TMC2209Stepper::GCONF() {
-    return read(GCONF_register.address);
+    return SWSerial->read(TMC2209_SLAVE_ADDR,GCONF_register.address);
 }
 void TMC2209Stepper::GCONF(uint32_t input) {
     GCONF_register.sr = input;
-    write(GCONF_register.address, GCONF_register.sr);
+    SWSerial->write(TMC2209_SLAVE_ADDR,GCONF_register.address, GCONF_register.sr);
 }
 
 void TMC2209Stepper::I_scale_analog(bool B)     { SET_REG(i_scale_analog);  }
