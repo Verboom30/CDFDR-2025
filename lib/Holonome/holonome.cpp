@@ -8,17 +8,14 @@ Holonome::Holonome(PinName Uart_TX_pin, PinName Uart_RX_pin,
             PinName C_step_pin, PinName C_dir_pin, uint8_t C_Slave_Addr,
             float RS)
 {
-    SerialTMC *SWSerialObj = new SerialTMC(Uart_TX_pin, Uart_RX_pin);
-    SWSerialHolonome = SWSerialObj;
+
+    SWSerialHolonome =new SerialTMC(Uart_TX_pin, Uart_RX_pin);
     // StepperA_thread.start(callback(this, &Holonome::routine_stepperA));
     // StepperB_thread.start(callback(this, &Holonome::routine_stepperB));
     // StepperC_thread.start(callback(this, &Holonome::routine_stepperC));
-    TMC2209Stepper* StepperAObj = new TMC2209Stepper(A_step_pin, A_dir_pin, SWSerialHolonome, RS, A_Slave_Addr);
-    TMC2209Stepper* StepperBObj = new TMC2209Stepper(B_step_pin, B_dir_pin, SWSerialHolonome, RS, B_Slave_Addr);
-    TMC2209Stepper* StepperCObj = new TMC2209Stepper(C_step_pin, C_dir_pin, SWSerialHolonome, RS, C_Slave_Addr);
-    StepperA = StepperAObj;
-    StepperB = StepperBObj;
-    StepperC = StepperCObj;
+    StepperA = new TMC2209Stepper(A_step_pin, A_dir_pin, SWSerialHolonome, RS, A_Slave_Addr);
+    StepperB = new TMC2209Stepper(B_step_pin, B_dir_pin, SWSerialHolonome, RS, B_Slave_Addr);
+    StepperC = new TMC2209Stepper(C_step_pin, C_dir_pin, SWSerialHolonome, RS, C_Slave_Addr);
     routine.start(callback(this, &Holonome::routine_holonome));
 
     _AckStpA =false;
@@ -52,31 +49,11 @@ bool Holonome::setupSteppers(void)
 
   
   SWSerialHolonome->beginSerial(155200);
+  wait_us(10*1000);
   StepperA->begin();
   StepperB->begin();
   StepperC->begin();
-  //read and check version - must be 0x21
-   uint8_t tmc_versionA = StepperA->version();
-   uint8_t CRCerrorA = SWSerialHolonome->CRCerror;
-   uint8_t tmc_versionB = StepperB->version();
-   uint8_t CRCerrorB = SWSerialHolonome->CRCerror;
-  uint8_t tmc_versionC = StepperC->version();
-  uint8_t CRCerrorC = SWSerialHolonome->CRCerror;
-
-
-  printf("TMC-VersionA: %02X\r\n",tmc_versionA);
-  printf("TMC-VersionB: %02X\r\n",tmc_versionB);
-  printf("TMC-VersionC: %02X\r\n",tmc_versionC);
-  if (tmc_versionA != 0x21 or tmc_versionB != 0x21 or tmc_versionC != 0x21) {
-    printf("Wrong TMC-Version(not 0x21) or communication error!! STOPPING!!!\r\n");
-    if (CRCerrorA or CRCerrorB or CRCerrorC) {
-      printf("CRC-Error!!!\r\n");
-      printf("CRC-ErrorA:%d, CRC-ErrorB:%d, CRC-ErrorC:%d\r\n",CRCerrorA,CRCerrorB,CRCerrorC);
-      return false;
-    }
-  }
-
-  
+ 
   //***********************************/************************************
   // StepperA                                                              /
   //***********************************/************************************
@@ -84,7 +61,7 @@ bool Holonome::setupSteppers(void)
   StepperA->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
                                        // 1110, 800
                                        // working: 800 12V/0,6Amax,  Speed up to 5200=4U/min
-  StepperA->microsteps(MICROSTEPS);    // Set microsteps to 1:Fullstep ... 256: 1/256th
+  StepperA->microsteps(MSTEP);    // Set microsteps to 1:Fullstep ... 256: 1/256th
   StepperA->en_spreadCycle(EN_SPREADCYCLE);     // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
   StepperA->pwm_autoscale(PWM_AUTOSCALE);       // Needed for stealthChop
 
@@ -95,7 +72,7 @@ bool Holonome::setupSteppers(void)
   StepperB->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
                                        // 1110, 800
                                        // working: 800 12V/0,6Amax,  Speed up to 5200=4U/min
-  StepperB->microsteps(MICROSTEPS);    // Set microsteps to 1:Fullstep ... 256: 1/256th
+  StepperB->microsteps(MSTEP);    // Set microsteps to 1:Fullstep ... 256: 1/256th
   StepperB->en_spreadCycle(EN_SPREADCYCLE);     // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
   StepperB->pwm_autoscale(PWM_AUTOSCALE);       // Needed for stealthChop
 
@@ -107,7 +84,7 @@ bool Holonome::setupSteppers(void)
   StepperC->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
                                        // 1110, 800
                                        // working: 800 12V/0,6Amax,  Speed up to 5200=4U/min
-  StepperC->microsteps(MICROSTEPS);    // Set microsteps to 1:Fullstep ... 256: 1/256th
+  StepperC->microsteps(MSTEP);    // Set microsteps to 1:Fullstep ... 256: 1/256th
   StepperC->en_spreadCycle(EN_SPREADCYCLE);     // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
   StepperC->pwm_autoscale(PWM_AUTOSCALE);       // Needed for stealthChop
   return true;
@@ -269,7 +246,7 @@ void Holonome::goesTo(int positionX, int positionY, int Alpha)
      setPositionZero();
     _SpeedX = (float((_MovepositionX))/(abs(_MovepositionX)+abs(_MovepositionY)+abs(_MoveAlpha)))*SPEED;
     _SpeedY = (float((_MovepositionY))/(abs(_MovepositionX)+abs(_MovepositionY)+abs(_MoveAlpha)))*SPEED;
-    _SpeedAlpha = (float((_MoveAlpha))/(abs(_MovepositionX)+abs(_MovepositionY)+abs(_MoveAlpha)))*float(2*SPEED/RADIUS);
+    _SpeedAlpha = (float((_MoveAlpha))/(abs(_MovepositionX)+abs(_MovepositionY)+abs(_MoveAlpha)))*float(SPEED/RADIUS);
     _Cmd = "GOTO";
 }
 
@@ -286,7 +263,7 @@ void Holonome::move(int positionX, int positionY, int Alpha)
     setPositionZero();
     _SpeedX = (float((_MovepositionX))/(abs(_MovepositionX)+abs(_MovepositionY)+abs(_MoveAlpha)))*SPEED;
     _SpeedY = (float((_MovepositionY))/(abs(_MovepositionX)+abs(_MovepositionY)+abs(_MoveAlpha)))*SPEED;
-    _SpeedAlpha = (float(_MoveAlpha)/(abs(_MovepositionX)+abs(_MovepositionY)+abs(_MoveAlpha)))*float(2*SPEED/RADIUS);
+    _SpeedAlpha = (float(_MoveAlpha)/(abs(_MovepositionX)+abs(_MovepositionY)+abs(_MoveAlpha)))*float(SPEED/RADIUS);
     _Cmd = "MOVE";
    
 }

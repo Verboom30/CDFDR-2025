@@ -8,20 +8,19 @@
 
 #define PI      3.14159265
 #define RADIUS  121.0 // robot wheel-base radius
-#define MSTEP   8
 #define RSTEP   198.5
 #define RWHEEL  27.5 
 #define REDUC   0.5
 #define KSTP     ((PI*2.0*RWHEEL/(RSTEP*MSTEP))*REDUC)
-#define SPEED   800.0 // max 50000 Mstepper 16 3200Ma
+#define SPEED   200.0 // max 50000 Mstepper 16 3200Ma
 #define THETA   60.0 // trop angle sur le A
 
 #define ACC    4.0
 #define DEC    4.0
 
 #define R_SENSE 0.11f        // R-Sense in OHM. Match to your driver
-#define RMSCURRENT 1500      // RMS current of Stepper Coil in mA
-#define MICROSTEPS 8         // # of microsteps
+#define RMSCURRENT 500       // RMS current of Stepper Coil in mA
+#define MSTEP   16
 #define TOFF 5               // Enables driver in software - 3, 5
 #define EN_SPREADCYCLE false // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
 #define PWM_AUTOSCALE true   // Needed for stealthChop
@@ -35,10 +34,10 @@ class Holonome
             PinName C_step_pin, PinName C_dir_pin, uint8_t C_Slave_Addr,
             float RS);
 
-        TMC2209Stepper* StepperA = nullptr;
-        TMC2209Stepper* StepperB = nullptr;
-        TMC2209Stepper* StepperC = nullptr;
-        SerialTMC * SWSerialHolonome = nullptr;
+        TMC2209Stepper* StepperA;
+        TMC2209Stepper* StepperB;
+        TMC2209Stepper* StepperC;
+        SerialTMC * SWSerialHolonome;
 
         bool    setupSteppers(void);
         void    getPosition(void);

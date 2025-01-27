@@ -4,6 +4,7 @@
 #include "TMC2209_bitfields.hpp"
 #include "Stepper/Stepper.hpp"
 #include "Serial/SerialTMC.hpp"
+#include <inttypes.h>
 #define INIT_REGISTER(REG) REG##_t REG##_register = REG##_t
 #define INIT2209_REGISTER(REG) TMC2209_n::REG##_t REG##_register = TMC2209_n::REG##_t
 class TMC2209Stepper : public Stepper 
@@ -16,7 +17,7 @@ class TMC2209Stepper : public Stepper
     //***********************************/************************************
     //                             Public Methods                           //
     //***********************************/************************************
-    void begin();
+    bool begin();
    
     void rms_current(uint16_t mA);
     void microsteps(uint16_t ms);
@@ -136,8 +137,8 @@ class TMC2209Stepper : public Stepper
     static constexpr uint8_t TMC_READ = 0x00, TMC_WRITE = 0x80;
     static constexpr uint8_t  TMC2209_SYNC = 0x05;
     const uint8_t TMC2209_SLAVE_ADDR;
-    static constexpr uint8_t replyDelay = 2;  //ms
-    static constexpr uint8_t max_retries = 2;
+    static constexpr uint8_t replyDelay = 4;  //ms
+    static constexpr uint8_t max_retries = 4;
     static constexpr uint8_t abort_window = 5; //5ms timeout
     const float Rsense;
     float holdMultiplier = 0.5;

@@ -21,13 +21,23 @@ TMC2209Stepper::TMC2209Stepper(PinName step_pin, PinName dir_pin, SerialTMC*SWSe
 //***********************************/************************************
 //                             Public Methods                           //
 //***********************************/************************************
-void TMC2209Stepper::begin() {
-   
+bool TMC2209Stepper::begin() {
+
     pdn_disable(true);
     mstep_reg_select(true);
     //Wait to initialize
     wait_us(replyDelay*1000);
-
+    uint8_t tmc_version =version();
+    printf("TMC-Version@%02X: %02X\r\n",TMC2209_SLAVE_ADDR,tmc_version);
+    if (tmc_version != 0x21){
+      printf("Wrong TMC-Version(not 0x21) or communication error!! STOPPING!!!\r\n");
+      if(SWSerial->CRCerror){
+        printf("CRC-Error!!!\r\n");
+        printf("Read Uart 0x%08"PRIx32"\n",SWSerial->read(TMC2209_SLAVE_ADDR,TMC2209_n::IOIN_t::address));
+        return false;
+      }
+    }
+    return true;
 }
 
 uint32_t TMC2209Stepper::IOIN() {

@@ -24,7 +24,7 @@ class SerialTMC
     //***********************************/************************************
     //                          Protected Methods                           //
     //***********************************/************************************
-    BufferedSerial * SWSerial = nullptr;
+    BufferedSerial * SWSerial;
     int16_t serial_single_read();
     uint8_t serial_single_write(const uint8_t data);
     uint8_t calcCRC(uint8_t datagram[], uint8_t len);

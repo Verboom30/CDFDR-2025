@@ -4,9 +4,7 @@
 //***********************************/************************************
 SerialTMC::SerialTMC(PinName Uart_TX_pin, PinName Uart_RX_pin)
 {
-  BufferedSerial *SWSerialObj = new BufferedSerial(Uart_TX_pin, Uart_RX_pin);
-  SWSerial = SWSerialObj;
-  
+  SWSerial = new BufferedSerial(Uart_TX_pin, Uart_RX_pin);
 }
 //***********************************/************************************
 //                                Get Set                               //
