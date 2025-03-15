@@ -5,12 +5,12 @@
  */
 
 #include "TMCStepper.h"
+#include "BasicStepperDriver.h"
+
 
 #define EN_PIN           38 // Enable
-#define DIR_PIN          55 // Direction
-#define STEP_PIN         54 // Step
-#define SW_RX            2 // TMC2208/TMC2224 SoftwareSerial receive pin
-#define SW_TX            3 // TMC2208/TMC2224 SoftwareSerial transmit pin
+#define SW_RX            7 // TMC2208/TMC2224 SoftwareSerial receive pin
+#define SW_TX            8 // TMC2208/TMC2224 SoftwareSerial transmit pin
 #define SERIAL_PORT Serial // TMC2208/TMC2224 HardwareSerial port
 #define DRIVER_ADDRESS 0b00 // TMC2209 Driver address according to MS1 and MS2
 
@@ -20,26 +20,37 @@
                       // Panucatt BSD2660 uses 0.1
                       // Watterott TMC5160 uses 0.075
 
-// Select your stepper driver type
-//TMC2130Stepper driver(CS_PIN, R_SENSE);                           // Hardware SPI
-//TMC2130Stepper driver(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK); // Software SPI
-//TMC2660Stepper driver(CS_PIN, R_SENSE);                           // Hardware SPI
-//TMC2660Stepper driver(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK);
-//TMC5160Stepper driver(CS_PIN, R_SENSE);
-//TMC5160Stepper driver(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK);
+// Motor steps per revolution. Most steppers are 200 steps or 1.8 degrees/step
+#define MOTOR_STEPS 200
+#define RPM 150
 
-//TMC2208Stepper driver(&SERIAL_PORT, R_SENSE);                     // Hardware Serial
-//TMC2208Stepper driver(SW_RX, SW_TX, R_SENSE);                     // Software serial
-//TMC2209Stepper driver(&SERIAL_PORT, R_SENSE, DRIVER_ADDRESS);
+// Since microstepping is set externally, make sure this matches the selected mode
+// If it doesn't, the motor will move at a different RPM than chosen
+// 1=full step, 2=half step etc.
+
+
+// All the wires needed for full functionality
+#define DIR 2
+#define STEP 3
+//Uncomment line to use enable/disable functionality
+//#define SLEEP 13
+
+#define RMSCURRENT 3000       // RMS current of Stepper Coil in mA
+#define MSTEP   16
+#define TOFF 5               // Enables driver in software - 3, 5
+#define EN_SPREADCYCLE false // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
+#define PWM_AUTOSCALE true   // Needed for stealthChop
+
 TMC2209Stepper driver(SW_RX, SW_TX, R_SENSE, DRIVER_ADDRESS);
+
+// 2-wire basic config, microstepping is hardwired on the driver
+BasicStepperDriver stepper(MOTOR_STEPS, DIR, STEP);
 
 
 void setup() {
   pinMode(0, OUTPUT);
   pinMode(1, OUTPUT);   
   pinMode(EN_PIN, OUTPUT);
-  pinMode(STEP_PIN, OUTPUT);
-  pinMode(DIR_PIN, OUTPUT);
   digitalWrite(0, HIGH); 
   digitalWrite(1, HIGH); 
   digitalWrite(EN_PIN, LOW);      // Enable driver in hardware
@@ -49,10 +60,10 @@ void setup() {
 //SERIAL_PORT.begin(115200);      // HW UART drivers
   driver.beginSerial(115200);     // SW UART drivers
   Serial.begin(115200);
+  stepper.begin(RPM, MSTEP);
   delay(1000);
   
   Serial.println("connecting to TMC-Module...");
-  //driver.begin();                // Initialize driver
   
   int tmc_version = driver.version();
   Serial.print("TMC-Version :");
@@ -63,8 +74,14 @@ void setup() {
                Serial.println("CRC-Error!!!");
            }
    }
-
-  driver.toff(5);                 // Enables driver in software
+  driver.begin();                // Initialize driver
+  driver.toff(TOFF);                 // Enables driver in software
+  driver.rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
+  // 1110, 800
+  // working: 800 12V/0,6Amax,  Speed up to 5200=4U/min
+  driver.microsteps(MSTEP);    // Set microsteps to 1:Fullstep ... 256: 1/256th
+  driver.en_spreadCycle(EN_SPREADCYCLE);     // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
+  driver.pwm_autoscale(PWM_AUTOSCALE);       // Needed for stealthChop
   
   
 }
@@ -72,5 +89,6 @@ void setup() {
 bool shaft = false;
 
 void loop() {
-  
+  stepper.move(-MOTOR_STEPS*MSTEP);
+  delay(300);
 }

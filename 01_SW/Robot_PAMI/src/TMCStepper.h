@@ -38,18 +38,18 @@
 	#include <SoftwareSerial.h>
 #endif
 
-#include "source/SERIAL_SWITCH.h"
-#include "source/SW_SPI.h"
+#include "lib/TMC2209/SERIAL_SWITCH.h"
+#include "lib/TMC2209/SW_SPI.h"
 
 #pragma GCC diagnostic pop
 
-#include "source/TMC2130_bitfields.h"
-#include "source/TMC2160_bitfields.h"
-#include "source/TMC5130_bitfields.h"
-#include "source/TMC5160_bitfields.h"
-#include "source/TMC2208_bitfields.h"
-#include "source/TMC2209_bitfields.h"
-#include "source/TMC2660_bitfields.h"
+#include "lib/TMC2209/TMC2130_bitfields.h"
+#include "lib/TMC2209/TMC2160_bitfields.h"
+#include "lib/TMC2209/TMC5130_bitfields.h"
+#include "lib/TMC2209/TMC5160_bitfields.h"
+#include "lib/TMC2209/TMC2208_bitfields.h"
+#include "lib/TMC2209/TMC2209_bitfields.h"
+#include "lib/TMC2209/TMC2660_bitfields.h"
 
 #define INIT_REGISTER(REG) REG##_t REG##_register = REG##_t
 #define INIT2130_REGISTER(REG) TMC2130_n::REG##_t REG##_register = TMC2130_n::REG##_t
