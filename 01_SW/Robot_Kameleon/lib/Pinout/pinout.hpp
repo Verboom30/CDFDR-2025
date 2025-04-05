@@ -15,4 +15,10 @@
 // moteur C
 #define DIR_C  D4
 #define STEP_C D5 
+
+#define SEL_1 D13
+#define SEL_2 D12
+#define SEL_3 D11
+
+
 #endif // __PINOUT_H_

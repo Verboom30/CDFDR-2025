@@ -8,13 +8,17 @@
 
 Holonome RobotHolonome(TMC_UART_TX, TMC_UART_RX, 
             STEP_A, DIR_A, 0x00,
-            STEP_B, DIR_B, 0x01,
-            STEP_C, DIR_C, 0x02,
+            STEP_B, DIR_B, 0x00,
+            STEP_C, DIR_C, 0x01,
             R_SENSE);
 
 
 // SerialTMC *SWSerial = new SerialTMC(TMC_UART_TX, TMC_UART_RX);
 // TMC2209Stepper StepperA(STEP_A, DIR_A, SWSerial, R_SENSE, 0x01);
+DigitalOut sel_1(SEL_1);
+DigitalOut sel_2(SEL_2);
+DigitalOut sel_3(SEL_3);
+
 
 int main()
 {
@@ -36,17 +40,39 @@ int main()
   // StepperA.setDeceleration(5000/DEC);
   // StepperA.move(20000);
   // while(!StepperA.stopped());
+  sel_1 = 0;
+  sel_2 = 0;
+  sel_3 = 0;
+  wait_us(10*2000);
 
-   RobotHolonome.setupSteppers();
-  RobotHolonome.stop();
-  while(!RobotHolonome.waitAck());
-  RobotHolonome.setPositionZero();
-  while(!RobotHolonome.waitAck());
+  RobotHolonome.SWSerialHolonome->beginSerial(115200);
+  wait_us(10*1000);
+  sel_1 = 1;
+  sel_2 = 0;
+  sel_3 = 0;
+  RobotHolonome.StepperA->begin();
+  wait_us(10*1000);
+  sel_1 = 0;
+  sel_2 = 0;
+  sel_3 = 1;
+  RobotHolonome.StepperB->begin();
+  wait_us(10*1000);
+  sel_1 = 0;
+  sel_2 = 0;
+  sel_3 = 1;
+  RobotHolonome.StepperC->begin();
   
 
-  RobotHolonome.goesTo(0,0,90);
-  while(!RobotHolonome.waitAck());
-  while(!RobotHolonome.stopped());
+  //RobotHolonome.setupSteppers();
+  // RobotHolonome.stop();
+  // while(!RobotHolonome.waitAck());
+  // RobotHolonome.setPositionZero();
+  // while(!RobotHolonome.waitAck());
+  
+
+  // RobotHolonome.goesTo(0,0,90);
+  // while(!RobotHolonome.waitAck());
+  // while(!RobotHolonome.stopped());
  
 
   // while (1)
