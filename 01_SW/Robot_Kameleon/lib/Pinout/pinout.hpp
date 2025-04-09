@@ -40,8 +40,8 @@
 //***********************************/************************************
 
 #define PINCE_R1     PB_6  //SERVO4
-#define PINCE_R2     PC_9  //SERVO3
-#define PINCE_R3     PC_8  //SERVO2
+#define PINCE_R2     PC_8  //SERVO3
+#define PINCE_R3     PC_9  //SERVO2
 #define PINCE_R4     PB_5  //SERVO1
 #define FORK         PD_13 //SERVO5
 #define SUCKER_PUMP  D10   //SERVO6
