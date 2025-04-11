@@ -4,8 +4,7 @@
 //                         Constructors                                 //
 //***********************************/************************************
 
-TMC2209Stepper::TMC2209Stepper(PinName step_pin, PinName dir_pin, SerialTMC*SWSerial, float RS, uint8_t Slave_Addr) :
-  Stepper(step_pin,dir_pin),
+TMC2209Stepper::TMC2209Stepper(SerialTMC*SWSerial, float RS, uint8_t Slave_Addr) :
   Rsense(RS),
   TMC2209_SLAVE_ADDR(Slave_Addr)
 {
@@ -39,6 +38,7 @@ bool TMC2209Stepper::begin() {
     }
     return true;
 }
+
 
 uint32_t TMC2209Stepper::IOIN() {
     return SWSerial->read(TMC2209_SLAVE_ADDR, TMC2209_n::IOIN_t::address);

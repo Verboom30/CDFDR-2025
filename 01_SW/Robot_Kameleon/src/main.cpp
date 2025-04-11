@@ -2,18 +2,28 @@
 #include "pinout.hpp"
 #include "TMC2209.hpp"
 #include "Holonome.hpp"
+#include "UART_TMC.hpp"
 #include "lcd.hpp"
 #include "main_pck.hpp"
 #include <inttypes.h>
 
-Holonome RobotHolonome(TMC_UART_TX, TMC_UART_RX, 
-            STEP_A, DIR_A, 0x00,
-            STEP_B, DIR_B, 0x00,
-            STEP_C, DIR_C, 0x00,
-            R_SENSE);
+//SerialTMC *SWSerial = new SerialTMC(TMC_UART_TX, TMC_UART_RX);
+//TMC2209Stepper StepperA(STEP_A, DIR_A, SWSerial, R_SENSE, 0x00);
+// TMC2209Stepper StepperB(STEP_B, DIR_B, &SWSerial, R_SENSE, 0x01);
+// TMC2209Stepper StepperC(STEP_C, DIR_C, &SWSerial, R_SENSE, 0x02);
 
 
-// SerialTMC *SWSerial = new SerialTMC(TMC_UART_TX, TMC_UART_RX);
+
+Uart_TMC TMCSerial(TMC_UART_TX, TMC_UART_RX, SEL_UART_0, SEL_UART_1, SEL_UART_2, R_SENSE);
+// //***********************************/************************************
+// //                                 MOVE                                 //
+// //***********************************/************************************
+// Holonome RobotHolonome(StepperA, StepperB, StepperC);
+//***********************************/************************************
+//                                 MOVE                                  //
+//***********************************/************************************
+
+
 // TMC2209Stepper StepperA(STEP_A, DIR_A, SWSerial, R_SENSE, 0x01);
 // DigitalOut sel_1(SEL_1);
 // DigitalOut sel_2(SEL_2);
@@ -43,6 +53,12 @@ DigitalIn  SW_init(SW_INIT);
 DigitalIn  SW_team(SW_TEAM);
 DigitalIn  SW_bau(SW_BAU);
 DigitalIn  SW_Tirette(TIRETTE);
+//***********************************/************************************
+//                               STEPPER UART                           //
+//***********************************/************************************
+// DigitalOut sel_1 (SEL_UART_0);
+// DigitalOut sel_2 (SEL_UART_1);
+// DigitalOut sel_3 (SEL_UART_2);
 
 //***********************************/************************************
 //                                 SERVO                                //
@@ -54,13 +70,6 @@ PwmOut Pince_r4(PINCE_R4);
 PwmOut Fork(FORK);
 PwmOut Sucket_pump(SUCKER_PUMP);
 PwmOut Sucket_valve(SUCKER_VALVE);
-
-//***********************************/************************************
-//                               STEPPER UART                           //
-//***********************************/************************************
-DigitalOut Sel_TMC_0 (SEL_UART_0);
-DigitalOut Sel_TMC_1 (SEL_UART_1);
-DigitalOut Sel_TMC_2 (SEL_UART_2);
 
 //***********************************/************************************
 //                                 LIDAR                                //
@@ -104,9 +113,26 @@ int main()
   Sucket_valve.period_ms(20);
 
 
-
+  lcd.cls();
   lcd.printf("Kameleon\n");
   lcd.locate(0,1);
+  
+
+  //SWSerial->beginSerial(155200);
+ 
+  //StepperA.setup_stepper();
+  // StepperB.setup_stepper();
+  // StepperC.setup_stepper();
+  TMCSerial.setup_all_stepper();
+  Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
+ 
+ 
+
+  //RobotHolonome.setupSteppers();
+  // RobotHolonome.stop();
+  // while(!RobotHolonome.waitAck());
+  // RobotHolonome.setPositionZero();
+  // while(!RobotHolonome.waitAck());
   // SWSerial->beginSerial(155200);
   // wait_us(10*1000);
   // StepperA.begin();
@@ -162,11 +188,10 @@ int main()
 
   while (1)
   {
-    printf("SW_r1_up:%d SW_r2_up:%d SW_r3_up:%d SW_r4_up:%d SW_r1_dw:%d SW_r2_dw:%d SW_r3_dw:%d SW_r4_dw:%d SW_fork_up:%d SW_fork_mid:%d SW_fork_down:%d \n",
-    int(SW_r1_up), int(SW_r2_up), int(SW_r3_up), int(SW_r4_up),
-    int(SW_r1_down), int(SW_r2_down), int(SW_r3_down), int(SW_r4_down),
-    int(SW_fork_up), int(SW_fork_mid), int(SW_fork_down));
-
+    // printf("SW_r1_up:%d SW_r2_up:%d SW_r3_up:%d SW_r4_up:%d SW_r1_dw:%d SW_r2_dw:%d SW_r3_dw:%d SW_r4_dw:%d SW_fork_up:%d SW_fork_mid:%d SW_fork_down:%d \n",
+    // int(SW_r1_up), int(SW_r2_up), int(SW_r3_up), int(SW_r4_up),
+    // int(SW_r1_down), int(SW_r2_down), int(SW_r3_down), int(SW_r4_down),
+    // int(SW_fork_up), int(SW_fork_mid), int(SW_fork_down));
 
     // Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
     // Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
@@ -178,10 +203,6 @@ int main()
     // Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
     // Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
     // HAL_Delay (2000); // Attente de 2 secondes 
-
-   
-
-
-
+  
   }
 }

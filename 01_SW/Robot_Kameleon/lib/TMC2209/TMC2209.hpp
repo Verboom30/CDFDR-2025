@@ -7,13 +7,22 @@
 #include <inttypes.h>
 #define INIT_REGISTER(REG) REG##_t REG##_register = REG##_t
 #define INIT2209_REGISTER(REG) TMC2209_n::REG##_t REG##_register = TMC2209_n::REG##_t
-class TMC2209Stepper : public Stepper 
+
+
+#define R_SENSE 0.11f        // R-Sense in OHM. Match to your driver
+#define RMSCURRENT 500       // RMS current of Stepper Coil in mA
+#define MSTEP   16
+#define TOFF 5               // Enables driver in software - 3, 5
+#define EN_SPREADCYCLE false // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
+#define PWM_AUTOSCALE true   // Needed for stealthChop
+
+class TMC2209Stepper 
 {
   public:  
     //***********************************/************************************
     //                         Constructors                                 //
     //***********************************/************************************    
-    TMC2209Stepper (PinName step_pin, PinName dir_pin, SerialTMC*SWSerial, float RS, uint8_t Slave_Addr);
+    TMC2209Stepper (SerialTMC*SWSerial, float RS, const uint8_t Slave_Addr);
     //***********************************/************************************
     //                             Public Methods                           //
     //***********************************/************************************
@@ -149,6 +158,7 @@ class TMC2209Stepper : public Stepper
     //***********************************/************************************
     //                            Private Methods                           //
     //***********************************/************************************
+     
 };
 
 

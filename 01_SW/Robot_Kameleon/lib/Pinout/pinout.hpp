@@ -28,9 +28,9 @@
 //***********************************/************************************
 //                                 SWITCH                               //
 //***********************************/************************************
-#define TIRETTE    D13  
-#define SW_TEAM    D11 
-#define SW_BAU     D8 
+#define TIRETTE    PA_5 
+#define SW_TEAM    PA_7 
+#define SW_BAU     PF_12 
 #define SW_INIT    PE_0
 #define SW_SPARE_1 PE_2
 #define SW_SPARE_2 PA_0
@@ -44,34 +44,34 @@
 #define PINCE_R3     PC_9  //SERVO2
 #define PINCE_R4     PB_5  //SERVO1
 #define FORK         PD_13 //SERVO5
-#define SUCKER_PUMP  D10   //SERVO6
-#define SUCKER_VALVE D9    //SERVO7
+#define SUCKER_PUMP  PD_14   //SERVO6
+#define SUCKER_VALVE PD_15    //SERVO7
 #define SERVO_8      PE_5  //SERVO8
 //***********************************/************************************
 //                                 STEPPER                              //
 //***********************************/************************************
 // STEPPER_A
-#define STEP_A D6
-#define DIR_A  D7
+#define STEP_A PE_9
+#define DIR_A  PF_13
 
 // STEPPER_B
-#define STEP_B D5
-#define DIR_B  D4
+#define STEP_B PE_11
+#define DIR_B  PF_14
 
 // STEPPER_C
-#define STEP_C D3 
-#define DIR_C  D2
+#define STEP_C PE_13 
+#define DIR_C  PF_15
 
 // STEPPER_R1
 #define STEP_R1 PE_14
 #define DIR_R1  PB_1
 
 // STEPPER_R2
-#define STEP_R2 D15
+#define STEP_R2 PB_8
 #define DIR_R2  PC_2
 
 // STEPPER_R3
-#define STEP_R3 D14
+#define STEP_R3 PB_9
 #define DIR_R3  PF_4
 
 // STEPPER_R4
@@ -79,7 +79,7 @@
 #define DIR_R4  PB_2
 
 // STEPPER_FORK STEPPER5
-#define STEP_FORK D12
+#define STEP_FORK PA_6
 #define DIR_FORK  PD_11
 
 // STEPPER_SUCKER STEPPER6
@@ -101,8 +101,8 @@
 //                               UART BTH                               //
 //***********************************/************************************
 // Bluetooth HC-06
-#define BTH_UART_TX D1
-#define BTH_UART_RX D0
+#define BTH_UART_TX PG_9
+#define BTH_UART_RX PG_14
 //***********************************/************************************
 //                               SERIAL                                 //
 //***********************************/************************************
@@ -118,6 +118,7 @@
 //***********************************/************************************
 //                                 LCD                                  //
 //***********************************/************************************
+
 //Ldc Screen
 #define LCD_RS PC_10
 #define LCD_EN PC_11
