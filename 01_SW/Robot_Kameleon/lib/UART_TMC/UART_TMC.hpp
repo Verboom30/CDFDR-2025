@@ -3,7 +3,7 @@
 
 #include "mbed.h"
 #include "pinout.hpp"
-#include "../TMC2209/TMC2209.hpp"
+#include "TMC2209/TMC2209.hpp"
 
 class Uart_TMC
 {

@@ -2,7 +2,6 @@
 #define __TMC2209_H_
 #include "mbed.h"
 #include "TMC2209_bitfields.hpp"
-#include "Stepper/Stepper.hpp"
 #include "Serial/SerialTMC.hpp"
 #include <inttypes.h>
 #define INIT_REGISTER(REG) REG##_t REG##_register = REG##_t
