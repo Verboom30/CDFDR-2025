@@ -119,12 +119,11 @@
 //                                 LCD                                  //
 //***********************************/************************************
 //Ldc Screen
-#define LCD_RS PE_2
-#define LCD_EN PE_4
+#define LCD_RS PC_10
+#define LCD_EN PC_11
 #define LCD_D4 PC_12
 #define LCD_D5 PD_2
 #define LCD_D6 PG_2
 #define LCD_D7 PG_3
-
 
 #endif // __PINOUT_H_
