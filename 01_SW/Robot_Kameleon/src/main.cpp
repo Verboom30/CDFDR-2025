@@ -16,10 +16,10 @@ Uart_TMC TMCSerial(TMC_UART_TX, TMC_UART_RX, SEL_UART_0, SEL_UART_1, SEL_UART_2,
 // //***********************************/************************************
 Stepper *StepperA = new Stepper(STEP_A,DIR_A);
 Stepper *StepperB = new Stepper(STEP_B,DIR_B);
-Stepper StepperC(STEP_C,DIR_C);
+Stepper *StepperC = new Stepper(STEP_C,DIR_C);
 DigitalOut En_drive_N(ENABLE_DRIVE_N);
 DigitalOut En_step_N(ENABLE_STEP_N);
-//Holonome RobotHolonome(StepperA, StepperB, StepperC);
+Holonome RobotHolonome(StepperA, StepperB, StepperC);
 //***********************************/************************************
 //                              LIMIT SWITCH                            //
 //***********************************/************************************
@@ -64,7 +64,32 @@ DigitalOut led_lidar(LIDAR_LED);
 //***********************************/************************************
 LCD lcd(LCD_RS,LCD_EN,LCD_D4,LCD_D5,LCD_D6,LCD_D7, LCD16x2); // rs, e, d4-d7
 
+Thread show_pos_thread;
 
+void showPostion(void)
+{
+  while (1)
+  {
+    // printf("PosX:%f PosY:%f Alpha:%f  SpeedX:%f SpeedY:%f SpeedAlpha:%f SpeedA:%f SpeedB:%f SpeedC:%f \n"
+    // ,RobotMove->getPositionX(),RobotMove->getPositionY(),RobotMove->getAlpha(),RobotMove->getSpeedX(),RobotMove->getSpeedY(),
+    // RobotMove->getSpeedAlpha(),RobotMove->getSpeedA(),RobotMove->getSpeedB(),RobotMove->getSpeedC()
+    // );
+
+    printf("PosX:%f PosY:%f Alpha:%f  SpeedX:%f SpeedY:%f SpeedAlpha:%f PosA:%d PosB:%d PosC:%d \n"
+    ,RobotHolonome.getPositionX(),RobotHolonome.getPositionY(),RobotHolonome.getAlpha(),RobotHolonome.getSpeedX(),RobotHolonome.getSpeedY(),
+    RobotHolonome.getSpeedAlpha(),RobotHolonome.getPosA(),RobotHolonome.getPosB(),RobotHolonome.getPosC()
+    );
+
+    // printf("PosX:%f PosY:%f Alpha:%f  SpeedX:%f SpeedY:%f SpeedAlpha:%f StepA:%d StepB:%d StepC:%d SpeedA:%f SpeedB:%f SpeedC:%f\n"
+    // ,RobotMove->getPositionX(),RobotMove->getPositionY(),RobotMove->getAlpha(),RobotMove->getSpeedX(),RobotMove->getSpeedY(),
+    // RobotMove->getSpeedAlpha(),RobotMove->getStepA(),RobotMove->getStepB(),RobotMove->getStepC(),RobotMove->getSpeedA(),RobotMove->getSpeedB(),RobotMove->getSpeedC()
+    // );
+
+    //printf("%f;%f;%f\r\n",RobotMove->getPositionX(),RobotMove->getPositionY(),RobotMove->getAlpha());
+ 
+  }
+  
+}
 float theta2pluse(int theta)
 {
   return 500.0+(100.0/9.0)*float(theta);
@@ -98,6 +123,7 @@ int main()
   En_drive_N = 0;
   En_step_N = 0;
 
+  show_pos_thread.start(showPostion);
 
   lcd.cls();
   lcd.printf("Kameleon\n");
@@ -106,77 +132,38 @@ int main()
 
   TMCSerial.setup_all_stepper();
 
-  // RobotHolonome.stop();
-  // while(!RobotHolonome.waitAck());
-  // RobotHolonome.setPositionZero();
-  StepperC.setSpeed(2000);
-  StepperC.setAcceleration(2000);
-  StepperC.setDeceleration(2000);
-  StepperC.stop();
-  StepperC.setPositionZero();
-  StepperC.move(10000);
-  while(!StepperC.stopped());
-
-
- 
- 
-
-  //RobotHolonome.setupSteppers();
-  // RobotHolonome.stop();
-  // while(!RobotHolonome.waitAck());
-  // RobotHolonome.setPositionZero();
-  // while(!RobotHolonome.waitAck());
-  // SWSerial->beginSerial(155200);
-  // wait_us(10*1000);
-  // StepperA.begin();
-  // StepperA.toff(TOFF);                // Enables driver in software - 3, 5 ????
-  // StepperA.rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
-  //                                      // 1110, 800
-  //                                      // working: 800 12V/0,6Amax,  Speed up to 5200=4U/min
-  // StepperA.microsteps(MICROSTEPS);    // Set microsteps to 1:Fullstep ... 256: 1/256th
-  // StepperA.en_spreadCycle(EN_SPREADCYCLE);     // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
-  // StepperA.pwm_autoscale(PWM_AUTOSCALE);       // Needed for stealthChop
-
-  // StepperA.stop();
-  // StepperA.setPositionZero();
-  // StepperA.setSpeed(5000);
-  // StepperA.setAcceleration(5000/ACC);
-  // StepperA.setDeceleration(5000/DEC);
-  // StepperA.move(20000);
-  // while(!StepperA.stopped());
-  // sel_1 = 0;
-  // sel_2 = 0;
-  // sel_3 = 0;
-  // wait_us(10*2000);
-
-  // RobotHolonome.SWSerialHolonome->beginSerial(115200);
-  // wait_us(10*1000);
-  // sel_1 = 1;
-  // sel_2 = 0;
-  // sel_3 = 0;
-  // RobotHolonome.StepperA->begin();
-  // wait_us(10*1000);
-  // sel_1 = 0;
-  // sel_2 = 0;
-  // sel_3 = 1;
-  // RobotHolonome.StepperB->begin();
-  // wait_us(10*1000);
-  // sel_1 = 0;
-  // sel_2 = 0;
-  // sel_3 = 1;
-  // RobotHolonome.StepperC->begin();
+  RobotHolonome.stop();
+  while(!RobotHolonome.waitAck());
+  RobotHolonome.setPositionZero();
   
 
-  //RobotHolonome.setupSteppers();
-  // RobotHolonome.stop();
-  // while(!RobotHolonome.waitAck());
-  // RobotHolonome.setPositionZero();
-  // while(!RobotHolonome.waitAck());
-  
+  RobotHolonome.move(50,0,0);
+  while(!RobotHolonome.waitAck());
+  while(!RobotHolonome.stopped());
+  HAL_Delay (2000);
+  RobotHolonome.move(50,0,0);
+  while(!RobotHolonome.waitAck());
+  while(!RobotHolonome.stopped());
 
-  // RobotHolonome.goesTo(0,0,90);
-  // while(!RobotHolonome.waitAck());
-  // while(!RobotHolonome.stopped());
+  HAL_Delay (2000);
+  RobotHolonome.goesTo(0,0,0);
+  while(!RobotHolonome.waitAck());
+  while(!RobotHolonome.stopped());
+
+  HAL_Delay (2000);
+  RobotHolonome.move(-50,0,0);
+  while(!RobotHolonome.waitAck());
+  while(!RobotHolonome.stopped());
+
+  HAL_Delay (2000);
+  RobotHolonome.move(150,0,0);
+  while(!RobotHolonome.waitAck());
+  while(!RobotHolonome.stopped());
+
+  HAL_Delay (2000);
+  RobotHolonome.goesTo(0,0,0);
+  while(!RobotHolonome.waitAck());
+  while(!RobotHolonome.stopped());
  
 
   while (1)

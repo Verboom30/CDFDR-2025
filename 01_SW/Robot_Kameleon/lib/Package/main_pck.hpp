@@ -8,7 +8,7 @@
 #define YELLOW  "\033[0;33m"
 
 #define R_SENSE 0.11f        // R-Sense in OHM. Match to your driver
-#define RMSCURRENT 1500       // RMS current of Stepper Coil in mA
+#define RMSCURRENT 5000       // RMS current of Stepper Coil in mA
 #define MSTEP   16
 #define TOFF 5               // Enables driver in software - 3, 5
 #define EN_SPREADCYCLE false // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
