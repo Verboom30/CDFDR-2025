@@ -1,33 +1,25 @@
 #include "mbed.h"
 #include "pinout.hpp"
 #include "Holonome.hpp"
+#include "Stepper.hpp"
 #include "UART_TMC.hpp"
 #include "lcd.hpp"
 #include "main_pck.hpp"
 #include <inttypes.h>
 
-//SerialTMC *SWSerial = new SerialTMC(TMC_UART_TX, TMC_UART_RX);
-//TMC2209Stepper StepperA(STEP_A, DIR_A, SWSerial, R_SENSE, 0x00);
-// TMC2209Stepper StepperB(STEP_B, DIR_B, &SWSerial, R_SENSE, 0x01);
-// TMC2209Stepper StepperC(STEP_C, DIR_C, &SWSerial, R_SENSE, 0x02);
-
-
-
+//***********************************/************************************
+//                              UART_TMC                                //
+//***********************************/************************************
 Uart_TMC TMCSerial(TMC_UART_TX, TMC_UART_RX, SEL_UART_0, SEL_UART_1, SEL_UART_2, R_SENSE);
 // //***********************************/************************************
 // //                                 MOVE                                 //
 // //***********************************/************************************
-// Holonome RobotHolonome(StepperA, StepperB, StepperC);
-//***********************************/************************************
-//                                 MOVE                                  //
-//***********************************/************************************
-
-
-// TMC2209Stepper StepperA(STEP_A, DIR_A, SWSerial, R_SENSE, 0x01);
-// DigitalOut sel_1(SEL_1);
-// DigitalOut sel_2(SEL_2);
-// DigitalOut sel_3(SEL_3);
-
+Stepper *StepperA = new Stepper(STEP_A,DIR_A);
+Stepper *StepperB = new Stepper(STEP_B,DIR_B);
+Stepper StepperC(STEP_C,DIR_C);
+DigitalOut En_drive_N(ENABLE_DRIVE_N);
+DigitalOut En_step_N(ENABLE_STEP_N);
+//Holonome RobotHolonome(StepperA, StepperB, StepperC);
 //***********************************/************************************
 //                              LIMIT SWITCH                            //
 //***********************************/************************************
@@ -52,13 +44,6 @@ DigitalIn  SW_init(SW_INIT);
 DigitalIn  SW_team(SW_TEAM);
 DigitalIn  SW_bau(SW_BAU);
 DigitalIn  SW_Tirette(TIRETTE);
-//***********************************/************************************
-//                               STEPPER UART                           //
-//***********************************/************************************
-// DigitalOut sel_1 (SEL_UART_0);
-// DigitalOut sel_2 (SEL_UART_1);
-// DigitalOut sel_3 (SEL_UART_2);
-
 //***********************************/************************************
 //                                 SERVO                                //
 //***********************************/************************************
@@ -110,6 +95,8 @@ int main()
   Fork.period_ms(20);
   Sucket_pump.period_ms(20);
   Sucket_valve.period_ms(20);
+  En_drive_N = 0;
+  En_step_N = 0;
 
 
   lcd.cls();
@@ -117,13 +104,20 @@ int main()
   lcd.locate(0,1);
   
 
-  //SWSerial->beginSerial(155200);
- 
-  //StepperA.setup_stepper();
-  // StepperB.setup_stepper();
-  // StepperC.setup_stepper();
   TMCSerial.setup_all_stepper();
-  Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
+
+  // RobotHolonome.stop();
+  // while(!RobotHolonome.waitAck());
+  // RobotHolonome.setPositionZero();
+  StepperC.setSpeed(2000);
+  StepperC.setAcceleration(2000);
+  StepperC.setDeceleration(2000);
+  StepperC.stop();
+  StepperC.setPositionZero();
+  StepperC.move(10000);
+  while(!StepperC.stopped());
+
+
  
  
 

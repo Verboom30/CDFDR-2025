@@ -86,6 +86,9 @@
 #define STEP_SUCKER PB_11
 #define DIR_SUCKER  PD_12
 
+#define ENABLE_DRIVE_N PE_10
+#define ENABLE_STEP_N PE_12
+
 //***********************************/************************************
 //                               STEPPER UART                           //
 //***********************************/************************************
