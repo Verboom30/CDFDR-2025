@@ -88,7 +88,7 @@ bool Uart_TMC::setup_all_stepper(void)
   UART_StepperR1->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
                                        // 1110, 800
                                        // working: 800 12V/0,6Amax,  Speed up to 5200=4U/min
-  UART_StepperR1->microsteps(MSTEP);    // Set microsteps to 1:Fullstep ... 256: 1/256th
+  UART_StepperR1->microsteps(MSTEP_ACT);    // Set microsteps to 1:Fullstep ... 256: 1/256th
   UART_StepperR1->en_spreadCycle(EN_SPREADCYCLE);     // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
   UART_StepperR1->pwm_autoscale(PWM_AUTOSCALE);       // Needed for stealthChop
 
@@ -99,7 +99,7 @@ bool Uart_TMC::setup_all_stepper(void)
   UART_StepperR2->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
                                        // 1110, 800
                                        // working: 800 12V/0,6Amax,  Speed up to 5200=4U/min
-  UART_StepperR2->microsteps(MSTEP);    // Set microsteps to 1:Fullstep ... 256: 1/256th
+  UART_StepperR2->microsteps(MSTEP_ACT);    // Set microsteps to 1:Fullstep ... 256: 1/256th
   UART_StepperR2->en_spreadCycle(EN_SPREADCYCLE);     // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
   UART_StepperR2->pwm_autoscale(PWM_AUTOSCALE);       // Needed for stealthChop
 
@@ -110,7 +110,7 @@ bool Uart_TMC::setup_all_stepper(void)
   UART_StepperR3->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
                                        // 1110, 800
                                        // working: 800 12V/0,6Amax,  Speed up to 5200=4U/min
-  UART_StepperR3->microsteps(MSTEP);    // Set microsteps to 1:Fullstep ... 256: 1/256th
+  UART_StepperR3->microsteps(MSTEP_ACT);    // Set microsteps to 1:Fullstep ... 256: 1/256th
   UART_StepperR3->en_spreadCycle(EN_SPREADCYCLE);     // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
   UART_StepperR3->pwm_autoscale(PWM_AUTOSCALE);       // Needed for stealthChop
 
@@ -121,7 +121,7 @@ bool Uart_TMC::setup_all_stepper(void)
   UART_StepperR4->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
                                        // 1110, 800
                                        // working: 800 12V/0,6Amax,  Speed up to 5200=4U/min
-  UART_StepperR4->microsteps(MSTEP);    // Set microsteps to 1:Fullstep ... 256: 1/256th
+  UART_StepperR4->microsteps(MSTEP_ACT);    // Set microsteps to 1:Fullstep ... 256: 1/256th
   UART_StepperR4->en_spreadCycle(EN_SPREADCYCLE);     // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
   UART_StepperR4->pwm_autoscale(PWM_AUTOSCALE);       // Needed for stealthChop
   
@@ -139,7 +139,7 @@ bool Uart_TMC::setup_all_stepper(void)
   UART_StepperFork->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
                                        // 1110, 800
                                        // working: 800 12V/0,6Amax,  Speed up to 5200=4U/min
-  UART_StepperFork->microsteps(MSTEP);    // Set microsteps to 1:Fullstep ... 256: 1/256th
+  UART_StepperFork->microsteps(MSTEP_ACT);    // Set microsteps to 1:Fullstep ... 256: 1/256th
   UART_StepperFork->en_spreadCycle(EN_SPREADCYCLE);     // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
   UART_StepperFork->pwm_autoscale(PWM_AUTOSCALE);       // Needed for stealthChop
    
@@ -150,7 +150,7 @@ bool Uart_TMC::setup_all_stepper(void)
   UART_StepperSucker->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
                                        // 1110, 800
                                        // working: 800 12V/0,6Amax,  Speed up to 5200=4U/min
-  UART_StepperSucker->microsteps(MSTEP);    // Set microsteps to 1:Fullstep ... 256: 1/256th
+  UART_StepperSucker->microsteps(MSTEP_ACT);    // Set microsteps to 1:Fullstep ... 256: 1/256th
   UART_StepperSucker->en_spreadCycle(EN_SPREADCYCLE);     // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
   UART_StepperSucker->pwm_autoscale(PWM_AUTOSCALE);       // Needed for stealthChop
 
