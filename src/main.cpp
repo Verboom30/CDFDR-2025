@@ -3,15 +3,25 @@
 #include "TMC2209.hpp"
 #include <inttypes.h>
 
-#define R_SENSE 0.11f   // R-Sense in OHM. Match to your driver
-#define RMSCURRENT 1500  // RMS current of Stepper Coil in mA
-#define MICROSTEPS 8  // # of microsteps
+#define R_SENSE 3.7f   // R-Sense in OHM. Match to your driver
+#define RMSCURRENT 200  // RMS current of Stepper Coil in mA
+#define MICROSTEPS 16  // # of microsteps
 
-TMC2209Stepper StepperA(PIN_STEP,PIN_DIR,TMC_UART_TX, TMC_UART_RX, R_SENSE, 0x00);
+TMC2209Stepper StepperA(STEP_R1,DIR_R1,TMC_UART_TX, TMC_UART_RX, R_SENSE, 0x00);
 
-
+DigitalOut En_drive_N(ENABLE_DRIVE_N);
+DigitalOut En_step_N(ENABLE_STEP_N);
+DigitalOut sel_0(SEL_UART_0);
+DigitalOut sel_1(SEL_UART_1);
+DigitalOut sel_2(SEL_UART_2);
 int main()
 {
+  sel_0 =0;
+  sel_1 =0;
+  sel_2 =1;
+  En_drive_N =0;
+  En_step_N =0;
+  HAL_Delay (500);
   printf("connecting to TMC-Module...\r\n");
   StepperA.begin();  
   //read and check version - must be 0x21
@@ -33,13 +43,13 @@ int main()
   StepperA.pwm_autoscale(true);       // Needed for stealthChop
 
   StepperA.setSpeed(10000);
-  StepperA.setAcceleration(4000);
-  StepperA.setDeceleration(4000);
+  StepperA.setAcceleration(0);
+  StepperA.setDeceleration(0);
   StepperA.stop();
   StepperA.setPositionZero();
 
   //printf("Read Uart 0x%08"PRIx32"\n",StepperA.IOIN());
-  StepperA.move(10000);
+  StepperA.move(5000);
   while(!StepperA.stopped());
   // while (1)
   // {
