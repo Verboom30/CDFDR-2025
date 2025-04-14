@@ -29,10 +29,10 @@ Holonome RobotHolonome();
 Stepper *StepperFork = new Stepper(STEP_FORK,DIR_FORK);
 Stepper *StepperSucker = new Stepper(STEP_SUCKER,DIR_SUCKER);
 
-LinearActuator *StepperR1 = new LinearActuator(STEP_R1,DIR_R1,R1_SW_UP,R1_SW_DOWN);
-LinearActuator *StepperR2= new LinearActuator(STEP_R2,DIR_R2,R2_SW_UP,R2_SW_DOWN);
-LinearActuator *StepperR3= new LinearActuator(STEP_R3,DIR_R3,R3_SW_UP,R3_SW_DOWN);
-LinearActuator *StepperR4 =new LinearActuator(STEP_R4,DIR_R4,R4_SW_UP,R4_SW_DOWN);
+LinearActuator *StepperR1 = new LinearActuator(STEP_R1,DIR_R1,R1_SW_UP,R1_SW_DOWN,false);
+LinearActuator *StepperR2= new LinearActuator(STEP_R2,DIR_R2,R2_SW_UP,R2_SW_DOWN,true);
+LinearActuator *StepperR3= new LinearActuator(STEP_R3,DIR_R3,R3_SW_UP,R3_SW_DOWN,false);
+LinearActuator *StepperR4 =new LinearActuator(STEP_R4,DIR_R4,R4_SW_UP,R4_SW_DOWN,true);
 
 //***********************************/************************************
 //                              LIMIT SWITCH                            //
@@ -149,7 +149,7 @@ int main()
   lcd.printf("Kameleon\n");
   lcd.locate(0,1);
   
-  //HAL_Delay (500);
+  HAL_Delay (500);
   TMCSerial.setup_all_stepper();
 
   // RobotHolonome.stop();
@@ -159,9 +159,29 @@ int main()
 
 
   //StepperR1.setDeceleration(0);
-  //StepperR1.stop();
+  HAL_Delay (500);
   StepperR1->InitLinearActuator();
+  StepperR2->InitLinearActuator();
+  StepperR3->InitLinearActuator();
+  StepperR4->InitLinearActuator();
   StepperR1->goUp();
+  StepperR2->goUp();
+  StepperR3->goUp();
+  StepperR4->goUp();
+
+  HAL_Delay (500);
+  Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
+  Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
+  Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
+  Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
+  HAL_Delay (500); // Attente de 2 secondes 
+  Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
+  Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
+  Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
+  Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
+  HAL_Delay (500); // Attente de 2 secondes 
+  
+  
   
   // StepperR2.InitLinearActuator();
   // StepperR2.goUp();
