@@ -41,6 +41,7 @@ bool Uart_TMC::setup_all_stepper(void)
   //***********************************/************************************
   // StepperA                                                              /
   //***********************************/************************************
+  wait_us(10*1000);
   UART_StepperA->toff(TOFF);                // Enables driver in software - 3, 5 ????
   UART_StepperA->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
                                        // 1110, 800
@@ -52,6 +53,7 @@ bool Uart_TMC::setup_all_stepper(void)
   //***********************************/************************************
   // StepperB                                                              /
   //***********************************/************************************
+  wait_us(10*1000);
   UART_StepperB->toff(TOFF);                // Enables driver in software - 3, 5 ????
   UART_StepperB->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
                                        // 1110, 800
@@ -64,6 +66,7 @@ bool Uart_TMC::setup_all_stepper(void)
   //***********************************/************************************
   // StepperC                                                              /
   //***********************************/************************************
+  wait_us(10*1000);
   UART_StepperC->toff(TOFF);                 // Enables driver in software - 3, 5 ????
   UART_StepperC->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
                                        // 1110, 800
@@ -84,6 +87,7 @@ bool Uart_TMC::setup_all_stepper(void)
   //***********************************/************************************
   // UART_StepperR1                                                              /
   //***********************************/************************************
+  wait_us(10*1000);
   UART_StepperR1->toff(TOFF);                // Enables driver in software - 3, 5 ????
   UART_StepperR1->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
                                        // 1110, 800
@@ -91,10 +95,12 @@ bool Uart_TMC::setup_all_stepper(void)
   UART_StepperR1->microsteps(MSTEP_ACT);    // Set microsteps to 1:Fullstep ... 256: 1/256th
   UART_StepperR1->en_spreadCycle(EN_SPREADCYCLE);     // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
   UART_StepperR1->pwm_autoscale(PWM_AUTOSCALE);       // Needed for stealthChop
+  
 
   //***********************************/************************************
   // UART_StepperR2                                                              /
   //***********************************/************************************
+  wait_us(10*1000);
   UART_StepperR2->toff(TOFF);                // Enables driver in software - 3, 5 ????
   UART_StepperR2->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
                                        // 1110, 800
@@ -106,6 +112,7 @@ bool Uart_TMC::setup_all_stepper(void)
   //***********************************/************************************
   // UART_StepperR3                                                              /
   //***********************************/************************************
+  wait_us(10*1000);
   UART_StepperR3->toff(TOFF);                // Enables driver in software - 3, 5 ????
   UART_StepperR3->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
                                        // 1110, 800
@@ -117,6 +124,7 @@ bool Uart_TMC::setup_all_stepper(void)
   //***********************************/************************************
   // UART_StepperR4                                                              /
   //***********************************/************************************
+  wait_us(10*1000);
   UART_StepperR4->toff(TOFF);                // Enables driver in software - 3, 5 ????
   UART_StepperR4->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
                                        // 1110, 800
@@ -135,6 +143,7 @@ bool Uart_TMC::setup_all_stepper(void)
   //***********************************/************************************
   // UART_StepperFork                                                              /
   //***********************************/************************************
+  wait_us(10*1000);
   UART_StepperFork->toff(TOFF);                // Enables driver in software - 3, 5 ????
   UART_StepperFork->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
                                        // 1110, 800
@@ -146,6 +155,7 @@ bool Uart_TMC::setup_all_stepper(void)
   //***********************************/************************************
   // UART_StepperSucker                                                              /
   //***********************************/************************************
+  wait_us(10*1000);
   UART_StepperSucker->toff(TOFF);                // Enables driver in software - 3, 5 ????
   UART_StepperSucker->rms_current(RMSCURRENT);   // Set motor RMS current in mA / min 500 for 24V/speed:3000
                                        // 1110, 800

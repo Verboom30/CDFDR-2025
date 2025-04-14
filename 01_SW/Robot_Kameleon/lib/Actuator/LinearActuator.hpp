@@ -16,7 +16,7 @@
 class LinearActuator
 {
   public:
-    LinearActuator(PinName step, PinName dir,PinName SW_up, PinName SW_down);
+    LinearActuator(PinName step, PinName dir,PinName SW_up, PinName SW_down, bool reverse);
     Stepper* StepperAct= nullptr;
    
     bool InitDir(void);
@@ -26,7 +26,7 @@ class LinearActuator
     DigitalIn _sw_up;
     DigitalIn _sw_down;
   private:
-    int reverse;
+    int _reverse;
   protected:
     
 };
