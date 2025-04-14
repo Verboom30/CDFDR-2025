@@ -15,26 +15,27 @@ Uart_TMC TMCSerial(TMC_UART_TX, TMC_UART_RX, SEL_UART_0, SEL_UART_1, SEL_UART_2,
 //***********************************/************************************
 //                                 MOVE                                 //
 //***********************************/************************************
-Stepper *StepperA = new Stepper(STEP_A,DIR_A);
-Stepper *StepperB = new Stepper(STEP_B,DIR_B);
-Stepper *StepperC = new Stepper(STEP_C,DIR_C);
+// Stepper *StepperA = new Stepper(STEP_A,DIR_A);
+// Stepper *StepperB = new Stepper(STEP_B,DIR_B);
+// Stepper *StepperC = new Stepper(STEP_C,DIR_C);
 DigitalOut En_drive_N(ENABLE_DRIVE_N);
 DigitalOut En_step_N(ENABLE_STEP_N);
-Holonome RobotHolonome(StepperA, StepperB, StepperC);
+// Holonome RobotHolonome(StepperA, StepperB, StepperC);
 
 //***********************************/************************************
 //                                 STEPPER                              //
 //***********************************/************************************
-//Stepper *StepperR1 = new Stepper(STEP_R1,DIR_R1);
-Stepper *StepperR2 = new Stepper(STEP_R2,DIR_R2);
-Stepper *StepperR3 = new Stepper(STEP_R3,DIR_R4);
-Stepper *StepperR4 = new Stepper(STEP_R4,DIR_R4);
+//Stepper StepperR1(STEP_R1,DIR_R1);
+Stepper *StepperR1 = new Stepper(STEP_R1,DIR_R1);
+//Stepper *StepperR2 = new Stepper(STEP_R2,DIR_R2);
+// Stepper *StepperR3 = new Stepper(STEP_R3,DIR_R4);
+// Stepper *StepperR4 = new Stepper(STEP_R4,DIR_R4);
 
 
 Stepper *StepperFork = new Stepper(STEP_FORK,DIR_FORK);
 Stepper *StepperSucker = new Stepper(STEP_SUCKER,DIR_SUCKER);
 
-LinearActuator StepperR1(STEP_R1,DIR_R1,R1_SW_UP,R1_SW_DOWN);
+// LinearActuator StepperR1(STEP_R1,DIR_R1,R1_SW_UP,R1_SW_DOWN);
 //***********************************/************************************
 //                              LIMIT SWITCH                            //
 //***********************************/************************************
@@ -92,10 +93,10 @@ void showPostion(void)
     // RobotMove->getSpeedAlpha(),RobotMove->getSpeedA(),RobotMove->getSpeedB(),RobotMove->getSpeedC()
     // );
 
-    printf("PosX:%f PosY:%f Alpha:%f  SpeedX:%f SpeedY:%f SpeedAlpha:%f PosA:%d PosB:%d PosC:%d \n"
-    ,RobotHolonome.getPositionX(),RobotHolonome.getPositionY(),RobotHolonome.getAlpha(),RobotHolonome.getSpeedX(),RobotHolonome.getSpeedY(),
-    RobotHolonome.getSpeedAlpha(),RobotHolonome.getPosA(),RobotHolonome.getPosB(),RobotHolonome.getPosC()
-    );
+    // printf("PosX:%f PosY:%f Alpha:%f  SpeedX:%f SpeedY:%f SpeedAlpha:%f PosA:%d PosB:%d PosC:%d \n"
+    // ,RobotHolonome.getPositionX(),RobotHolonome.getPositionY(),RobotHolonome.getAlpha(),RobotHolonome.getSpeedX(),RobotHolonome.getSpeedY(),
+    // RobotHolonome.getSpeedAlpha(),RobotHolonome.getPosA(),RobotHolonome.getPosB(),RobotHolonome.getPosC()
+    // );
 
     // printf("PosX:%f PosY:%f Alpha:%f  SpeedX:%f SpeedY:%f SpeedAlpha:%f StepA:%d StepB:%d StepC:%d SpeedA:%f SpeedB:%f SpeedC:%f\n"
     // ,RobotMove->getPositionX(),RobotMove->getPositionY(),RobotMove->getAlpha(),RobotMove->getSpeedX(),RobotMove->getSpeedY(),
@@ -114,6 +115,8 @@ float theta2pluse(int theta)
 
 int main()
 {
+  En_drive_N = SW_Drive;
+  En_step_N =SW_Stepper; 
  // SW_r1_up.mode(PullUp);
   SW_r2_up.mode(PullUp);
   SW_r3_up.mode(PullUp);
@@ -139,8 +142,8 @@ int main()
   Fork.period_ms(20);
   Sucket_pump.period_ms(20);
   Sucket_valve.period_ms(20);
-  En_drive_N = 1;
-  En_step_N = 1;
+  // En_drive_N = 1;
+  // En_step_N = 1;
 
   //show_pos_thread.start(showPostion);
 
@@ -148,17 +151,21 @@ int main()
   lcd.printf("Kameleon\n");
   lcd.locate(0,1);
   
-
+  HAL_Delay (500);
   TMCSerial.setup_all_stepper();
 
-  RobotHolonome.stop();
-  while(!RobotHolonome.waitAck());
-  RobotHolonome.setPositionZero();
+  // RobotHolonome.stop();
+  // while(!RobotHolonome.waitAck());
+  // RobotHolonome.setPositionZero();
 
 
-  
+  StepperR1->setSpeed(10000);
+  StepperR1->setAcceleration(4000);
+  StepperR1->setDeceleration(4000);
+  //StepperR1.setDeceleration(0);
   //StepperR1.stop();
-  StepperR1.move(100);
+  StepperR1->move(2000);
+  while(!StepperR1->stopped());
   //while(!StepperR1.stopped());
   // RobotHolonome.move(50,0,0);
   // while(!RobotHolonome.waitAck());
