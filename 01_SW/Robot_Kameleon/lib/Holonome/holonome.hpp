@@ -23,8 +23,10 @@
 class Holonome 
 {
     public:
-        Holonome(Stepper* StepperA,Stepper* StepperB, Stepper* StepperC);
-
+        Holonome();
+        Stepper *StepperA = new Stepper(STEP_A,DIR_A);
+        Stepper *StepperB = new Stepper(STEP_B,DIR_B);
+        Stepper *StepperC = new Stepper(STEP_C,DIR_C);
         void    getPosition(void);
         float   getPositionX(void);
         float   getPositionY(void);
@@ -97,10 +99,7 @@ class Holonome
         //                          Protected Methods                           //
         //***********************************/************************************
         
-        Stepper* StepperA = nullptr;
-        Stepper* StepperB = nullptr;
-        Stepper* StepperC = nullptr;
-         
+     
         
         
 };

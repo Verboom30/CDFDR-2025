@@ -2,7 +2,7 @@
 //***********************************/************************************
 //                         Constructors                                 //
 //***********************************/************************************
-Holonome::Holonome(Stepper* StepperA, Stepper* StepperB, Stepper* StepperC)
+Holonome::Holonome()
 {
 
     //SWSerialHolonome =new SerialTMC(Uart_TX_pin, Uart_RX_pin);
@@ -12,9 +12,10 @@ Holonome::Holonome(Stepper* StepperA, Stepper* StepperB, Stepper* StepperC)
     // StepperA = new TMC2209Stepper(A_step_pin, A_dir_pin, SEL_UART_0, SWSerial, RS, A_Slave_Addr);
     // StepperB = new TMC2209Stepper(B_step_pin, B_dir_pin, SEL_UART_0, SWSerial, RS, B_Slave_Addr);
     // StepperC = new TMC2209Stepper(C_step_pin, C_dir_pin, SEL_UART_0, SWSerial, RS, C_Slave_Addr);
-    this->StepperA =StepperA;
-    this->StepperB =StepperB;
-    this->StepperC =StepperC;
+    // this->StepperA =StepperA;
+    // this->StepperB =StepperB;
+    // this->StepperC =StepperC;
+  
     routine.start(callback(this, &Holonome::routine_holonome));
 
     _AckStpA =false;

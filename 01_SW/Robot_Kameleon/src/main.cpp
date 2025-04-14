@@ -20,22 +20,20 @@ Uart_TMC TMCSerial(TMC_UART_TX, TMC_UART_RX, SEL_UART_0, SEL_UART_1, SEL_UART_2,
 // Stepper *StepperC = new Stepper(STEP_C,DIR_C);
 DigitalOut En_drive_N(ENABLE_DRIVE_N);
 DigitalOut En_step_N(ENABLE_STEP_N);
-// Holonome RobotHolonome(StepperA, StepperB, StepperC);
+Holonome RobotHolonome();
 
 //***********************************/************************************
 //                                 STEPPER                              //
 //***********************************/************************************
-//Stepper StepperR1(STEP_R1,DIR_R1);
-Stepper *StepperR1 = new Stepper(STEP_R1,DIR_R1);
-//Stepper *StepperR2 = new Stepper(STEP_R2,DIR_R2);
-// Stepper *StepperR3 = new Stepper(STEP_R3,DIR_R4);
-// Stepper *StepperR4 = new Stepper(STEP_R4,DIR_R4);
-
 
 Stepper *StepperFork = new Stepper(STEP_FORK,DIR_FORK);
 Stepper *StepperSucker = new Stepper(STEP_SUCKER,DIR_SUCKER);
 
-// LinearActuator StepperR1(STEP_R1,DIR_R1,R1_SW_UP,R1_SW_DOWN);
+LinearActuator *StepperR1 = new LinearActuator(STEP_R1,DIR_R1,R1_SW_UP,R1_SW_DOWN);
+LinearActuator *StepperR2= new LinearActuator(STEP_R2,DIR_R2,R2_SW_UP,R2_SW_DOWN);
+LinearActuator *StepperR3= new LinearActuator(STEP_R3,DIR_R3,R3_SW_UP,R3_SW_DOWN);
+LinearActuator *StepperR4 =new LinearActuator(STEP_R4,DIR_R4,R4_SW_UP,R4_SW_DOWN);
+
 //***********************************/************************************
 //                              LIMIT SWITCH                            //
 //***********************************/************************************
@@ -151,7 +149,7 @@ int main()
   lcd.printf("Kameleon\n");
   lcd.locate(0,1);
   
-  HAL_Delay (500);
+  //HAL_Delay (500);
   TMCSerial.setup_all_stepper();
 
   // RobotHolonome.stop();
@@ -159,13 +157,22 @@ int main()
   // RobotHolonome.setPositionZero();
 
 
-  StepperR1->setSpeed(10000);
-  StepperR1->setAcceleration(4000);
-  StepperR1->setDeceleration(4000);
+
   //StepperR1.setDeceleration(0);
   //StepperR1.stop();
-  StepperR1->move(2000);
-  while(!StepperR1->stopped());
+  StepperR1->InitLinearActuator();
+  StepperR1->goUp();
+  
+  // StepperR2.InitLinearActuator();
+  // StepperR2.goUp();
+
+  // StepperR3.InitLinearActuator();
+  // StepperR3.goUp();
+
+  // StepperR4.InitLinearActuator();
+  // StepperR4.goUp();
+  //StepperR1.StepperAct->move(1000);
+  //while(!StepperR1.StepperAct->stopped());
   //while(!StepperR1.stopped());
   // RobotHolonome.move(50,0,0);
   // while(!RobotHolonome.waitAck());

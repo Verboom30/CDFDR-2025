@@ -2,110 +2,59 @@
 //***********************************/************************************
 //                         Constructors                                 //
 //***********************************/************************************
-LinearActuator::LinearActuator(PinName step, PinName dir,PinName SW_up, PinName SW_down)
+LinearActuator::LinearActuator(PinName step, PinName dir,PinName SW_up, PinName SW_down): _sw_up(SW_up), _sw_down(SW_down)
 {
-    
-    routine.start(callback(this, &LinearActuator::routine_Actuator));
-    _Cmd ="";
-    _position =0;
-    Stepper* StepperAct = new Stepper(step, dir);
-  
-    
+    StepperAct = new Stepper(step, dir);;
+    _sw_up.mode(PullUp);
+    _sw_down.mode(PullUp);
+    reverse =1;
 }
 
 //***********************************/************************************
 //                                Get Set                               //
 //***********************************/************************************
 
-float LinearActuator::getSpeed(void)
-{
-    return StepperAct->getSpeed();
-}
-
-int LinearActuator::getPos(void)
-{
-    return StepperAct->getPosition();
-}
-
-int LinearActuator::getStep(void)
-{
-    return StepperAct->getStep();
-}
-
-void LinearActuator::setPosition(int position)
-{
-    _position =position;
-    _Cmd ="SET";
-   
-}
-void LinearActuator::setPositionZero(void)
-{
-    _Cmd ="RST";
-}
-
-bool LinearActuator::stopped(void)
-{
-    return StepperAct->stopped();
-}
-
-void LinearActuator::run(void)
-{
-    StepperAct->run();    
-}
-void LinearActuator::stop(void)
-{   
-    _Cmd = "STOP";
-     
-}
-void LinearActuator::goesTo(int position)
-{
-    _position = position;
-    _Cmd = "GOTO";
-}
-void LinearActuator::move(int position)
-{
-    _position = position;
-    _Cmd = "MOVE";
-}
 
 
 //***********************************/************************************
 //                             Public Methods                           //
 //***********************************/************************************
-
-bool InitLinearActuator(void){
-
-
-}
-void LinearActuator::routine_Actuator(void)
+bool LinearActuator::InitDir(void)
 {
-    while(1)
-    {
-        if((_Cmd == "MOVE") and StepperAct->stopped()){
-            StepperAct->setSpeed(SPEED_ACT);
-            StepperAct->setAcceleration(ACC_ACT);
-            StepperAct->setDeceleration(DEC_ACT);
-            StepperAct->move(_position);
-           
-        }else if ((_Cmd == "GOTO")and StepperAct->stopped()){
-            StepperAct->setSpeed(SPEED_ACT);
-            StepperAct->setAcceleration(ACC_ACT);
-            StepperAct->setDeceleration(DEC_ACT);
-            StepperAct->goesTo(_position);
-          
-        }else if (_Cmd == "STOP"){
-            StepperAct->stop();
-           
-        }else if (_Cmd == "SET" and StepperAct->stopped()){
-            StepperAct->setPosition(_position);
-            
-        }else if (_Cmd == "RST" and StepperAct->stopped()){
-            StepperAct->setPositionZero();
-           
-        }
-
-        
-
-    }
-        
+    do
+    {  
+        StepperAct->move(100);
+        while(!StepperAct->stopped());
+    } while (_sw_up !=0 and _sw_down !=0);
+    if(_sw_down !=1) reverse =-1;
+    else if (_sw_up !=1) reverse = 1;
+    return true;
 }
+
+bool LinearActuator::goUp(void)
+{
+    do
+    {  
+        StepperAct->move(100*reverse);
+        while(!StepperAct->stopped());
+    } while (_sw_up !=0);
+    return true;
+}
+
+bool LinearActuator::goDown(void)
+{
+    do
+    {  
+        StepperAct->move(-100*reverse);
+        while(!StepperAct->stopped());
+    } while (_sw_down !=0);
+    return true;
+}
+
+void LinearActuator::InitLinearActuator(void){
+    StepperAct->setSpeed(SPEED_ACT);
+    StepperAct->setAcceleration(0);
+    StepperAct->setDeceleration(0);
+    InitDir();
+}
+
