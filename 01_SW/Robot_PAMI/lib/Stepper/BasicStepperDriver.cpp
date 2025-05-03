@@ -34,6 +34,11 @@ constexpr const T& stepperMax(const T& a, const T& b)
  * Basic connection: only DIR, STEP are connected.
  * Microstepping controls should be hardwired.
  */
+
+ BasicStepperDriver::BasicStepperDriver(short steps, short dir_pin, short step_pin, short dir_pin2, short step_pin2)
+:motor_steps(steps), dir_pin(dir_pin), step_pin(step_pin),dir_pin2(dir_pin2), step_pin2(step_pin2), enable_pin(PIN_UNCONNECTED)
+{
+}
 BasicStepperDriver::BasicStepperDriver(short steps, short dir_pin, short step_pin)
 :BasicStepperDriver(steps, dir_pin, step_pin, PIN_UNCONNECTED)
 {
@@ -57,10 +62,14 @@ BasicStepperDriver::BasicStepperDriver(short steps, short dir_pin, short step_pi
  */
 void BasicStepperDriver::begin(float rpm, short microsteps){
     pinMode(dir_pin, OUTPUT);
+    pinMode(dir_pin2, OUTPUT);
     digitalWrite(dir_pin, HIGH);
+    digitalWrite(dir_pin2, LOW);
 
     pinMode(step_pin, OUTPUT);
+    pinMode(step_pin2, OUTPUT);
     digitalWrite(step_pin, LOW);
+    digitalWrite(step_pin2, LOW);
 
     if IS_CONNECTED(enable_pin){
         pinMode(enable_pin, OUTPUT);
@@ -316,13 +325,16 @@ long BasicStepperDriver::nextAction(void){
          * DIR pin is sampled on rising STEP edge, so it is set first
          */
         digitalWrite(dir_pin, dir_state);
+        digitalWrite(dir_pin2, (dir_state == 0) ? HIGH : LOW);
         digitalWrite(step_pin, HIGH);
+        digitalWrite(step_pin2, HIGH);
         unsigned m = micros();
         unsigned long pulse = step_pulse; // save value because calcStepPulse() will overwrite it
         calcStepPulse();
         // We should pull HIGH for at least 1-2us (step_high_min)
         delayMicros(step_high_min);
         digitalWrite(step_pin, LOW);
+        digitalWrite(step_pin2, LOW);
         // account for calcStepPulse() execution time; sets ceiling for max rpm on slower MCUs
         last_action_end = micros();
         m = last_action_end - m;

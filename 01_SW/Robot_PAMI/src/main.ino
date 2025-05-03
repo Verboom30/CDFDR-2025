@@ -13,28 +13,19 @@ Uart_TMC driverG(TMC_UART_RX, TMC_UART_TX, R_SENSE, 0b00);
 Uart_TMC driverD(TMC_UART_RX, TMC_UART_TX, R_SENSE, 0b01);
 
 // 2-wire basic config, microstepping is hardwired on the driver
-BasicStepperDriver stepperG(MOTOR_STEPS, DIR_G, STEP_G);
-BasicStepperDriver stepperD(MOTOR_STEPS, DIR_D, STEP_D);
+BasicStepperDriver stepper(MOTOR_STEPS, DIR_G, STEP_G, DIR_D, STEP_D);
 
 
 
 void setup() {
-
- 
   Serial.begin(115200);
   driverG.setup_stepper();
   driverD.setup_stepper();
-  stepperG.begin(RPM, MSTEP);
-  stepperD.begin(RPM, MSTEP);
- 
-  
- 
-  
-  
+  stepper.begin(RPM, MSTEP);
+
 }
 
 void loop() {
-  stepperG.move(-MOTOR_STEPS*MSTEP);
-  stepperD.move(-MOTOR_STEPS*MSTEP);
+  stepper.move(MOTOR_STEPS*MSTEP);
   delay(1500);
 }

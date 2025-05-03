@@ -66,7 +66,9 @@ protected:
      * Driver Configuration
      */
     short dir_pin;
+    short dir_pin2;
     short step_pin;
+    short step_pin2;
     short enable_pin = PIN_UNCONNECTED;
     short enable_active_state = HIGH;
     // Get max microsteps supported by the device
@@ -111,6 +113,7 @@ public:
      * Basic connection: DIR, STEP are connected.
      */
     BasicStepperDriver(short steps, short dir_pin, short step_pin);
+    BasicStepperDriver(short steps, short dir_pin, short step_pin, short dir_pin2, short step_pin2);
     BasicStepperDriver(short steps, short dir_pin, short step_pin, short enable_pin);
     /*
      * Initialize pins, calculate timings etc
