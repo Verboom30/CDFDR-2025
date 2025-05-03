@@ -30,8 +30,8 @@
 //                               STEPPER UART                           //
 //***********************************/************************************
 //UART TMC2209
-#define TMC_UART_TX 7
-#define TMC_UART_RX 8
+#define TMC_UART_TX 8
+#define TMC_UART_RX 7
 
 //***********************************/************************************
 //                               CAPTEUR_LASER                                //
