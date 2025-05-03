@@ -4,7 +4,8 @@
  * motor in alternating directions.
  */
 
-#include "TMCStepper.h"
+
+#include "../lib/TMC2209/TMCStepper.h"
 #include "BasicStepperDriver.h"
 
 
