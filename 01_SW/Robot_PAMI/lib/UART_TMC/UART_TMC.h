@@ -7,7 +7,7 @@
 #define RPM 50
 
 #define RMSCURRENT 3000       // RMS current of Stepper Coil in mA
-#define MSTEP   16
+#define MSTEP   8
 #define TOFF 5               // Enables driver in software - 3, 5
 #define EN_SPREADCYCLE false // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
 #define PWM_AUTOSCALE true   // Needed for stealthChop

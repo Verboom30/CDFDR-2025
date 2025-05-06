@@ -1,9 +1,16 @@
 #include "TMCStepper.h"
-#include "BasicStepperDriver.h"
+#include <AccelStepper.h>
 #include "pinout.h"
 #include "UART_TMC.h"
 #include <Wire.h>
 #include <VL53L0X.h>
+#include <Thread.h>
+#include <ThreadController.h>
+
+ThreadController controller = ThreadController();
+
+Thread ThreadDrive = Thread();
+Thread ThreadSensors = Thread();
 
 #define R_SENSE 3.70f // Match to your driver
                       // SilentStepStick series use 0.11
@@ -15,11 +22,13 @@ Uart_TMC driverG(TMC_UART_RX, TMC_UART_TX, R_SENSE, 0b00);
 Uart_TMC driverD(TMC_UART_RX, TMC_UART_TX, R_SENSE, 0b01);
 
 // 2-wire basic config, microstepping is hardwired on the driver
-BasicStepperDriver stepper(MOTOR_STEPS, DIR_G, STEP_G, DIR_D, STEP_D);
-
-
+//BasicStepperDriver stepper(MOTOR_STEPS, DIR_G, STEP_G, DIR_D, STEP_D);
+AccelStepper stepperG(AccelStepper::DRIVER, STEP_G, DIR_G);
+AccelStepper stepperD(AccelStepper::DRIVER, STEP_D, DIR_D);
 VL53L0X sensor1;
 VL53L0X sensor2;
+int state =0;
+bool SetupSpeed = false;
 
 void setup() {
   Serial.begin(115200);
@@ -77,14 +86,36 @@ void setup() {
   sensor1.startContinuous();
   sensor2.startContinuous();
 
-  
-  //driverG.setup_stepper();
+  if(!(driverG.setup_stepper())) { Serial.println("TMC communication error StepG !"); }
+  if(!(driverD.setup_stepper())) { Serial.println("TMC communication error StepD !\n"); }
   //driverD.setup_stepper();
   //stepper.begin(RPM, MSTEP);
 
+  ThreadDrive.onRun(taskDrive);
+  ThreadSensors.onRun(taskSensors);
+  controller.add(&ThreadSensors);
+  controller.add(&ThreadDrive);
+   //ThreadDrive.setInterval(1);
+  ThreadSensors.setInterval(300);
+
+  stepperG.setMaxSpeed(10000);       // Vitesse maximale en pas par seconde
+  stepperG.setAcceleration(1500);    // Accélération en pas par seconde^2
+  //stepperG.moveTo(2000);            // Définir la position cible
+
+  stepperD.setMaxSpeed(10000);       // Vitesse maximale en pas par seconde
+  stepperD.setAcceleration(1500);    // Accélération en pas par seconde^2
+  //stepperD.moveTo(-2000);            // Définir la position cible
+
+ 
 }
 
-void loop() {
+
+void taskDrive(){
+  
+  
+}
+
+void taskSensors(){
   Serial.print("sensor1: " );
   Serial.print(sensor1.readRangeContinuousMillimeters());
   if (sensor1.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
@@ -93,6 +124,36 @@ void loop() {
   Serial.print(sensor2.readRangeContinuousMillimeters());
   if (sensor1.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
   Serial.println();
-  //stepper.move(MOTOR_STEPS*MSTEP);
-  //delay(500);
+}
+
+bool MovetoPoint(int stepG, int StepD, bool stop){
+  if (SetupSpeed == false) {
+    stepperG.move(stepG);stepperD.move(StepD);
+    SetupSpeed = true;
+  }
+  stepperG.run(); stepperD.run(); 
+  if (!(stepperG.isRunning()) and !(stepperD.isRunning())) {
+    SetupSpeed = false; 
+    return true;
+  } 
+  return false;
+}
+void loop() {
+  controller.run();
+  switch (state)
+  {
+  case 0 :
+    if (MovetoPoint(2000,2000,false)) state++;
+    break;
+  case 1 :
+    if (MovetoPoint(5000,-5000,false)) state++;
+  break;
+  
+  default:
+    break;
+  }
+  
+  
+ 
+  
 }
