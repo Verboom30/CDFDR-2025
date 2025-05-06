@@ -8,8 +8,6 @@
 #include <ThreadController.h>
 
 ThreadController controller = ThreadController();
-
-Thread ThreadDrive = Thread();
 Thread ThreadSensors = Thread();
 
 #define R_SENSE 3.70f // Match to your driver
@@ -29,6 +27,7 @@ VL53L0X sensor1;
 VL53L0X sensor2;
 int state =0;
 bool SetupSpeed = false;
+bool StopMove = false;
 
 void setup() {
   Serial.begin(115200);
@@ -88,33 +87,18 @@ void setup() {
 
   if(!(driverG.setup_stepper())) { Serial.println("TMC communication error StepG !"); }
   if(!(driverD.setup_stepper())) { Serial.println("TMC communication error StepD !\n"); }
-  //driverD.setup_stepper();
-  //stepper.begin(RPM, MSTEP);
 
-  ThreadDrive.onRun(taskDrive);
   ThreadSensors.onRun(taskSensors);
   controller.add(&ThreadSensors);
-  controller.add(&ThreadDrive);
-   //ThreadDrive.setInterval(1);
   ThreadSensors.setInterval(300);
 
   stepperG.setMaxSpeed(10000);       // Vitesse maximale en pas par seconde
   stepperG.setAcceleration(1500);    // Accélération en pas par seconde^2
-  //stepperG.moveTo(2000);            // Définir la position cible
 
   stepperD.setMaxSpeed(10000);       // Vitesse maximale en pas par seconde
   stepperD.setAcceleration(1500);    // Accélération en pas par seconde^2
-  //stepperD.moveTo(-2000);            // Définir la position cible
 
- 
 }
-
-
-void taskDrive(){
-  
-  
-}
-
 void taskSensors(){
   Serial.print("sensor1: " );
   Serial.print(sensor1.readRangeContinuousMillimeters());
@@ -124,6 +108,7 @@ void taskSensors(){
   Serial.print(sensor2.readRangeContinuousMillimeters());
   if (sensor1.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
   Serial.println();
+  StopMove = (sensor1.readRangeContinuousMillimeters() < 200 or sensor2.readRangeContinuousMillimeters() < 200);
 }
 
 bool MovetoPoint(int stepG, int StepD, bool stop){
@@ -131,22 +116,23 @@ bool MovetoPoint(int stepG, int StepD, bool stop){
     stepperG.move(stepG);stepperD.move(StepD);
     SetupSpeed = true;
   }
-  stepperG.run(); stepperD.run(); 
+  if (!stop) stepperG.run(), stepperD.run(); 
   if (!(stepperG.isRunning()) and !(stepperD.isRunning())) {
     SetupSpeed = false; 
     return true;
   } 
   return false;
 }
+
 void loop() {
   controller.run();
   switch (state)
   {
   case 0 :
-    if (MovetoPoint(2000,2000,false)) state++;
+    if (MovetoPoint(2000,2000,StopMove)) state++;
     break;
   case 1 :
-    if (MovetoPoint(5000,-5000,false)) state++;
+    if (MovetoPoint(5000,-5000,StopMove)) state++;
   break;
   
   default:
