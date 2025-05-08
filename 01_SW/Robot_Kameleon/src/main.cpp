@@ -1,6 +1,5 @@
 #include "mbed.h"
 #include "pinout.hpp"
-#include "Holonome.hpp"
 #include "Stepper.hpp"
 #include "UART_TMC.hpp"
 #include "lcd.hpp"
@@ -20,36 +19,15 @@ Uart_TMC TMCSerial(TMC_UART_TX, TMC_UART_RX, SEL_UART_0, SEL_UART_1, SEL_UART_2,
 // Stepper *StepperC = new Stepper(STEP_C,DIR_C);
 DigitalOut En_drive_N(ENABLE_DRIVE_N);
 DigitalOut En_step_N(ENABLE_STEP_N);
-Holonome RobotHolonome();
+
 
 //***********************************/************************************
 //                                 STEPPER                              //
-//***********************************/************************************
-
-Stepper *StepperFork = new Stepper(STEP_FORK,DIR_FORK);
-Stepper *StepperSucker = new Stepper(STEP_SUCKER,DIR_SUCKER);
-
-LinearActuator *StepperR1 = new LinearActuator(STEP_R1,DIR_R1,R1_SW_UP,R1_SW_DOWN,true);
-LinearActuator *StepperR2= new LinearActuator(STEP_R2,DIR_R2,R2_SW_UP,R2_SW_DOWN,true);
-LinearActuator *StepperR3= new LinearActuator(STEP_R3,DIR_R3,R3_SW_UP,R3_SW_DOWN,false);
-LinearActuator *StepperR4 =new LinearActuator(STEP_R4,DIR_R4,R4_SW_UP,R4_SW_DOWN,true);
 
 //***********************************/************************************
-//                              LIMIT SWITCH                            //
-//***********************************/************************************
-//DigitalIn  SW_r1_up(R1_SW_UP);
-DigitalIn  SW_r2_up(R2_SW_UP);
-DigitalIn  SW_r3_up(R3_SW_UP);
-DigitalIn  SW_r4_up(R4_SW_UP);
-
-//DigitalIn  SW_r1_down(R1_SW_DOWN);
-DigitalIn  SW_r2_down(R2_SW_DOWN);
-DigitalIn  SW_r3_down(R3_SW_DOWN);
-DigitalIn  SW_r4_down(R4_SW_DOWN);
-
-DigitalIn  SW_fork_up(FORK_SW_UP);
-DigitalIn  SW_fork_mid(FORK_SW_MID);
-DigitalIn  SW_fork_down(FORK_SW_DOWN);
+LinearActuator *StepperRG = new LinearActuator(STEP_RG,DIR_RG,RG_SW_UP,RG_SW_DOWN,false);
+LinearActuator *StepperRD = new LinearActuator(STEP_RD,DIR_RD,RD_SW_UP,RD_SW_DOWN,true);
+LinearActuator *StepperRM = new LinearActuator(STEP_RM,DIR_RM,RM_SW_UP,RM_SW_DOWN,true);
 
 //***********************************/************************************
 //                                 SWITCH                               //
@@ -67,9 +45,10 @@ PwmOut Pince_r1(PINCE_R1);
 PwmOut Pince_r2(PINCE_R2);
 PwmOut Pince_r3(PINCE_R3);
 PwmOut Pince_r4(PINCE_R4);
-PwmOut Fork(FORK);
-PwmOut Sucket_pump(SUCKER_PUMP);
-PwmOut Sucket_valve(SUCKER_VALVE);
+PwmOut Mover_rg(PINCE_MOVE_R1);
+PwmOut Mover_rd(PINCE_MOVE_R4);
+PwmOut Hook_G(SERVO_HOOKG);
+PwmOut Hook_D(SERVO_HOOKD);
 
 //***********************************/************************************
 //                                 LIDAR                                //
@@ -115,17 +94,7 @@ int main()
 {
   En_drive_N = SW_Drive;
   En_step_N =SW_Stepper; 
- // SW_r1_up.mode(PullUp);
-  SW_r2_up.mode(PullUp);
-  SW_r3_up.mode(PullUp);
-  SW_r4_up.mode(PullUp);
-  //SW_r1_down.mode(PullUp);
-  SW_r2_down.mode(PullUp);
-  SW_r3_down.mode(PullUp);
-  SW_r4_down.mode(PullUp);
-  SW_fork_up.mode(PullUp);
-  SW_fork_mid.mode(PullUp);
-  SW_fork_down.mode(PullUp);
+
   SW_init.mode(PullUp);
   SW_team.mode(PullUp);
   SW_bau.mode(PullUp);
@@ -137,9 +106,10 @@ int main()
   Pince_r2.period_ms(20);
   Pince_r3.period_ms(20);
   Pince_r4.period_ms(20);
-  Fork.period_ms(20);
-  Sucket_pump.period_ms(20);
-  Sucket_valve.period_ms(20);
+  Mover_rg.period_ms(20);
+  Mover_rd.period_ms(20);
+  Hook_G.period_ms(20);
+  Hook_D.period_ms(20);
   // En_drive_N = 1;
   // En_step_N = 1;
 
@@ -151,39 +121,72 @@ int main()
   
   HAL_Delay (500);
   TMCSerial.setup_all_stepper();
+  
+  
+  StepperRG->InitLinearActuator();
+  StepperRD->InitLinearActuator();
+  StepperRM->InitLinearActuator();
 
   // RobotHolonome.stop();
   // while(!RobotHolonome.waitAck());
   // RobotHolonome.setPositionZero();
-
-
-
-  //StepperR1.setDeceleration(0);
-  HAL_Delay (500);
-  StepperR1->InitLinearActuator();
-  StepperR2->InitLinearActuator();
-  StepperR3->InitLinearActuator();
-  StepperR4->InitLinearActuator();
-  StepperR1->goUp();
-  StepperR2->goUp();
-  StepperR3->goUp();
-  StepperR4->goUp();
-
-  HAL_Delay (500);
+  Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
+  Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
+  Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_side));
+  Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_side));
   Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
-  Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
-  Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
-  Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
-  HAL_Delay (500); // Attente de 2 secondes 
-  Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
   Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
   Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
-  Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
-  HAL_Delay (500); // Attente de 2 secondes 
-  StepperR1->goDown();
-  StepperR2->goDown();
-  StepperR3->goDown();
-  StepperR4->goDown();
+  Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
+ 
+  StepperRG->goUp();
+  StepperRD->goUp();
+  StepperRM->goUp();
+
+  Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_home));
+  Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_home));
+
+  // HAL_Delay (500);
+  // Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bars_take));
+  // Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bars_take));
+  // HAL_Delay (500);
+  // StepperRG->goDown();
+  // StepperRD->goDown();
+
+  // Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
+  // Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
+
+  // Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
+  // Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
+  
+
+
+  
+ 
+  // StepperRG->goUp();
+  // StepperRD->goUp();
+  // StepperRM->goUp();
+  //  HAL_Delay (500);
+  // StepperRG->goDown();
+  // StepperRD->goDown();
+  // StepperRM->goDown();
+  
+ 
+  //HAL_Delay (1500);
+  //Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
+   //Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
+   //Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
+   //Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
+  // HAL_Delay (1500); // Attente de 2 secondes 
+  // Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
+  // Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
+  // Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
+  // Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
+  // HAL_Delay (1500); // Attente de 2 secondes 
+  // StepperR1->goDown();
+  // StepperR2->goDown();
+  // StepperR3->goDown();
+  // StepperR4->goDown();
   
   
   
@@ -231,6 +234,9 @@ int main()
   {
     En_drive_N = SW_Drive;
     En_step_N =SW_Stepper; 
+  
+   
+   
     // printf("SW_r1_up:%d SW_r2_up:%d SW_r3_up:%d SW_r4_up:%d SW_r1_dw:%d SW_r2_dw:%d SW_r3_dw:%d SW_r4_dw:%d SW_fork_up:%d SW_fork_mid:%d SW_fork_down:%d \n",
     // int(SW_r1_up), int(SW_r2_up), int(SW_r3_up), int(SW_r4_up),
     // int(SW_r1_down), int(SW_r2_down), int(SW_r3_down), int(SW_r4_down),

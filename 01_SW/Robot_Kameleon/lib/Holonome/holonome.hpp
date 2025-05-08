@@ -24,9 +24,9 @@ class Holonome
 {
     public:
         Holonome();
-        Stepper *StepperA = new Stepper(STEP_A,DIR_A);
-        Stepper *StepperB = new Stepper(STEP_B,DIR_B);
-        Stepper *StepperC = new Stepper(STEP_C,DIR_C);
+        Stepper *StepperA; //= new Stepper(STEP_A,DIR_A);
+        Stepper *StepperB; //= new Stepper(STEP_B,DIR_B);
+        Stepper *StepperC; //= new Stepper(STEP_C,DIR_C);
         void    getPosition(void);
         float   getPositionX(void);
         float   getPositionY(void);

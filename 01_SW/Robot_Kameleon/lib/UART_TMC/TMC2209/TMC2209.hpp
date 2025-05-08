@@ -144,7 +144,7 @@ class TMC2209Stepper
     static constexpr uint8_t max_retries = 4;
     static constexpr uint8_t abort_window = 5; //5ms timeout
     const float Rsense;
-    float holdMultiplier = 0.5;
+    float holdMultiplier = 0.25;
 
    
   

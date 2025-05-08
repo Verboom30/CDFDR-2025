@@ -9,7 +9,7 @@
 
 #define ACC_ACT   4000.0
 #define DEC_ACT   4000.0
-#define SPEED_ACT 10000.0 // max 50000 Mstepper 16 3200Ma
+#define SPEED_ACT 15000.0 // max 50000 Mstepper 16 3200Ma
 #define MSTEP_ACT 16
 
 

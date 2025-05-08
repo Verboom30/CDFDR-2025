@@ -100,15 +100,17 @@ void setup() {
 
 }
 void taskSensors(){
-  Serial.print("sensor1: " );
-  Serial.print(sensor1.readRangeContinuousMillimeters());
-  if (sensor1.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
-  Serial.print("  ");
-  Serial.print("sensor2: " );
-  Serial.print(sensor2.readRangeContinuousMillimeters());
-  if (sensor1.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
-  Serial.println();
+  // Serial.print("sensor1: " );
+  // Serial.print(sensor1.readRangeContinuousMillimeters());
+  // if (sensor1.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
+  // Serial.print("  ");
+  // Serial.print("sensor2: " );
+  // Serial.print(sensor2.readRangeContinuousMillimeters());
+  // if (sensor1.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
+  // Serial.println();
   StopMove = (sensor1.readRangeContinuousMillimeters() < 200 or sensor2.readRangeContinuousMillimeters() < 200);
+  
+
 }
 
 bool MovetoPoint(int stepG, int StepD, bool stop){
@@ -126,13 +128,14 @@ bool MovetoPoint(int stepG, int StepD, bool stop){
 
 void loop() {
   controller.run();
+  digitalWrite(LED_R,StopMove);
   switch (state)
   {
   case 0 :
     if (MovetoPoint(2000,2000,StopMove)) state++;
     break;
   case 1 :
-    if (MovetoPoint(5000,-5000,StopMove)) state++;
+    if (MovetoPoint(-5000,5000,StopMove)) state++;
   break;
   
   default:
