@@ -30,13 +30,13 @@ const struct pos_pince Pince[]{
 struct pos_bras {
     int bras_home;
     int bras_side;
-    int bars_take;
+    int bras_take;
     int bras_banner;
 };
 
 const struct pos_bras Bras[]{
-    {10,40,180,160}, //Bras G
-    {185,160,20,40}, //Bras D
+    {8,40,160,160}, //Bras G
+    {185,160,35,40}, //Bras D
     
    
 };

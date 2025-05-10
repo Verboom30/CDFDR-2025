@@ -37,6 +37,8 @@
 #define PINCE_MOVE_R4  PD_14 //SERVO6
 #define SERVO_HOOKG    PD_15 //SERVO7
 #define SERVO_HOOKD    PE_5  //SERVO8
+#define SUCKER_PUMP    PF_8 
+#define SUCKER_VALVE   PF_7 
 //***********************************/************************************
 //                                 STEPPER                              //
 //***********************************/************************************

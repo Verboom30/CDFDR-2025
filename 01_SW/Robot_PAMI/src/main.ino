@@ -10,6 +10,14 @@
 ThreadController controller = ThreadController();
 Thread ThreadSensors = Thread();
 
+#define PI      3.14159265
+#define RADIUS  33.0 // robot wheel-base radius
+#define RSTEP   200
+#define RWHEEL  30.0 
+#define REDUC   1.0
+#define KSTP     ((PI*2.0*RWHEEL/(RSTEP*MSTEP))*REDUC)
+#define SPEED   20000.0 // max 50000 Mstepper 16 3200Ma
+
 #define R_SENSE 3.70f // Match to your driver
                       // SilentStepStick series use 0.11
                       // UltiMachine Einsy and Archim2 boards use 0.2
@@ -112,7 +120,6 @@ void taskSensors(){
   
 
 }
-
 bool MovetoPoint(int stepG, int StepD, bool stop){
   if (SetupSpeed == false) {
     stepperG.move(stepG);stepperD.move(StepD);
@@ -132,10 +139,11 @@ void loop() {
   switch (state)
   {
   case 0 :
-    if (MovetoPoint(2000,2000,StopMove)) state++;
-    break;
+   while(!MovetoPoint(int(RADIUS*(PI/180.0)*95.0/KSTP),int(RADIUS*(PI/180.0)*95.0/KSTP),false));
+   while(!MovetoPoint(int(-300/KSTP),int(300/KSTP),false));
+  break;
   case 1 :
-    if (MovetoPoint(-5000,5000,StopMove)) state++;
+   
   break;
   
   default:
