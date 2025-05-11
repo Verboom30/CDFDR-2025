@@ -258,7 +258,7 @@ int main()
     {
       case 0:
         if (SW_init != 1) {
-          state++;
+          state =3;
         }
         break;
 
@@ -313,12 +313,22 @@ int main()
         break;
       case 3:
         if (SW_init != 1) {
-          
+          Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_drop_banner));
+          Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_drop_banner));
+          Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
+          Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
+          HAL_Delay (2500);
+          Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_banner));
+          Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_banner));
+          HAL_Delay (500);
           state++;
         }
         break;
       case 4:
         if (SW_init != 1) {
+          Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_banner));
+          Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_banner));
+          HAL_Delay (500);
         
           state++;
         }
@@ -326,6 +336,10 @@ int main()
 
       case 5:
         if (SW_init != 1) {
+          HAL_Delay (1500);
+          Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_drop_banner));
+          Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_drop_banner));
+           HAL_Delay (500);
           //Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
           //Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
           state++;
@@ -334,7 +348,8 @@ int main()
 
       case 6:
         if (SW_init != 1){
-          
+          Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
+          Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
           state++;
         }
         break;

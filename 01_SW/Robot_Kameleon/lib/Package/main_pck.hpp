@@ -17,13 +17,14 @@
 struct pos_pince {
     int pince_open;
     int pince_close;
+    int pince_banner;
 };
 
 const struct pos_pince Pince[]{
-    {170, 140}, //Pince R1
-    {70, 50},  //Pince R2
-    {180, 150},   //Pince R3
-    {90, 60}, //Pince R4
+    {170, 140,120}, //Pince R1
+    {70, 50,0},  //Pince R2
+    {180, 150,0},   //Pince R3
+    {90, 60,40}, //Pince R4
    
 };
 
@@ -32,11 +33,12 @@ struct pos_bras {
     int bras_side;
     int bras_take;
     int bras_banner;
+    int bras_drop_banner;
 };
 
 const struct pos_bras Bras[]{
-    {8,40,160,160}, //Bras G
-    {185,160,35,40}, //Bras D
+    {8,40,160,180,140}, //Bras G
+    {185,160,80,10,40}, //Bras D
     
    
 };
