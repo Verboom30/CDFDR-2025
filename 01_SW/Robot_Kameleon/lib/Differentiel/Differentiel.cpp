@@ -161,7 +161,7 @@ void diffrentiel::goesTo(int positionX, int positionY, int Alpha)
     _Alpha_Save     = _Alpha;
      setPositionZero();
     _Speed =  (float(abs(_Move))/(abs(_Move)+abs(_MoveAlpha)))*SPEED;
-    _SpeedAlpha =  (float(abs(_MoveAlpha))/(abs(_Move)+abs(_MoveAlpha)))*SPEED;
+    _SpeedAlpha =  (float(abs(_MoveAlpha))/(abs(_Move)+abs(_MoveAlpha)))*(SPEED/4.0);
     _Cmd = "GOTO";
 }
 
@@ -169,14 +169,14 @@ void diffrentiel::move(int positionX, int positionY, int Alpha)
 {
     _cibleposX      = positionX;
     _cibleposY      = positionY;
-    _Move = sqrt(pow(float(_positionX),2.0)+pow(float(_positionY),2.0));
+    _Move = positionY;
     _MoveAlpha      = float(Alpha); 
     _positionX_Save = _positionX;
     _positionY_Save = _positionY;
     _Alpha_Save     = _Alpha;
      setPositionZero();
     _Speed =  (float(abs(_Move))/(abs(_Move)+abs(_MoveAlpha)))*SPEED;
-    _SpeedAlpha =  (float(abs(_MoveAlpha))/(abs(_Move)+abs(_MoveAlpha)))*SPEED;
+    _SpeedAlpha =  (float(abs(_MoveAlpha))/(abs(_Move)+abs(_MoveAlpha)))*(SPEED/4.0);
     _Cmd = "MOVE";
    
 }
@@ -188,9 +188,9 @@ void diffrentiel::routine_diffrentiel(void)
     {
         if ((_Cmd == "GOTO" or _Cmd == "MOVE") and _AckStpG ==false){    
             StepperG->setSpeed((_Speed - (RADIUS*_SpeedAlpha))/KSTP);
-            StepperG->setAcceleration(getSpeedG()/ACC);
-            StepperG->setDeceleration(getSpeedG()/DEC); 
-            StepperG->move(int((_Move -(RADIUS*_SpeedAlpha))/KSTP));
+            StepperG->setAcceleration(float(getSpeedG()/ACC));
+            StepperG->setDeceleration(float(getSpeedG()/DEC)); 
+            StepperG->move(int((-_Move -(RADIUS*_SpeedAlpha))/KSTP));
             _AckStpG = true;
 
 
@@ -207,9 +207,9 @@ void diffrentiel::routine_diffrentiel(void)
         
         if ((_Cmd == "GOTO" or _Cmd == "MOVE") and _AckStpD ==false){   
             StepperD->setSpeed((_Speed + (RADIUS*_SpeedAlpha))/KSTP);
-            StepperD->setAcceleration(getSpeedD()/ACC);
-            StepperD->setDeceleration(getSpeedD()/DEC); 
-            StepperG->move(int((_Move + (RADIUS*_SpeedAlpha))/KSTP));
+            StepperD->setAcceleration(float(getSpeedD()/ACC));
+            StepperD->setDeceleration(float(getSpeedD()/DEC)); 
+            StepperD->move(int((_Move + (RADIUS*_SpeedAlpha))/KSTP));
             //StepperD->move(int(((-RADIUS*_MoveAlpha*(PI/180.0)) + cos((PI/180.0)*(THETA+_Alpha))*_MovepositionX - sin((PI/180.0)*(THETA+_Alpha))*_MovepositionY)/KSTP)); 
             _AckStpD = true;
 

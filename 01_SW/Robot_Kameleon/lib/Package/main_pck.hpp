@@ -38,7 +38,7 @@ struct pos_bras {
 
 const struct pos_bras Bras[]{
     {8,40,160,180,140}, //Bras G
-    {185,160,80,10,40}, //Bras D
+    {185,160,30,10,40}, //Bras D
     
    
 };

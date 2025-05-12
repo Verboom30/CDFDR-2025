@@ -18,7 +18,7 @@ Uart_TMC TMCSerial(TMC_UART_TX, TMC_UART_RX, SEL_UART_0, SEL_UART_1, SEL_UART_2,
 // Stepper *StepperA = new Stepper(STEP_A,DIR_A);
 // Stepper *StepperB = new Stepper(STEP_B,DIR_B);
 // Stepper *StepperC = new Stepper(STEP_C,DIR_C);
-//diffrentiel* RobotDiff = new diffrentiel();
+diffrentiel* RobotDiff = new diffrentiel();
 DigitalOut En_drive_N(ENABLE_DRIVE_N);
 DigitalOut En_step_N(ENABLE_STEP_N);
 
@@ -71,10 +71,10 @@ void showPostion(void)
 {
   while (1)
   {
-    // printf("PosX:%f PosY:%f Alpha:%f  SpeedX:%f SpeedY:%f SpeedAlpha:%f SpeedA:%f SpeedB:%f SpeedC:%f \n"
-    // ,RobotMove->getPositionX(),RobotMove->getPositionY(),RobotMove->getAlpha(),RobotMove->getSpeedX(),RobotMove->getSpeedY(),
-    // RobotMove->getSpeedAlpha(),RobotMove->getSpeedA(),RobotMove->getSpeedB(),RobotMove->getSpeedC()
-    // );
+    printf("PosX:%f PosY:%f Speed:%f SpeedAlpha:%f SpeedG:%f SpeedD:%f \n"
+    ,RobotDiff->getPositionX(),RobotDiff->getPositionY(),RobotDiff->getSpeed(),RobotDiff->getSpeedAlpha()
+    ,RobotDiff->getSpeedG(),RobotDiff->getSpeedD()
+    );
 
     // printf("PosX:%f PosY:%f Alpha:%f  SpeedX:%f SpeedY:%f SpeedAlpha:%f PosA:%d PosB:%d PosC:%d \n"
     // ,RobotHolonome.getPositionX(),RobotHolonome.getPositionY(),RobotHolonome.getAlpha(),RobotHolonome.getSpeedX(),RobotHolonome.getSpeedY(),
@@ -95,6 +95,8 @@ float theta2pluse(int theta)
 {
   return 500.0+(100.0/9.0)*float(theta);
 }
+
+
 
 int main()
 {
@@ -119,7 +121,7 @@ int main()
   // En_drive_N = 1;
   // En_step_N = 1;
 
-  //show_pos_thread.start(showPostion);
+  show_pos_thread.start(showPostion);
 
   lcd.cls();
   lcd.printf("Kameleon\n");
@@ -134,53 +136,54 @@ int main()
   StepperRM->InitLinearActuator();
   HAL_Delay (500);
  
+  // StepperRG->goUp();
+  // StepperRD->goUp();
+  // StepperRM->goUp();
+  // while(!(StepperRG->goUp() and StepperRD->goUp() and StepperRM->goUp()));
 
-
-  StepperRG->goUp();
-  StepperRD->goUp();
-  StepperRM->goUp();
-  while(!(StepperRG->goUp() and StepperRD->goUp() and StepperRM->goUp()));
-  //StepperRM->goUp();
-
-  StepperRG->goDown();
-  StepperRD->goDown();
-  StepperRM->goDown();
-  while(!(StepperRG->goDown() and StepperRD->goDown() and StepperRM->goDown()));
-
-  
-  
-
-  
+  // StepperRG->goDown();
+  // StepperRD->goDown();
+  // StepperRM->goDown();
+  // while(!(StepperRG->goDown() and StepperRD->goDown() and StepperRM->goDown()));
 
   // RobotHolonome.stop();
   // while(!RobotHolonome.waitAck());
   // RobotHolonome.setPositionZero();
-  // Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
-  // Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
-  // Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_side));
-  // Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_side));
-  // Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close)); 
-  // Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
-  // Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
-  // Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
+  Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
+  Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
+  Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_side));
+  Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_side));
+  HAL_Delay (500);
+  Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close)); 
+  Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
+  Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
+  Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
  
-  // StepperRG->goUp();
-  // StepperRD->goUp();
-  // StepperRM->goUp();
+  StepperRG->goUp();
+  StepperRD->goUp();
+  StepperRM->goUp();
+  while(!(StepperRG->goUp() and StepperRD->goUp() and StepperRM->goUp()));
 
 
-  // Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_home));
-  // Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_home));
+  Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_home));
+  Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_home));
 
-  // RobotDiff->stop();
-  // while(!RobotDiff->waitAck());
-  // RobotDiff->setPositionZero();
-  // while(!RobotDiff->waitAck());
-  // HAL_Delay (2000);
+ 
+  
 
-  // RobotDiff->move(50000,0,0);
-  // while(!RobotDiff->waitAck());
-  // while(!RobotDiff->stopped());
+  RobotDiff->stop();
+  while(!RobotDiff->waitAck());
+  RobotDiff->setPositionZero();
+  while(!RobotDiff->waitAck());
+
+
+  RobotDiff->move(0,1000,0);
+  while(!RobotDiff->waitAck());
+  while(!RobotDiff->stopped());
+
+  RobotDiff->move(0,-1000,0);
+  while(!RobotDiff->waitAck());
+  while(!RobotDiff->stopped());
 
 
 
@@ -277,7 +280,7 @@ int main()
     // {
     //   case 0:
     //     if (SW_init != 1) {
-    //       state =3;
+    //       state++;
     //     }
     //     break;
 
@@ -288,6 +291,7 @@ int main()
     //       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
     //       StepperRG->goDown();
     //       StepperRD->goDown();
+    //       while(!(StepperRG->goDown() and StepperRD->goDown()));
     //       state++;
     //       break;
     //   case 2:
@@ -303,9 +307,11 @@ int main()
     //       Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_side));
     //       Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_side));
     //       HAL_Delay (500);
-    //       StepperRM->goDown();
+    //       StepperRM->move(-11500);
+    //       while(!StepperRM->StepperAct->stopped());
     //       Suck_Pump.pulsewidth_us(theta2pluse(180));
-    //       StepperRM->StepperAct->move(500);
+    //       HAL_Delay (500);
+    //       StepperRM->move(-100);
     //       while(!StepperRM->StepperAct->stopped());
     //       HAL_Delay (500);
     //       Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
@@ -314,20 +320,21 @@ int main()
     //       StepperRM->goUp();
     //       StepperRG->goUp();
     //       StepperRD->goUp();
-    //       StepperRG->StepperAct->move(-2500);
-    //       while(!StepperRG->StepperAct->stopped());
-    //       StepperRD->StepperAct->move(2500);
-    //       while(!StepperRD->StepperAct->stopped());
+    //       while(!(StepperRG->goUp() and StepperRD->goUp() and StepperRM->goUp()));
+    //       StepperRG->move(-2500);
+    //       StepperRD->move(-2500);
+    //       while(!(StepperRG->StepperAct->stopped() and StepperRD->StepperAct->stopped()));
     //       HAL_Delay (500);
     //       Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_take));
     //       Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_take));
     //       HAL_Delay (1500);
-    //       StepperRM->StepperAct->move(2500);
+    //       StepperRM->move(-2500);
     //       while(!StepperRM->StepperAct->stopped());
+    //       HAL_Delay (500);
     //       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
     //       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
     //       Suck_Pump.pulsewidth_us(theta2pluse(0));
-    //       state++;
+    //       state = 7;
     //     }
     //     break;
     //   case 3:
@@ -345,6 +352,10 @@ int main()
     //     break;
     //   case 4:
     //     if (SW_init != 1) {
+          
+    //       StepperRG->goUp();
+    //       StepperRD->goUp();
+    //       while(!(StepperRG->goUp() and StepperRD->goUp()));
     //       Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_banner));
     //       Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_banner));
     //       HAL_Delay (500);
@@ -355,9 +366,15 @@ int main()
 
     //   case 5:
     //     if (SW_init != 1) {
+
     //       Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_drop_banner));
     //       Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_drop_banner));
     //       HAL_Delay (500);
+    //       StepperRG->goDown();
+    //       StepperRD->goDown();
+    //       HAL_Delay (500);
+    //       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
+    //       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
     //       //Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
     //       //Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
     //       state++;
@@ -366,11 +383,7 @@ int main()
 
     //   case 6:
     //     if (SW_init != 1){
-    //       StepperRG->goDown();
-    //       StepperRD->goDown();
-    //       HAL_Delay (500);
-    //       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
-    //       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
+          
     //       state++;
     //     }
     //     break;

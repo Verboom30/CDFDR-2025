@@ -13,6 +13,8 @@ LinearActuator::LinearActuator(PinName step, PinName dir,PinName SW_up, PinName 
         _reverse =1;
     }
     routine.start(callback(this, &LinearActuator::routine_Actuator));
+    _step_move = 0;
+    _Cmd = "";
    //InitLinearActuator();
    
 
@@ -57,6 +59,11 @@ void LinearActuator::InitLinearActuator(void){
     StepperAct->setDeceleration(SPEED_ACT/DEC_ACT);
     
 }
+void LinearActuator::move(int step){
+    _step_move = step;
+    _Cmd = "MOVE";
+
+}
 
 void LinearActuator::routine_Actuator(void)
 { 
@@ -73,7 +80,13 @@ void LinearActuator::routine_Actuator(void)
         while (_sw_down !=0);
         StepperAct->stop();
         _Cmd = "";
+     }else if (_Cmd == "MOVE")
+     {
+        StepperAct->move(_step_move*_reverse);
+        while(!StepperAct->stopped());
+        _Cmd = "";
      }
+     
      
    }
    

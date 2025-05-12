@@ -13,11 +13,11 @@
 #define RSTEP   200
 #define RWHEEL  35.0 
 #define REDUC   0.5
-#define KSTP     ((PI*2.0*RWHEEL/(RSTEP*MSTEP))*REDUC)
-#define SPEED   200.0 // max 50000 Mstepper 16 3200Ma
+#define KSTP    ((PI*2.0*RWHEEL/(RSTEP*MSTEP))*REDUC)
+#define SPEED   300.0 // max 50000 Mstepper 16 3200Ma
 
-#define ACC    4.0
-#define DEC    4.0
+#define ACC    2.0
+#define DEC    2.0
 
 class diffrentiel
 {
