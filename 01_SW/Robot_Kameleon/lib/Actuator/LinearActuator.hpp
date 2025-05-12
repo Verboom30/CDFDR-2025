@@ -7,9 +7,9 @@
 #include "main_pck.hpp"
 #include <string.h>
 
-#define ACC_ACT   4000.0
-#define DEC_ACT   4000.0
-#define SPEED_ACT 15000.0 // max 50000 Mstepper 16 3200Ma
+#define ACC_ACT   0.2
+#define DEC_ACT   0.2
+#define SPEED_ACT 25000.0 // max 50000 Mstepper 16 3200Ma
 #define MSTEP_ACT 16
 
 
@@ -23,10 +23,14 @@ class LinearActuator
     bool goUp(void);
     bool goDown(void);
     void InitLinearActuator(void);
+    Thread routine;
+    void routine_Actuator(void);
     DigitalIn _sw_up;
     DigitalIn _sw_down;
   private:
     int _reverse;
+    string _Cmd;
+    bool _Ack;
   protected:
     
 };

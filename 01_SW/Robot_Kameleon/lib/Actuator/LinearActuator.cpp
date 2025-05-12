@@ -12,6 +12,8 @@ LinearActuator::LinearActuator(PinName step, PinName dir,PinName SW_up, PinName 
     }else{
         _reverse =1;
     }
+    routine.start(callback(this, &LinearActuator::routine_Actuator));
+   //InitLinearActuator();
    
 
 }
@@ -39,28 +41,41 @@ LinearActuator::LinearActuator(PinName step, PinName dir,PinName SW_up, PinName 
 
 bool LinearActuator::goUp(void)
 {
-    do
-    {  
-        StepperAct->move(100*_reverse);
-        while(!StepperAct->stopped());
-    } while (_sw_up !=0);
-    return true;
+    _Cmd = "UP";
+    return (_sw_up !=1) ? true : false;
 }
 
 bool LinearActuator::goDown(void)
 {
-    do
-    {  
-        StepperAct->move(-100*_reverse);
-        while(!StepperAct->stopped());
-    } while (_sw_down !=0);
-    return true;
+    _Cmd = "DOWN";
+    return (_sw_down !=1) ? true : false;
 }
 
 void LinearActuator::InitLinearActuator(void){
     StepperAct->setSpeed(SPEED_ACT);
-    StepperAct->setAcceleration(0);
-    StepperAct->setDeceleration(0);
-    //InitDir();
+    StepperAct->setAcceleration(SPEED_ACT/ACC_ACT);
+    StepperAct->setDeceleration(SPEED_ACT/DEC_ACT);
+    
+}
+
+void LinearActuator::routine_Actuator(void)
+{ 
+   while (1)
+   {
+     if (_Cmd == "UP") {
+        StepperAct->move(100000*_reverse);
+        while (_sw_up !=0);
+        StepperAct->stop();
+        _Cmd = "";
+     }else if (_Cmd == "DOWN")
+     {
+        StepperAct->move(-100000*_reverse);
+        while (_sw_down !=0);
+        StepperAct->stop();
+        _Cmd = "";
+     }
+     
+   }
+   
 }
 

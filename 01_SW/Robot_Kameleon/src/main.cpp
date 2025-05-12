@@ -128,30 +128,49 @@ int main()
   HAL_Delay (500);
   TMCSerial.setup_all_stepper();
   
-  
+ 
   StepperRG->InitLinearActuator();
   StepperRD->InitLinearActuator();
   StepperRM->InitLinearActuator();
+  HAL_Delay (500);
+ 
+
+
+  StepperRG->goUp();
+  StepperRD->goUp();
+  StepperRM->goUp();
+  while(!(StepperRG->goUp() and StepperRD->goUp() and StepperRM->goUp()));
+  //StepperRM->goUp();
+
+  StepperRG->goDown();
+  StepperRD->goDown();
+  StepperRM->goDown();
+  while(!(StepperRG->goDown() and StepperRD->goDown() and StepperRM->goDown()));
+
+  
+  
+
+  
 
   // RobotHolonome.stop();
   // while(!RobotHolonome.waitAck());
   // RobotHolonome.setPositionZero();
-  Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
-  Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
-  Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_side));
-  Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_side));
-  Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close)); 
-  Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
-  Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
-  Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
+  // Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
+  // Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
+  // Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_side));
+  // Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_side));
+  // Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close)); 
+  // Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
+  // Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
+  // Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
  
-  StepperRG->goUp();
-  StepperRD->goUp();
-  StepperRM->goUp();
+  // StepperRG->goUp();
+  // StepperRD->goUp();
+  // StepperRM->goUp();
 
 
-  Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_home));
-  Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_home));
+  // Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_home));
+  // Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_home));
 
   // RobotDiff->stop();
   // while(!RobotDiff->waitAck());
@@ -254,122 +273,124 @@ int main()
     En_drive_N = SW_Drive;
     En_step_N =SW_Stepper; 
 
-    switch (state)
-    {
-      case 0:
-        if (SW_init != 1) {
-          state =3;
-        }
-        break;
+    // switch (state)
+    // {
+    //   case 0:
+    //     if (SW_init != 1) {
+    //       state =3;
+    //     }
+    //     break;
 
-      case 1:
-          Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_take));
-          Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_take));
-          Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
-          Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
-          StepperRG->goDown();
-          StepperRD->goDown();
-          state++;
-          break;
-      case 2:
-        if (SW_init != 1) {
-          Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
-          Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
-          HAL_Delay (500);
-          Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
-          Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
-          Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
-          Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
-          HAL_Delay (500);
-          Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_side));
-          Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_side));
-          HAL_Delay (500);
-          StepperRM->goDown();
-          Suck_Pump.pulsewidth_us(theta2pluse(180));
-          StepperRM->StepperAct->move(500);
-          while(!StepperRM->StepperAct->stopped());
-          HAL_Delay (500);
-          Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
-          Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
-          HAL_Delay (500);
-          StepperRM->goUp();
-          StepperRG->goUp();
-          StepperRD->goUp();
-          StepperRG->StepperAct->move(-2500);
-          while(!StepperRG->StepperAct->stopped());
-          StepperRD->StepperAct->move(2500);
-          while(!StepperRD->StepperAct->stopped());
-          HAL_Delay (500);
-          Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_take));
-          Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_take));
-          HAL_Delay (1500);
-          StepperRM->StepperAct->move(2500);
-          while(!StepperRM->StepperAct->stopped());
-          Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
-          Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
-          Suck_Pump.pulsewidth_us(theta2pluse(0));
-          state++;
-        }
-        break;
-      case 3:
-        if (SW_init != 1) {
-          Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_drop_banner));
-          Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_drop_banner));
-          Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
-          Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
-          HAL_Delay (2500);
-          Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_banner));
-          Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_banner));
-          HAL_Delay (500);
-          state++;
-        }
-        break;
-      case 4:
-        if (SW_init != 1) {
-          Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_banner));
-          Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_banner));
-          HAL_Delay (500);
+    //   case 1:
+    //       Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_take));
+    //       Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_take));
+    //       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
+    //       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
+    //       StepperRG->goDown();
+    //       StepperRD->goDown();
+    //       state++;
+    //       break;
+    //   case 2:
+    //     if (SW_init != 1) {
+    //       Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
+    //       Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
+    //       HAL_Delay (500);
+    //       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
+    //       Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
+    //       Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
+    //       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
+    //       HAL_Delay (500);
+    //       Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_side));
+    //       Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_side));
+    //       HAL_Delay (500);
+    //       StepperRM->goDown();
+    //       Suck_Pump.pulsewidth_us(theta2pluse(180));
+    //       StepperRM->StepperAct->move(500);
+    //       while(!StepperRM->StepperAct->stopped());
+    //       HAL_Delay (500);
+    //       Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
+    //       Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
+    //       HAL_Delay (500);
+    //       StepperRM->goUp();
+    //       StepperRG->goUp();
+    //       StepperRD->goUp();
+    //       StepperRG->StepperAct->move(-2500);
+    //       while(!StepperRG->StepperAct->stopped());
+    //       StepperRD->StepperAct->move(2500);
+    //       while(!StepperRD->StepperAct->stopped());
+    //       HAL_Delay (500);
+    //       Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_take));
+    //       Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_take));
+    //       HAL_Delay (1500);
+    //       StepperRM->StepperAct->move(2500);
+    //       while(!StepperRM->StepperAct->stopped());
+    //       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
+    //       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
+    //       Suck_Pump.pulsewidth_us(theta2pluse(0));
+    //       state++;
+    //     }
+    //     break;
+    //   case 3:
+    //     if (SW_init != 1) {
+    //       Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_drop_banner));
+    //       Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_drop_banner));
+    //       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
+    //       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
+    //       HAL_Delay (2500);
+    //       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_banner));
+    //       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_banner));
+    //       HAL_Delay (500);
+    //       state++;
+    //     }
+    //     break;
+    //   case 4:
+    //     if (SW_init != 1) {
+    //       Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_banner));
+    //       Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_banner));
+    //       HAL_Delay (500);
         
-          state++;
-        }
-        break;
+    //       state++;
+    //     }
+    //     break;
 
-      case 5:
-        if (SW_init != 1) {
-          HAL_Delay (1500);
-          Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_drop_banner));
-          Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_drop_banner));
-           HAL_Delay (500);
-          //Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
-          //Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
-          state++;
-        }
-        break;
+    //   case 5:
+    //     if (SW_init != 1) {
+    //       Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_drop_banner));
+    //       Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_drop_banner));
+    //       HAL_Delay (500);
+    //       //Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
+    //       //Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
+    //       state++;
+    //     }
+    //     break;
 
-      case 6:
-        if (SW_init != 1){
-          Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
-          Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
-          state++;
-        }
-        break;
-      case 7:
-            //Suck_Pump.pulsewidth_us(theta2pluse(180));
-            //HAL_Delay (1000);
+    //   case 6:
+    //     if (SW_init != 1){
+    //       StepperRG->goDown();
+    //       StepperRD->goDown();
+    //       HAL_Delay (500);
+    //       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
+    //       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
+    //       state++;
+    //     }
+    //     break;
+    //   case 7:
+    //         //Suck_Pump.pulsewidth_us(theta2pluse(180));
+    //         //HAL_Delay (1000);
           
-            //Suck_Pump.pulsewidth_us(theta2pluse(0));
-            //HAL_Delay (1000);
-            state++;
+    //         //Suck_Pump.pulsewidth_us(theta2pluse(0));
+    //         //HAL_Delay (1000);
+    //         state++;
             
-        break;
-      case 8:
+    //     break;
+    //   case 8:
          
-        break;
-      /* code */
+    //     break;
+    //   /* code */
     
-      default:
-        break;
-    }
+    //   default:
+    //     break;
+    // }
   
    
    
