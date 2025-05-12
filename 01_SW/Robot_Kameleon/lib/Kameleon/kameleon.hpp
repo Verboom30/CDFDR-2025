@@ -12,6 +12,14 @@ enum Kameleon_mode {
     DEBUG
 };
 
+enum Pince_Rotation_Position {
+    HOME = 0,
+    CAN_GRAB,
+    CAN_MOVE,
+    BANNER_HOLD,
+    BANNER_DROP
+};
+
 // Typedefs
 typedef const PinName PinStepper[2]; // Couple Step / Dir Pin for stepper control
 typedef const PinName PinServo;
@@ -89,11 +97,11 @@ namespace constraints {
                                              {ANGLE_TO_PULSE(70), ANGLE_TO_PULSE(50)},
                                              {ANGLE_TO_PULSE(180), ANGLE_TO_PULSE(150)},
                                              {ANGLE_TO_PULSE(90), ANGLE_TO_PULSE(60)}};
-    int PinceRotationDeployement[2] = {ANGLE_TO_PULSE(10),
-                                                    ANGLE_TO_PULSE(185)};
+    // Rotation of the exterior Pince : home, can grab, can move, banner holding and banner drop positions
+    int PinceRotationDeployement[2][5] = {{ANGLE_TO_PULSE(10), ANGLE_TO_PULSE(10), ANGLE_TO_PULSE(10), ANGLE_TO_PULSE(10), ANGLE_TO_PULSE(10)},
+                                          {ANGLE_TO_PULSE(10), ANGLE_TO_PULSE(10), ANGLE_TO_PULSE(10), ANGLE_TO_PULSE(10), ANGLE_TO_PULSE(10)}};
     int HookersUpDown[2][2] = {{ANGLE_TO_PULSE(65), ANGLE_TO_PULSE(160)},
-                                            {ANGLE_TO_PULSE(45), ANGLE_TO_PULSE(50)}};                                        
-    
+                                            {ANGLE_TO_PULSE(45), ANGLE_TO_PULSE(50)}};
 };
 
 class Kameleon {
@@ -107,6 +115,11 @@ public:
     void moveLeftCenterPince(bool move);
     void moveRightCenterPince(bool move);
     void moveAllPinces(bool move);
+
+    // Pince Rotations
+    void moveLeftPinceRotation(Pince_Rotation_Position position);
+    void moveRightPinceRotation(Pince_Rotation_Position position);
+    void moveAllPinceRotation(Pince_Rotation_Position position);
 
 private:
 

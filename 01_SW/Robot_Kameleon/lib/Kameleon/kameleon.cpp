@@ -34,3 +34,15 @@ void Kameleon::moveAllPinces(bool move) {
     moveLeftCenterPince(move);
     moveRightCenterPince(move);
 }
+
+// Pince Rotation Actions
+void Kameleon::moveLeftPinceRotation(Pince_Rotation_Position position) {
+    _LeftPinceRotation->pulsewidth_us(constraints::PinceRotationDeployement[0][(int)position]);
+}
+void Kameleon::moveRightPinceRotation(Pince_Rotation_Position position) {
+    _LeftPinceRotation->pulsewidth_us(constraints::PinceRotationDeployement[1][(int)position]);
+}
+void Kameleon::moveAllPinceRotation(Pince_Rotation_Position position) {
+    moveLeftPinceRotation(position);
+    moveRightPinceRotation(position);
+}
