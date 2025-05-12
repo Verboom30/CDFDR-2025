@@ -6,7 +6,7 @@
 Stepper::Stepper(PinName clk, PinName dir): _clk(clk) , _dir(dir)
 {
 
-    
+
     _clk = 1;
     _dir = 0;
     _state = STOP;
@@ -30,10 +30,10 @@ Stepper::Stepper(PinName clk, PinName dir): _clk(clk) , _dir(dir)
 //***********************************/************************************
 void Stepper::setSpeed(float speed)
 {
-    //stop();   
+    //stop();
     _spd = (speed<0) ? -speed : speed;  //speed must be unsigned
     if(_spd)_dtmin = 1000000/_spd;      //fin min delay (max spd)
-    //handler();  
+    //handler();
 }
 
 float Stepper::getSpeed(void)
@@ -43,7 +43,7 @@ float Stepper::getSpeed(void)
 
 void Stepper::setAcceleration(float acc)
 {
-  
+
     _acc = (acc<0) ? -acc : acc;            //acceleration must be unsigned
     if(_acc)_dt0 = 676000 * sqrt(2.0/_acc); //Equation 15 [µs] instead Equation 7
 }
@@ -111,17 +111,17 @@ bool Stepper::getPosCibleDone(void)
 
 void Stepper::run(void)
 {
-    handler();    
+    handler();
 }
 
 void Stepper::stop(void)
-{   
+{
     _clk = 1;
     remove();           //stop timer
-    _state = STOP;      //update state machine 
+    _state = STOP;      //update state machine
     _steps = 0;         //reset total steps per move
-   
-    
+
+
 }
 
 void Stepper::rotate(bool direction)
@@ -151,7 +151,7 @@ void Stepper::move(int steps)
 
 void Stepper::goesTo(int position)
 {
-    move(position-_pos);    //absolute to relative transformation   
+    move(position-_pos);    //absolute to relative transformation
 }
 
 //***********************************/************************************
@@ -159,13 +159,13 @@ void Stepper::goesTo(int position)
 //***********************************/************************************
 void Stepper::handler(void)
 {
-   
-    
+
+
     switch(_state)
     {
         case STOP:
             _n = 0;                      //reset setp counter (motor stopped)
-  
+
             if(_dt0 <= _dtmin || !_acc) //if first step faster than max speed step
             {
                 _dtn = _dtmin;       //delay = delaymin
@@ -179,18 +179,18 @@ void Stepper::handler(void)
 
             if(_steps)  //if finite mov required
             {
-                unsigned int nToSpeed = nTo(_spd,_acc);      //Equation 16 How many steps to reach max speed 
-                _nStartDec = (_steps * _dec) / (_dec + _acc);   //Equation 19 after how many step we must start decelerate  
-                if(_nStartDec > nToSpeed)_nStartDec = _steps - ((nToSpeed*_acc)/_dec);  //if speed can be reach Equation 17                
+                unsigned int nToSpeed = nTo(_spd,_acc);      //Equation 16 How many steps to reach max speed
+                _nStartDec = (_steps * _dec) / (_dec + _acc);   //Equation 19 after how many step we must start decelerate
+                if(_nStartDec > nToSpeed)_nStartDec = _steps - ((nToSpeed*_acc)/_dec);  //if speed can be reach Equation 17
             }
             _i = _dtn;
         break;
-        
+
         case ACCEL:
             //_dtn -=  (_dtn*2.0) / ((_n<<2)+1);   //Equation 20 find next delay
             _i-= _i*2.0 / ((_n<<2)+1);
             _dtn = _i;
-            
+
             if((unsigned int)_dtn <= _dtmin) //if max speed reached
             {
                  _dtn = _dtmin;
@@ -199,23 +199,23 @@ void Stepper::handler(void)
             }
             if(_steps && _dec && _n >= _nStartDec)_state = DECEL; //chech when must start decelerate
         break;
-        
+
         case CRUISE:
             if(_steps && _dec && _n >= _nStartDec)_state = DECEL; //chech when must start decelerate
         break;
-        
+
         case DECEL:
             //_dtn +=  (_dtn*2) / (((_steps-_n)<<2)+1);  //Equation 20 find next delay
             _i+= (_i*2.0) / (((_steps-_n)<<2)+1);
             _dtn = _i;
-        break;    
+        break;
     }
-    
+
     _clk=0;
-    
+
     if(!_n) insert(_dtn + us_ticker_read());   //start timer @ first delay
     else insert(event.timestamp+(unsigned int)_dtn);
-    
+
     _n++;                                   //increment step counter
     _pos += (_dir<<1)-1;                    //set new position +1 if cw; -1 if ccw
     _clk = 1;                              //toggle step out pin
@@ -230,7 +230,7 @@ unsigned int Stepper::nTo(float speed,float acc)
 {
     if(speed<0)speed = -speed;
     if(acc<0)acc = -acc;
-    
+
     return (!acc || !speed) ? 0 : (speed * speed) / (2 * acc); //Equation 16 step number n as a function of speed & acceleration
 }
 
