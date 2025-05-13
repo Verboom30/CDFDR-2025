@@ -6,7 +6,7 @@
 #include "main_pck.hpp"
 #include "LinearActuator.hpp"
 #include <inttypes.h>
-#include "differentiel.hpp"
+#include "Differentiel.hpp"
 
 //***********************************/************************************
 //                              UART_TMC                                //
@@ -18,7 +18,9 @@ Uart_TMC TMCSerial(TMC_UART_TX, TMC_UART_RX, SEL_UART_0, SEL_UART_1, SEL_UART_2,
 // Stepper *StepperA = new Stepper(STEP_A,DIR_A);
 // Stepper *StepperB = new Stepper(STEP_B,DIR_B);
 // Stepper *StepperC = new Stepper(STEP_C,DIR_C);
-diffrentiel* RobotDiff = new diffrentiel();
+Stepper StepperG(STEP_G,DIR_G);
+Stepper StepperD(STEP_D,DIR_D);
+diffrentiel RobotDiff(&StepperG,&StepperD);
 DigitalOut En_drive_N(ENABLE_DRIVE_N);
 DigitalOut En_step_N(ENABLE_STEP_N);
 
@@ -72,8 +74,8 @@ void showPostion(void)
   while (1)
   {
     printf("PosX:%f PosY:%f Speed:%f SpeedAlpha:%f SpeedG:%f SpeedD:%f \n"
-    ,RobotDiff->getPositionX(),RobotDiff->getPositionY(),RobotDiff->getSpeed(),RobotDiff->getSpeedAlpha()
-    ,RobotDiff->getSpeedG(),RobotDiff->getSpeedD()
+    ,RobotDiff.getPositionX(),RobotDiff.getPositionY(),RobotDiff.getSpeed(),RobotDiff.getSpeedAlpha()
+    ,RobotDiff.getSpeedG(),RobotDiff.getSpeedD()
     );
 
     // printf("PosX:%f PosY:%f Alpha:%f  SpeedX:%f SpeedY:%f SpeedAlpha:%f PosA:%d PosB:%d PosC:%d \n"
@@ -96,6 +98,15 @@ float theta2pluse(int theta)
   return 500.0+(100.0/9.0)*float(theta);
 }
 
+void Robotmoveto(diffrentiel& robot, int distance, int alpha = 0)
+{
+    robot.move(distance, alpha);
+    do
+    {
+      ThisThread::sleep_for(100ms);
+    } while (!robot.stopped());
+    robot.stop();
+}
 
 
 int main()
@@ -169,21 +180,16 @@ int main()
   Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_home));
 
  
+  RobotDiff.stop();
+  RobotDiff.setPositionZero();
+  
+  Robotmoveto(RobotDiff,1000,0);
+  HAL_Delay (500);
+  Robotmoveto(RobotDiff,-1000,0);
+ 
   
 
-  RobotDiff->stop();
-  while(!RobotDiff->waitAck());
-  RobotDiff->setPositionZero();
-  while(!RobotDiff->waitAck());
-
-
-  RobotDiff->move(0,1000,0);
-  while(!RobotDiff->waitAck());
-  while(!RobotDiff->stopped());
-
-  RobotDiff->move(0,-1000,0);
-  while(!RobotDiff->waitAck());
-  while(!RobotDiff->stopped());
+  
 
 
 

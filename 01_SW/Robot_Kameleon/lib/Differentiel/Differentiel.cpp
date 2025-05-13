@@ -1,231 +1,152 @@
-#include "differentiel.hpp"
-//***********************************/************************************
-//                         Constructors                                 //
-//***********************************/************************************
-diffrentiel::diffrentiel()
+#include "Differentiel.hpp"
+
+diffrentiel::diffrentiel(Stepper* moteurGauche, Stepper* moteurDroit)
+    : StepperG(moteurGauche), StepperD(moteurDroit), readyCount(0), semG(0), semD(0) 
 {
-    routine.start(callback(this, &diffrentiel::routine_diffrentiel));
+    _positionX = _positionY = 0;
+    _positionX_Save = _positionY_Save = 0;
+    _cibleposX = _cibleposY = 0;
+    _Alpha = _Alpha_Save = 0;
+    _Speed = _SpeedAlpha = 0;
+    _Move = _MoveAlpha = 0;
 
-    _AckStpG =false;
-    _AckStpD =false;
-    _Cmd ="";
-    _Alpha = 0;
-    _positionY  =0;
-    _positionX  =0;
-    _positionY_Save  =0;
-    _positionX_Save  =0;
-    _cibleposX       =0;
-    _cibleposY       =0;
-    _Alpha_Save      =0;
-    _Speed     =0; 
-    _SpeedAlpha =0;
-    _Move=0;
-    _MoveAlpha=0;
-
-   
+    routineG.start(callback(this, &diffrentiel::routine_gauche));
+    routineD.start(callback(this, &diffrentiel::routine_droite));
 }
 
-//***********************************/************************************
-//                                Get Set                               //
-//***********************************/************************************
-
-float diffrentiel::getSpeedG(void)
+void diffrentiel::run()
 {
-    return StepperG->getSpeed();
+    StepperG->run();
+    StepperD->run();
 }
 
-float diffrentiel::getSpeedD(void)
+void diffrentiel::stop()
 {
-    return StepperD->getSpeed();
-}
-
-int diffrentiel::getPosG(void)
-{
-    return StepperG->getPosition();
-}
-
-int diffrentiel::getPosD(void)
-{
-    return StepperD->getPosition();
-}
-
-int diffrentiel::getStepG(void)
-{
-    return StepperG->getStep();
-}
-
-int diffrentiel::getStepD(void)
-{
-    return StepperD->getStep();
+    StepperG->stop();
+    StepperD->stop();
 }
 
 void diffrentiel::setPosition(int positionX, int positionY, int Alpha)
 {
+    ScopedLock<Mutex> lock(mutexData);
     _positionX = positionX;
     _positionY = positionY;
-    _MoveAlpha = Alpha;
-    _Alpha_Save = 0;
-    _positionX_Save = 0;
-    _positionY_Save = 0;
-   
+    _Alpha = Alpha;
 }
 
-void diffrentiel::setPositionZero(void)
+void diffrentiel::setPositionZero()
 {
-    _Cmd ="RST";
-    while(!waitAck());
-}
-
-float diffrentiel::getPositionX(void)
-{
-    return -_positionX;
-}
-
-float diffrentiel::getPositionY(void)
-{
-    return _positionY;
-}
-
-float diffrentiel::getPosCibleX(void)
-{
-    return _cibleposX;
-}
-
-float diffrentiel::getPosCibleY(void)
-{
-    return _cibleposY;
-}
-
-float diffrentiel::getAlpha(void)
-{
-    return _Alpha;
-}
-
-float diffrentiel::getSpeed(void)
-{
-    return _Speed;
-}
-
-float diffrentiel::getSpeedAlpha(void)
-{
-    return _SpeedAlpha;
-}
-
-bool diffrentiel::stopped(void)
-{
-    return (StepperG->stopped() == true and StepperD->stopped()== true) ? true : false;
-}
-
-bool diffrentiel::PosCibleDone(void)
-{
-    return (StepperG->getPosCibleDone() == true and StepperD->getPosCibleDone()== true) ? true : false;
-}
-
-bool diffrentiel::waitAck(void)
-{
-    if(_AckStpG ==true and _AckStpD ==true){
-      
-        _Cmd ="ACK";
-        return 0;
-    }else if(_AckStpG ==false and _AckStpD ==false and _Cmd =="ACK"){
-        return 1;
-    }else{
-        return 0;
-    }
-}
-
-//***********************************/************************************
-//                             Public Methods                           //
-//***********************************/************************************
-
-void diffrentiel::run(void)
-{
-     StepperG->run();    
-     StepperD->run();    
-}
-
-void diffrentiel::stop(void)
-{   
-    _Cmd = "STOP";
-     
+    StepperG->setPositionZero();
+    StepperD->setPositionZero();
 }
 
 void diffrentiel::goesTo(int positionX, int positionY, int Alpha)
 {
-    _cibleposX      = positionX;
-    _cibleposY      = positionY;
-    _Move = sqrt(pow(float(_cibleposX-_positionX),2.0)+pow(float(_cibleposY-_positionY),2.0));
-    _MoveAlpha      = float(Alpha -_Alpha)          ; 
-    _positionX_Save = _positionX;
-    _positionY_Save = _positionY;
-    _Alpha_Save     = _Alpha;
-     setPositionZero();
-    _Speed =  (float(abs(_Move))/(abs(_Move)+abs(_MoveAlpha)))*SPEED;
-    _SpeedAlpha =  (float(abs(_MoveAlpha))/(abs(_Move)+abs(_MoveAlpha)))*(SPEED/4.0);
-    _Cmd = "GOTO";
-}
+    float dx = positionX - _positionX;
+    float dy = positionY - _positionY;
+    float move = sqrt(dx * dx + dy * dy);
+    float moveAlpha = Alpha - _Alpha;
 
-void diffrentiel::move(int positionX, int positionY, int Alpha)
-{
-    _cibleposX      = positionX;
-    _cibleposY      = positionY;
-    _Move = positionY;
-    _MoveAlpha      = float(Alpha); 
-    _positionX_Save = _positionX;
-    _positionY_Save = _positionY;
-    _Alpha_Save     = _Alpha;
-     setPositionZero();
-    _Speed =  (float(abs(_Move))/(abs(_Move)+abs(_MoveAlpha)))*SPEED;
-    _SpeedAlpha =  (float(abs(_MoveAlpha))/(abs(_Move)+abs(_MoveAlpha)))*(SPEED/4.0);
-    _Cmd = "MOVE";
-   
-}
-
-void diffrentiel::routine_diffrentiel(void)
-{
-    
-    while (1)
     {
-        if ((_Cmd == "GOTO" or _Cmd == "MOVE") and _AckStpG ==false){    
-            StepperG->setSpeed((_Speed - (RADIUS*_SpeedAlpha))/KSTP);
-            StepperG->setAcceleration(float(getSpeedG()/ACC));
-            StepperG->setDeceleration(float(getSpeedG()/DEC)); 
-            StepperG->move(int((-_Move -(RADIUS*_SpeedAlpha))/KSTP));
-            _AckStpG = true;
-
-
-        }else if (_Cmd == "STOP"){
-            StepperG->stop();
-            _AckStpG = true;
-
-        }else if (_Cmd == "RST" and _AckStpG ==false){
-            StepperG->setPositionZero();
-            _AckStpG = true;
-        }else if (_Cmd == "ACK"){
-            _AckStpG = false;
-        }
-        
-        if ((_Cmd == "GOTO" or _Cmd == "MOVE") and _AckStpD ==false){   
-            StepperD->setSpeed((_Speed + (RADIUS*_SpeedAlpha))/KSTP);
-            StepperD->setAcceleration(float(getSpeedD()/ACC));
-            StepperD->setDeceleration(float(getSpeedD()/DEC)); 
-            StepperD->move(int((_Move + (RADIUS*_SpeedAlpha))/KSTP));
-            //StepperD->move(int(((-RADIUS*_MoveAlpha*(PI/180.0)) + cos((PI/180.0)*(THETA+_Alpha))*_MovepositionX - sin((PI/180.0)*(THETA+_Alpha))*_MovepositionY)/KSTP)); 
-            _AckStpD = true;
-
-        }else if (_Cmd == "STOP"){
-            StepperD->stop();
-            _AckStpD = true; 
-
-         }else if (_Cmd == "RST" and _AckStpD ==false){
-            StepperD->setPositionZero();
-            _AckStpD = true;
-        }else if (_Cmd == "ACK"){
-            _AckStpD = false;
-        } 
-            //_Alpha     =  _Alpha_Save+ (((-1.0/(3.0*RADIUS))*StepperD->getPosition()) + ((-1.0/(3.0*RADIUS))*StepperG->getPosition()) + ((-1.0/(3.0*RADIUS))*StepperC->getPosition()))*KSTP/(PI/180.0);
-            //_positionX = _positionX_Save+ ((-cos((PI/180.0)*_Alpha)/6.0)*StepperG->getPosition() + ((cos((PI/180.0)*_Alpha)-sqrt(3)*sin((PI/180.0)*_Alpha))/12.0)*StepperD->getPosition() + ((sqrt(3)*sin((PI/180.0)*_Alpha)+cos((PI/180.0)*_Alpha))/12.0)*StepperC->getPosition())*KSTP*4;
-            //_positionY = _positionY_Save+ ((sin((PI/180.0)*_Alpha)/6.0)*StepperG->getPosition() - ((sin((PI/180.0)*_Alpha)+sqrt(3)*cos((PI/180.0)*_Alpha))/12.0)*StepperD->getPosition() + ((sqrt(3)*cos((PI/180.0)*_Alpha)-sin((PI/180.0)*_Alpha))/12.0)*StepperC->getPosition())*KSTP*4;
-
+        ScopedLock<Mutex> lock(mutexData);
+        _cibleposX = positionX;
+        _cibleposY = positionY;
+        _Move = move;
+        _MoveAlpha = moveAlpha;
+        _positionX_Save = _positionX;
+        _positionY_Save = _positionY;
+        _Alpha_Save = _Alpha;
+        _Speed = (abs(_Move) / (abs(_Move) + abs(_MoveAlpha))) * SPEED;
+        _SpeedAlpha = (abs(_MoveAlpha) / (abs(_Move) + abs(_MoveAlpha))) * (SPEED / 4.0f);
     }
+
+    flags.set(0x1 | 0x2);
+}
+
+void diffrentiel::move(int Distance, int Alpha)
+{
+    float move = Distance;
+    float moveAlpha = float(Alpha);
+
+    {
+        ScopedLock<Mutex> lock(mutexData);
+        _Move = move;
+        _MoveAlpha = moveAlpha;
+        _positionX_Save = _positionX;
+        _positionY_Save = _positionY;
+        _Alpha_Save = _Alpha;
+        _Speed = (abs(_Move) / (abs(_Move) + abs(_MoveAlpha))) * SPEED;
+        _SpeedAlpha = (abs(_MoveAlpha) / (abs(_Move) + abs(_MoveAlpha))) * (SPEED / 4.0f);
+    }
+
+    flags.set(0x1 | 0x2);
+}
+
+void diffrentiel::synchroniser() {
+    ScopedLock<Mutex> lock(syncMutex);
+    readyCount++;
+    if (readyCount == 2) {
+        semG.release();
+        semD.release();
+        readyCount = 0;
+    }
+}
+
+// ======================== Routines moteurs ========================= //
+
+void diffrentiel::routine_gauche()
+{
+    while (true) {
+        flags.wait_any(0x1); // attend ordre moteur gauche
+        synchroniser();
+        ScopedLock<Mutex> lock(mutexData);
+
+        float speed = (_Speed - RADIUS * _SpeedAlpha) / KSTP;
+        StepperG->setSpeed(speed);
+        StepperG->setAcceleration(speed / ACC);
+        StepperG->setDeceleration(speed / DEC);
+        StepperG->move(int((-_Move - RADIUS * _SpeedAlpha) / KSTP));
+    }
+}
+
+void diffrentiel::routine_droite()
+{
+    while (true) {
+        flags.wait_any(0x2); // attend ordre moteur droit
+        synchroniser();
+        ScopedLock<Mutex> lock(mutexData);
+
+        float speed = (_Speed + RADIUS * _SpeedAlpha) / KSTP;
+        StepperD->setSpeed(speed);
+        StepperD->setAcceleration(speed / ACC);
+        StepperD->setDeceleration(speed / DEC);
+        StepperD->move(int((_Move + RADIUS * _SpeedAlpha) / KSTP));
+    }
+}
+
+// ======================== Getters ========================= //
+
+float diffrentiel::getSpeedG()      { return StepperG->getSpeed(); }
+float diffrentiel::getSpeedD()      { return StepperD->getSpeed(); }
+int   diffrentiel::getPosG()        { return StepperG->getPosition(); }
+int   diffrentiel::getPosD()        { return StepperD->getPosition(); }
+int   diffrentiel::getStepG()       { return StepperG->getStep(); }
+int   diffrentiel::getStepD()       { return StepperD->getStep(); }
+
+float diffrentiel::getPositionX()   { return _positionX; }
+float diffrentiel::getPositionY()   { return _positionY; }
+float diffrentiel::getPosCibleX()   { return _cibleposX; }
+float diffrentiel::getPosCibleY()   { return _cibleposY; }
+float diffrentiel::getAlpha()       { return _Alpha; }
+float diffrentiel::getSpeed()       { return _Speed; }
+float diffrentiel::getSpeedAlpha()  { return _SpeedAlpha; }
+
+bool diffrentiel::stopped()
+{
+    return StepperG->stopped() && StepperD->stopped();
+}
+
+bool diffrentiel::PosCibleDone()
+{
+    return StepperG->getPosCibleDone() && StepperD->getPosCibleDone();
 }

@@ -6,6 +6,7 @@
 #include "Stepper.hpp"
 #include "main_pck.hpp"
 #include <string.h>
+#include <cmath>
 
 
 #define PI      3.14159265
@@ -22,75 +23,64 @@
 class diffrentiel
 {
     public:
-    diffrentiel();
-    Stepper *StepperG = new Stepper(STEP_G,DIR_G);
-    Stepper *StepperD = new Stepper(STEP_D,DIR_D);
-   
-    float   getPositionX(void);
-    float   getPositionY(void);
-    float   getPosCibleX(void);
-    float   getPosCibleY(void);
-    float   getAlpha(void);
-    float   getSpeed(void);
-    float   getSpeedAlpha(void);
-    
+    diffrentiel(Stepper* moteurGauche, Stepper* moteurDroit);
 
-    void  setPosition(int positionX, int positionY, int Alpha);
-    void  setPositionZero(void);
-    bool  stopped(void);
-    bool  waitAck(void);
-    bool  PosCibleDone(void);
+    void run();
+    void stop();
 
-    void  goesTo(int positionX, int positionY, int Alpha); 
-    void  move(int positionX, int positionY, int Alpha); 
-    void  stop(void);
-    void  run(void);
-    float getSpeedG(void);
-    float getSpeedD(void);
-    int getPosG(void);
-    int getPosD(void);
+    void goesTo(int positionX, int positionY, int Alpha);
+    void move(int distance, int Alpha); 
+    void setPosition(int positionX, int positionY, int Alpha);
+    void setPositionZero();
+
+    float getSpeedG();
+    float getSpeedD();
+    int getPosG();
+    int getPosD();
+    int getStepG();
+    int getStepD();
+
+    float getPositionX();
+    float getPositionY();
+    float getPosCibleX();
+    float getPosCibleY();
+    float getAlpha();
+    float getSpeed();
+    float getSpeedAlpha();
+
+    bool stopped();
+    bool PosCibleDone();
    
-    int getStepG(void);
-    int getStepD(void);
- 
-    Thread routine;
-    void routine_diffrentiel(void);
-    
+
 private : 
-    float _acc;                             //Acceleration [step/s²]
-    float _dec;                             //Decceleration [step/s²]
-    float _spd;                             //Speed [step/s]
-    float _Alpha;
-    float _positionX;
-    float _positionY;
-    float _cibleposX;
-    float _cibleposY;
-    float _positionX_Save;
-    float _positionY_Save;
-    float _Alpha_Save;
-    float _MoveAlpha; 
-    float _Move;
-    float _SpeedAlpha;
-    float _Speed;
-    
-    string _Cmd;
-    bool _AckStpG;
-    bool _AckStpD;
+    // Moteurs
+    Stepper* StepperG;
+    Stepper* StepperD;
+
+    // Threads et synchro
+    Thread routineG;
+    Thread routineD;
+    EventFlags flags;
+    Mutex mutexData;
+  
+    int readyCount;
+    Semaphore semG, semD;
+    Mutex syncMutex;
    
 
-    // Thread StepperA_thread;
-    // Thread StepperB_thread;
-    // Thread StepperC_thread;
-    
-    
-    // // void routine_stepperA(void);
-    // // void routine_stepperB(void);
-    // // void routine_stepperC(void); 
-        
-protected:
-    //***********************************/************************************
-    //                          Protected Methods                           //
-    //***********************************/************************************
+    // Données de mouvement
+    float _positionX, _positionY;
+    float _positionX_Save, _positionY_Save;
+    float _cibleposX, _cibleposY;
+    float _Alpha, _Alpha_Save;
+    float _Speed, _SpeedAlpha;
+    float _Move, _MoveAlpha;
+
+    // Routines moteurs
+    void routine_gauche();
+    void routine_droite();
+    void synchroniser();
+
 };
 
-#endif
+#endif // DIFFERENTIEL_HPP
