@@ -70,22 +70,56 @@ void diffrentiel::goesTo(int positionX, int positionY, int Alpha)
     float dx = positionX - _positionX;
     float dy = positionY - _positionY;
     float move = sqrt(dx * dx + dy * dy);
-    float moveAlpha = Alpha - _Alpha;
 
+    float targetAlpha = ((180.0f / M_PI) * atan2(dy, dx)); 
+    float moveAlpha = targetAlpha - _Alpha;
+
+    // Gérer la différence d'angle pour éviter les rotations inutiles
+    // L'angle est borné entre -180° et 180°
+    if (moveAlpha > 180) moveAlpha -= 360;
+    if (moveAlpha < -180) moveAlpha += 360;
+
+    // Si la différence d'angle est proche de 180° ou -180°, on inverse le mouvement
+    if (std::abs(moveAlpha) > 90) {
+        moveAlpha -= 180;
+        move = -move; 
+        if (moveAlpha > 180) moveAlpha -= 360;
+        if (moveAlpha < -180) moveAlpha += 360;
+    }
+   
+   
+    
+    // Déplacer le robot dans la direction calculée
+    diffrentiel::move(0,moveAlpha);
+    do
     {
-        ScopedLock<Mutex> lock(mutexData);
-        _cibleposX = positionX;
-        _cibleposY = positionY;
-        _Move = move;
-        _MoveAlpha = moveAlpha;
-        _positionX_Save = _positionX;
-        _positionY_Save = _positionY;
-        _Alpha_Save = _Alpha;
-        _Speed = (abs(_Move) / (abs(_Move) + abs(_MoveAlpha))) * SPEED;
-        _SpeedAlpha = (abs(_MoveAlpha) / (abs(_Move) + abs(_MoveAlpha))) * (SPEED * 2.0f);
+      ThisThread::sleep_for(100ms);
+    } while (!diffrentiel::stopped());
+    diffrentiel::move(move,0);
+
+    // Ensuite, avancer ou reculer selon la distance
+    do
+    {
+      ThisThread::sleep_for(100ms);
+    } while (!diffrentiel::stopped());
+
+    //Déplacer le robot suivant la consigne d'angle 
+    float finalAlpha = Alpha - _Alpha;  
+    if (finalAlpha > 180) finalAlpha -= 360;
+    if (finalAlpha < -180) finalAlpha += 360;
+
+    if (std::abs(finalAlpha) > 90) {
+        finalAlpha -= 180;
+        if (moveAlpha > 180) moveAlpha -= 360;
+        if (moveAlpha < -180) moveAlpha += 360;
     }
 
-    flags.set(0x1 | 0x2);
+    diffrentiel::move(0, finalAlpha);
+    do
+    {
+        ThisThread::sleep_for(100ms);
+    } while (!diffrentiel::stopped());
+
 }
 
 void diffrentiel::move(int Distance, int Alpha)

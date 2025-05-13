@@ -98,7 +98,7 @@ float theta2pluse(int theta)
   return 500.0+(100.0/9.0)*float(theta);
 }
 
-void Robotmoveto(diffrentiel& robot, int distance, int alpha = 0)
+void Robotmoveto(diffrentiel& robot, int distance, int alpha)
 {
     robot.move(distance, alpha);
     do
@@ -107,7 +107,15 @@ void Robotmoveto(diffrentiel& robot, int distance, int alpha = 0)
     } while (!robot.stopped());
     robot.stop();
 }
-
+void Robotgoto(diffrentiel& robot, int positionX, int positionY, int alpha)
+{
+    robot.goesTo(positionX, positionY, alpha);
+    do
+    {
+      ThisThread::sleep_for(100ms);
+    } while (!robot.stopped());
+    robot.stop();
+}
 void printPosition()
 {
     printf("[Position] X = %.2f mm | Y = %.2f mm | Angle = %.2f°\n",
@@ -179,34 +187,30 @@ int main()
   // RobotHolonome.stop();
   // while(!RobotHolonome.waitAck());
   // RobotHolonome.setPositionZero();
-  Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
-  Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
-  Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_side));
-  Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_side));
-  HAL_Delay (500);
-  Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close)); 
-  Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
-  Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
-  Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
+  // Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
+  // Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
+  // Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_side));
+  // Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_side));
+  // HAL_Delay (500);
+  // Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close)); 
+  // Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
+  // Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
+  // Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
  
-  StepperRG->goUp();
-  StepperRD->goUp();
-  StepperRM->goUp();
-  while(!(StepperRG->goUp() and StepperRD->goUp() and StepperRM->goUp()));
+  // StepperRG->goUp();
+  // StepperRD->goUp();
+  // StepperRM->goUp();
+  // while(!(StepperRG->goUp() and StepperRD->goUp() and StepperRM->goUp()));
 
 
-  Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_home));
-  Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_home));
+  // Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_home));
+  // Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_home));
 
   RobotDiff.setPosition(0, 0, 0);
-
-  Robotmoveto(RobotDiff,100,0);
-
-  Robotmoveto(RobotDiff,100,0);
-
-  Robotmoveto(RobotDiff,0,45);
-
-  Robotmoveto(RobotDiff,100,0);
+  HAL_Delay (1000);
+  Robotgoto(RobotDiff,100,100,0);
+  HAL_Delay (1000);
+  Robotgoto(RobotDiff,0,0,0);
   //Robotmoveto(RobotDiff,0,-90);
  
   
