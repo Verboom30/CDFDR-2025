@@ -57,7 +57,7 @@ void diffrentiel::goesTo(int positionX, int positionY, int Alpha)
         _positionY_Save = _positionY;
         _Alpha_Save = _Alpha;
         _Speed = (abs(_Move) / (abs(_Move) + abs(_MoveAlpha))) * SPEED;
-        _SpeedAlpha = (abs(_MoveAlpha) / (abs(_Move) + abs(_MoveAlpha))) * (SPEED / 4.0f);
+        _SpeedAlpha = (abs(_MoveAlpha) / (abs(_Move) + abs(_MoveAlpha))) * (SPEED * 2.0f);
     }
 
     flags.set(0x1 | 0x2);
@@ -76,7 +76,7 @@ void diffrentiel::move(int Distance, int Alpha)
         _positionY_Save = _positionY;
         _Alpha_Save = _Alpha;
         _Speed = (abs(_Move) / (abs(_Move) + abs(_MoveAlpha))) * SPEED;
-        _SpeedAlpha = (abs(_MoveAlpha) / (abs(_Move) + abs(_MoveAlpha))) * (SPEED / 4.0f);
+        _SpeedAlpha = (abs(_MoveAlpha) / (abs(_Move) + abs(_MoveAlpha))) * (SPEED * 2.0f);
     }
 
     flags.set(0x1 | 0x2);
@@ -101,11 +101,11 @@ void diffrentiel::routine_gauche()
         synchroniser();
         ScopedLock<Mutex> lock(mutexData);
 
-        float speed = (_Speed - RADIUS * _SpeedAlpha) / KSTP;
+        float speed = (_Speed - RADIUS * _SpeedAlpha * (PI/180.0f)) / KSTP;
         StepperG->setSpeed(speed);
         StepperG->setAcceleration(speed / ACC);
         StepperG->setDeceleration(speed / DEC);
-        StepperG->move(int((-_Move - RADIUS * _SpeedAlpha) / KSTP));
+        StepperG->move(- int((_Move - RADIUS * _MoveAlpha * (PI/180.0f)) / KSTP));
     }
 }
 
@@ -116,11 +116,11 @@ void diffrentiel::routine_droite()
         synchroniser();
         ScopedLock<Mutex> lock(mutexData);
 
-        float speed = (_Speed + RADIUS * _SpeedAlpha) / KSTP;
+        float speed = (_Speed + RADIUS * _SpeedAlpha * (PI/180.0f)) / KSTP;
         StepperD->setSpeed(speed);
         StepperD->setAcceleration(speed / ACC);
         StepperD->setDeceleration(speed / DEC);
-        StepperD->move(int((_Move + RADIUS * _SpeedAlpha) / KSTP));
+        StepperD->move(int((_Move + RADIUS * _MoveAlpha * (PI/180.0f)) / KSTP));
     }
 }
 

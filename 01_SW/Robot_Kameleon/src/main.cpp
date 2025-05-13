@@ -183,9 +183,9 @@ int main()
   RobotDiff.stop();
   RobotDiff.setPositionZero();
   
-  Robotmoveto(RobotDiff,1000,0);
+  Robotmoveto(RobotDiff,0,90);
   HAL_Delay (500);
-  Robotmoveto(RobotDiff,-1000,0);
+  Robotmoveto(RobotDiff,0,-90);
  
   
 

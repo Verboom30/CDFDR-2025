@@ -9,16 +9,16 @@
 #include <cmath>
 
 
-#define PI      3.14159265
-#define RADIUS  71.0 // robot wheel-base radius
+#define PI      3.14159265f
+#define RADIUS  71.0f // robot wheel-base radius
 #define RSTEP   200
-#define RWHEEL  35.0 
-#define REDUC   0.5
-#define KSTP    ((PI*2.0*RWHEEL/(RSTEP*MSTEP))*REDUC)
-#define SPEED   300.0 // max 50000 Mstepper 16 3200Ma
+#define RWHEEL  35.0f
+#define REDUC   0.5f
+#define KSTP    ((PI*2.0f*RWHEEL/(RSTEP*MSTEP))*REDUC)
+#define SPEED   300.0f // max 50000 Mstepper 16 3200Ma
 
-#define ACC    2.0
-#define DEC    2.0
+#define ACC    2.0f
+#define DEC    2.0f
 
 class diffrentiel
 {
