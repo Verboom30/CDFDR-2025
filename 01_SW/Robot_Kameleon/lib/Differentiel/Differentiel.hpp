@@ -9,12 +9,12 @@
 #include <cmath>
 
 
-#define PI      3.14159265f
+
 #define RADIUS  71.0f // robot wheel-base radius
 #define RSTEP   200
 #define RWHEEL  35.0f
 #define REDUC   0.5f
-#define KSTP    ((PI*2.0f*RWHEEL/(RSTEP*MSTEP))*REDUC)
+#define KSTP    ((M_PI*2.0f*RWHEEL/(RSTEP*MSTEP))*REDUC)
 #define SPEED   300.0f // max 50000 Mstepper 16 3200Ma
 
 #define ACC    2.0f
@@ -32,6 +32,7 @@ class diffrentiel
     void move(int distance, int Alpha); 
     void setPosition(int positionX, int positionY, int Alpha);
     void setPositionZero();
+    void resetPosition(); 
 
     float getSpeedG();
     float getSpeedD();
@@ -60,6 +61,7 @@ private :
     // Threads et synchro
     Thread routineG;
     Thread routineD;
+    Thread threadOdometrie;
     EventFlags flags;
     Mutex mutexData;
   
@@ -76,10 +78,16 @@ private :
     float _Speed, _SpeedAlpha;
     float _Move, _MoveAlpha;
 
+    int lastPosG = 0;
+    int lastPosD = 0;
+
     // Routines moteurs
     void routine_gauche();
     void routine_droite();
     void synchroniser();
+
+    void routine_odometrie();
+    void updatePosition();
 
 };
 

@@ -65,7 +65,7 @@ DigitalOut led_lidar(LIDAR_LED);
 //***********************************/************************************
 LCD lcd(LCD_RS,LCD_EN,LCD_D4,LCD_D5,LCD_D6,LCD_D7, LCD16x2); // rs, e, d4-d7
 
-Thread show_pos_thread;
+//Thread show_pos_thread;
 
 int state= 0;
 
@@ -108,9 +108,28 @@ void Robotmoveto(diffrentiel& robot, int distance, int alpha = 0)
     robot.stop();
 }
 
+void printPosition()
+{
+    printf("[Position] X = %.2f mm | Y = %.2f mm | Angle = %.2f°\n",
+           RobotDiff.getPositionX(),
+           RobotDiff.getPositionY(),
+           RobotDiff.getAlpha());
+}
+
+// --- Thread d'affichage de position ---
+void routineAffichage()
+{
+    while (true) {
+        printPosition();
+        ThisThread::sleep_for(100ms);
+    }
+}
 
 int main()
 {
+  Thread threadAffichage;
+  threadAffichage.start(routineAffichage);
+
   En_drive_N = SW_Drive;
   En_step_N =SW_Stepper; 
 
@@ -132,7 +151,7 @@ int main()
   // En_drive_N = 1;
   // En_step_N = 1;
 
-  show_pos_thread.start(showPostion);
+  //show_pos_thread.start(showPostion);
 
   lcd.cls();
   lcd.printf("Kameleon\n");
@@ -179,13 +198,16 @@ int main()
   Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_home));
   Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_home));
 
- 
-  RobotDiff.stop();
-  RobotDiff.setPositionZero();
-  
-  Robotmoveto(RobotDiff,0,90);
-  HAL_Delay (500);
-  Robotmoveto(RobotDiff,0,-90);
+  RobotDiff.setPosition(0, 0, 0);
+
+  Robotmoveto(RobotDiff,100,0);
+
+  Robotmoveto(RobotDiff,100,0);
+
+  Robotmoveto(RobotDiff,0,45);
+
+  Robotmoveto(RobotDiff,100,0);
+  //Robotmoveto(RobotDiff,0,-90);
  
   
 
@@ -277,10 +299,12 @@ int main()
   // while(!RobotHolonome.stopped());
  
 
-  while (1)
+  while (true)
   {
+    ThisThread::sleep_for(1s); 
     En_drive_N = SW_Drive;
     En_step_N =SW_Stepper; 
+
 
     // switch (state)
     // {
