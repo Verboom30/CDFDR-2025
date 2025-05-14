@@ -139,7 +139,7 @@ void diffrentiel::move(int Distance, int Alpha)
         _positionY_Save = _positionY;
         _Alpha_Save = _Alpha;
         _Speed = (abs(_Move) / (abs(_Move) + abs(_MoveAlpha))) * SPEED;
-        _SpeedAlpha = (abs(_MoveAlpha) / (abs(_Move) + abs(_MoveAlpha))) * (SPEED * 2.0f);
+        _SpeedAlpha = (abs(_MoveAlpha) / (abs(_Move) + abs(_MoveAlpha))) * (SPEED * 1.5f);
     }
 
     flags.set(0x1 | 0x2);
@@ -148,7 +148,7 @@ void diffrentiel::move(int Distance, int Alpha)
 void diffrentiel::synchroniser() {
     ScopedLock<Mutex> lock(syncMutex);
     readyCount++;
-    if (readyCount == 2) {
+    if (readyCount == 2) {  
         semG.release();
         semD.release();
         readyCount = 0;
