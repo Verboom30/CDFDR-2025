@@ -12,6 +12,7 @@
 //                              UART_TMC                                //
 //***********************************/************************************
 Uart_TMC TMCSerial(TMC_UART_TX, TMC_UART_RX, SEL_UART_0, SEL_UART_1, SEL_UART_2, R_SENSE);
+BufferedSerial pc(USBTX, USBRX,230400);
 //***********************************/************************************
 //                                 MOVE                                 //
 //***********************************/************************************
@@ -118,10 +119,16 @@ void Robotgoto(diffrentiel& robot, int positionX, int positionY, int alpha)
 }
 void printPosition()
 {
-    printf("[Position] X = %.2f mm | Y = %.2f mm | Angle = %.2f°\n",
+    //printf pour processing
+    printf("%f;%f;%f\r\n",
            RobotDiff.getPositionX(),
            RobotDiff.getPositionY(),
            RobotDiff.getAlpha());
+
+    // printf("[Position] X = %.2f mm | Y = %.2f mm | Angle = %.2f°\n",
+    //        RobotDiff.getPositionX(),
+    //        RobotDiff.getPositionY(),
+    //        RobotDiff.getAlpha());
 }
 
 // --- Thread d'affichage de position ---
@@ -208,8 +215,8 @@ int main()
 
   RobotDiff.setPosition(0, 0, 0);
   HAL_Delay (1000);
-  Robotgoto(RobotDiff,100,100,0);
-  HAL_Delay (1000);
+  Robotgoto(RobotDiff,1000,1000,0);
+
   Robotgoto(RobotDiff,0,0,0);
   //Robotmoveto(RobotDiff,0,-90);
  
