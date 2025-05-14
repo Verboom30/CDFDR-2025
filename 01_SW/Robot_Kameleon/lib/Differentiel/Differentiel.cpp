@@ -106,7 +106,7 @@ void diffrentiel::goesTo(int positionX, int positionY, int Alpha)
     } while (!diffrentiel::stopped());
 
     // 3. Rotation finale vers Alpha
-    float finalAlpha = Alpha - targetAlpha;  
+    float finalAlpha = Alpha - _Alpha;  
     if (finalAlpha > 180) finalAlpha -= 360;
     if (finalAlpha < -180) finalAlpha += 360;
 
