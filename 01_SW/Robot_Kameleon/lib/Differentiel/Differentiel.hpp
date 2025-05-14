@@ -14,7 +14,7 @@
 #define RSTEP   200
 #define RWHEEL  35.0f
 #define REDUC   0.5f
-#define KSTP    ((M_PI*2.0f*RWHEEL/(RSTEP*MSTEP))*REDUC)
+#define KSTP    float((M_PI*2.0f*RWHEEL/(RSTEP*MSTEP))*REDUC)
 #define SPEED   300.0f // max 50000 Mstepper 16 3200Ma
 
 #define ACC    2.0f
