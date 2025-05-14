@@ -67,6 +67,8 @@ void diffrentiel::resetPosition()
 
 void diffrentiel::goesTo(int positionX, int positionY, int Alpha)
 {
+    updatePosition();
+
     float dx = positionX - _positionX;
     float dy = positionY - _positionY;
     float move = sqrt(dx * dx + dy * dy);
@@ -89,36 +91,38 @@ void diffrentiel::goesTo(int positionX, int positionY, int Alpha)
    
    
     
-    // Déplacer le robot dans la direction calculée
+    // 1. Rotation vers direction
     diffrentiel::move(0,moveAlpha);
     do
     {
-      ThisThread::sleep_for(100ms);
+      ThisThread::sleep_for(10ms);
     } while (!diffrentiel::stopped());
+    
+    // 2. Translation
     diffrentiel::move(move,0);
-
-    // Ensuite, avancer ou reculer selon la distance
     do
     {
-      ThisThread::sleep_for(100ms);
+      ThisThread::sleep_for(10ms);
     } while (!diffrentiel::stopped());
 
-    //Déplacer le robot suivant la consigne d'angle 
-    float finalAlpha = Alpha - _Alpha;  
+    // 3. Rotation finale vers Alpha
+    float finalAlpha = Alpha - targetAlpha;  
     if (finalAlpha > 180) finalAlpha -= 360;
     if (finalAlpha < -180) finalAlpha += 360;
 
     if (std::abs(finalAlpha) > 90) {
         finalAlpha -= 180;
-        if (moveAlpha > 180) moveAlpha -= 360;
-        if (moveAlpha < -180) moveAlpha += 360;
+        if (finalAlpha > 180) finalAlpha -= 360;
+        if (finalAlpha < -180) finalAlpha += 360;
     }
 
     diffrentiel::move(0, finalAlpha);
     do
     {
-        ThisThread::sleep_for(100ms);
+        ThisThread::sleep_for(10ms);
     } while (!diffrentiel::stopped());
+
+    setPosition(positionX,positionY,Alpha);
 
 }
 
@@ -187,7 +191,7 @@ void diffrentiel::routine_odometrie()
 {
     while (true) {
         updatePosition();
-        ThisThread::sleep_for(100ms);
+        ThisThread::sleep_for(1ms);
     }
 }
 
@@ -237,6 +241,7 @@ float diffrentiel::getPosCibleY()   { ScopedLock<Mutex> lock(mutexData); return 
 float diffrentiel::getAlpha()       { ScopedLock<Mutex> lock(mutexData); return _Alpha; }
 float diffrentiel::getSpeed()       { ScopedLock<Mutex> lock(mutexData); return _Speed; }
 float diffrentiel::getSpeedAlpha()  { ScopedLock<Mutex> lock(mutexData); return _SpeedAlpha; }
+
 
 bool diffrentiel::stopped()
 {

@@ -216,9 +216,10 @@ int main()
   RobotDiff.setPosition(0, 0, 0);
   HAL_Delay (1000);
   Robotgoto(RobotDiff,1000,1000,0);
-
   Robotgoto(RobotDiff,0,0,0);
-  //Robotmoveto(RobotDiff,0,-90);
+  //Robotgoto(RobotDiff,0,0,0);
+  //Robotmoveto(RobotDiff,0,45);
+  //Robotmoveto(RobotDiff,-1414,0);
  
   
 
