@@ -73,7 +73,7 @@ void diffrentiel::goesTo(int positionX, int positionY, int Alpha)
     float dy = positionY - _positionY;
     float move = sqrt(dx * dx + dy * dy);
 
-    float targetAlpha = ((180.0f / M_PI) * atan2(dy, dx)); 
+    float targetAlpha = ((180.0f / M_PI) * atan2(dx, dy)); 
     float moveAlpha = targetAlpha - _Alpha;
 
     // Gérer la différence d'angle pour éviter les rotations inutiles
@@ -215,8 +215,8 @@ void diffrentiel::updatePosition()
     float dAlpha = (dG - dD) / (2.0f * RADIUS); // radians
 
     float alpha_rad = _Alpha * (M_PI / 180.0f);
-    _positionX += dC * cos(alpha_rad + dAlpha / 2.0f);
-    _positionY += dC * sin(alpha_rad + dAlpha / 2.0f);
+    _positionX += dC * sin(alpha_rad + dAlpha / 2.0f);
+    _positionY += dC * cos(alpha_rad + dAlpha / 2.0f);
 
     alpha_rad += dAlpha;
     _Alpha = alpha_rad * (180.0f / M_PI);
