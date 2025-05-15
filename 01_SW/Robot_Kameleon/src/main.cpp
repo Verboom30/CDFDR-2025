@@ -123,18 +123,26 @@ void Robotgoto(diffrentiel& robot, int positionX, int positionY, int alpha)
     if ( targetAlpha < 0.01f and targetAlpha > - 0.01f) targetAlpha = 0.0f;
 
     float moveAlpha = targetAlpha - robot.getAlpha();
+    float finalAlpha = alpha - targetAlpha; 
 
     // Gérer la différence d'angle pour éviter les rotations inutiles
     // L'angle est borné entre -180° et 180°
     if (moveAlpha > 180) moveAlpha -= 360;
     if (moveAlpha < -180) moveAlpha += 360;
 
+    if (finalAlpha > 180) finalAlpha -= 360;
+    if (finalAlpha < -180) finalAlpha += 360;
+
      // Si la différence d'angle est proche de 180° ou -180°, on inverse le mouvement
     if (std::abs(moveAlpha) > 90) {
         moveAlpha -= 180;
+        finalAlpha -=180;
         move = -move; 
         if (moveAlpha > 180) moveAlpha -= 360;
         if (moveAlpha < -180) moveAlpha += 360;
+
+        if (finalAlpha > 180) finalAlpha -= 360;
+        if (finalAlpha < -180) finalAlpha += 360;
     }
     // 1. Rotation vers direction
     HAL_Delay (50);
@@ -145,15 +153,6 @@ void Robotgoto(diffrentiel& robot, int positionX, int positionY, int alpha)
     Robotmoveto(robot,move,0);
 
     // 3. Rotation finale vers Alpha
-    float finalAlpha = alpha - targetAlpha;  
-    if (finalAlpha > 180) finalAlpha -= 360;
-    if (finalAlpha < -180) finalAlpha += 360;
-
-    if (std::abs(finalAlpha) > 90) {
-      finalAlpha -= 180;
-      if (finalAlpha > 180) finalAlpha -= 360;
-      if (finalAlpha < -180) finalAlpha += 360;
-    }
     HAL_Delay (50);
     Robotmoveto(robot,0,finalAlpha);
 
@@ -307,23 +306,23 @@ int main()
   StepperRM->InitLinearActuator();
   HAL_Delay (500);
 
-  Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
-  Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
-  Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_side));
-  Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_side));
-  HAL_Delay (500);
-  Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close)); 
-  Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
-  Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
-  Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
+  // Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
+  // Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
+  // Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_side));
+  // Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_side));
+  // HAL_Delay (500);
+  // Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close)); 
+  // Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
+  // Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
+  // Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
  
-  StepperRG->goUp();
-  StepperRD->goUp();
-  StepperRM->goUp();
-  while(!(StepperRG->goUp() and StepperRD->goUp() and StepperRM->goUp()));
+  // StepperRG->goUp();
+  // StepperRD->goUp();
+  // StepperRM->goUp();
+  // while(!(StepperRG->goUp() and StepperRD->goUp() and StepperRM->goUp()));
 
-  Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_home));
-  Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_home));
+  // Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_home));
+  // Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_home));
 
  
   while (true)
@@ -343,12 +342,25 @@ int main()
         if (SW_init != 1) {
           Robotgoto(RobotDiff,1775, 550, 90);
           Robotgoto(RobotDiff,2225, 550, 180);
-          down_pince_take();
+          //down_pince_take();
           Robotgoto(RobotDiff,2225, 325, 180);
           Robotgoto(RobotDiff,2225, 225, 180);
-          construction_gradin_niveau_2();
+          //construction_gradin_niveau_2();
           Robotgoto(RobotDiff,2225, 325, 180);
-          Robotgoto(RobotDiff,2225, 550, 0);
+          Robotgoto(RobotDiff,2225, 400, 90);
+          //down_pince_take();
+          Robotgoto(RobotDiff,2700, 400, 90);
+          Robotgoto(RobotDiff,2800, 400, 90);
+
+          Robotgoto(RobotDiff,2700, 400, -90);
+
+          Robotgoto(RobotDiff,1775, 700, 180);
+
+          Robotgoto(RobotDiff,1775, 200, 180);
+
+          
+
+
 
 
           //Robotgoto(RobotDiff,2175,1400,0);

@@ -69,7 +69,7 @@ void diffrentiel::move(int Distance, int Alpha)
         _Move = move;
         _MoveAlpha = moveAlpha;
         _Speed = (abs(_Move) / (abs(_Move) + abs(_MoveAlpha))) * SPEED;
-        _SpeedAlpha = (abs(_MoveAlpha) / (abs(_Move) + abs(_MoveAlpha))) * (SPEED * 2.0f);
+        _SpeedAlpha = (abs(_MoveAlpha) / (abs(_Move) + abs(_MoveAlpha))) * (SPEED * 1.5f);
     }
 
     flags.set(0x1 | 0x2);
