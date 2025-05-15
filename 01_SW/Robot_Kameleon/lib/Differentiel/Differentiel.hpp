@@ -27,8 +27,7 @@ class diffrentiel
 
     void run();
     void stop();
-
-    void goesTo(int positionX, int positionY, int Alpha);
+    
     void move(int distance, int Alpha); 
     void setPosition(int positionX, int positionY, int Alpha);
     void setPositionZero();
@@ -40,6 +39,8 @@ class diffrentiel
     int getPosD();
     int getStepG();
     int getStepD();
+    int getDeltaG();
+    int getDeltaD();
 
     float getPositionX();
     float getPositionY();
@@ -72,11 +73,11 @@ private :
 
     // Données de mouvement
     float _positionX, _positionY;
-    float _positionX_Save, _positionY_Save;
     float _cibleposX, _cibleposY;
-    float _Alpha, _Alpha_Save;
+    float _Alpha;
     float _Speed, _SpeedAlpha;
     float _Move, _MoveAlpha;
+    int _deltaG, _deltaD;
 
     int lastPosG = 0;
     int lastPosD = 0;
