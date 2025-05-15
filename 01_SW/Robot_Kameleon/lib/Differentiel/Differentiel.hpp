@@ -10,7 +10,7 @@
 
 
 
-#define RADIUS  66.5f // robot wheel-base radius
+#define RADIUS  67.0f // robot wheel-base radius
 #define RSTEP   200
 #define RWHEEL  35.0f
 #define REDUC   0.5f
