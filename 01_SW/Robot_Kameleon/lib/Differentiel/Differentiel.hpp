@@ -10,12 +10,12 @@
 
 
 
-#define RADIUS  67.0f // robot wheel-base radius
-#define RSTEP   200
+#define RADIUS  83.4f // robot wheel-base radius
+#define RSTEP   198
 #define RWHEEL  35.0f
 #define REDUC   0.5f
 #define KSTP    float((M_PI*2.0f*RWHEEL/(RSTEP*MSTEP))*REDUC)
-#define SPEED   300.0f // max 50000 Mstepper 16 3200Ma
+#define SPEED   200.0f // max 50000 Mstepper 16 3200Ma
 
 #define ACC    2.0f
 #define DEC    2.0f
