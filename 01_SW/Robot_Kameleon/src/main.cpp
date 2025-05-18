@@ -339,46 +339,131 @@ int main()
         break;
 
       case 1:
-        Robotmoveto(RobotDiff,0,360);
-   
-      
+        if (SW_init != 1) {
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
 
-        // if (SW_init != 1) {
-        //   Robotgoto(RobotDiff,1775, 550, 90);
-        //   Robotgoto(RobotDiff,2225, 550, 180);
-        //   down_pince_take();
-        //   Robotgoto(RobotDiff,2225, 325, 180);
-        //   Robotgoto(RobotDiff,2225, 225, 180);
-        //   Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
-        //   Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
-        //   HAL_Delay (500);
-        //   Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
-        //   Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
-        //   Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
-        //   Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
-        //   Robotgoto(RobotDiff,2225, 100, 180);
-        //   RobotDiff.setPosition(2225,170,180);
-        //   Robotgoto(RobotDiff,2225, 225, 180);
-        //   construction_gradin_niveau_2();
-        //   Robotgoto(RobotDiff,2225, 325, 180);
-        //   Robotgoto(RobotDiff,2225, 400, 90);
-        //   down_pince_take();
-        //   Robotgoto(RobotDiff,2700, 400, 90);
-        //   Robotgoto(RobotDiff,2850, 400, 90);
-        //   HAL_Delay (500);
-        //   Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
-        //   Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
-        //   HAL_Delay (500);
-        //   Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
-        //   Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
-        //   Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
-        //   Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
-        //   Robotgoto(RobotDiff,2700, 400, -90);
-        //   //Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
-        //   //Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
-        //   Robotgoto(RobotDiff,1775, 700, 180);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
 
-        //   Robotgoto(RobotDiff,1775, 300, 180);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          Robotmoveto(RobotDiff,0,90);
+          HAL_Delay (500);
+          // Robotgoto(RobotDiff,1775, 550, 90);
+          // Robotgoto(RobotDiff,2225, 550, 180);
+          // down_pince_take();
+          // Robotgoto(RobotDiff,2225, 325, 180);
+          // Robotgoto(RobotDiff,2225, 225, 180);
+          // Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
+          // Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
+          // HAL_Delay (500);
+          // Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
+          // Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
+          // Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
+          // Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
+          // Robotgoto(RobotDiff,2225, 100, 180);
+          // RobotDiff.setPosition(2225,170,180);
+          // Robotgoto(RobotDiff,2225, 225, 180);
+          // construction_gradin_niveau_2();
+          // Robotgoto(RobotDiff,2225, 325, 180);
+          // Robotgoto(RobotDiff,2225, 400, 90);
+          // down_pince_take();
+          // Robotgoto(RobotDiff,2700, 400, 90);
+          // Robotgoto(RobotDiff,2850, 400, 90);
+          // HAL_Delay (500);
+          // Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
+          // Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
+          // HAL_Delay (500);
+          // Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
+          // Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
+          // Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
+          // Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
+          // Robotgoto(RobotDiff,2700, 400, -90);
+          // //Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
+          // //Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
+          // Robotgoto(RobotDiff,1775, 700, 180);
+
+          // Robotgoto(RobotDiff,1775, 300, 180);
 
           
 
@@ -398,7 +483,7 @@ int main()
 
 
           state++;
-        //}
+        }
         break;
           
       case 2:
