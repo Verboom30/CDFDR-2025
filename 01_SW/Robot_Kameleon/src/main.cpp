@@ -21,7 +21,7 @@ BufferedSerial pc(USBTX, USBRX,230400);
 // Stepper *StepperC = new Stepper(STEP_C,DIR_C);
 Stepper StepperG(STEP_G,DIR_G);
 Stepper StepperD(STEP_D,DIR_D);
-diffrentiel RobotDiff(&StepperG,&StepperD);
+differentiel RobotDiff(&StepperG,&StepperD);
 DigitalOut En_drive_N(ENABLE_DRIVE_N);
 DigitalOut En_step_N(ENABLE_STEP_N);
 
@@ -99,7 +99,7 @@ float theta2pluse(int theta)
   return 500.0+(100.0/9.0)*float(theta);
 }
 
-void Robotmoveto(diffrentiel& robot, int distance, int alpha)
+void Robotmoveto(differentiel& robot, int distance, int alpha)
 {
     robot.move(distance, alpha);
     do
@@ -108,7 +108,7 @@ void Robotmoveto(diffrentiel& robot, int distance, int alpha)
     } while (!robot.stopped());
     //robot.stop();
 }
-void Robotgoto(diffrentiel& robot, int positionX, int positionY, int alpha)
+void Robotgoto(differentiel& robot, int positionX, int positionY, int alpha)
 {
     float dx = positionX - robot.getPositionX();
     float dy = positionY - robot.getPositionY();

@@ -20,10 +20,10 @@
 #define ACC    3.0f
 #define DEC    3.0f
 
-class diffrentiel
+class differentiel
 {
     public:
-    diffrentiel(Stepper* moteurGauche, Stepper* moteurDroit);
+    differentiel(Stepper* moteurGauche, Stepper* moteurDroit);
 
     void run();
     void stop();

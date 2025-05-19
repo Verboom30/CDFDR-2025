@@ -1,6 +1,6 @@
 #include "Differentiel.hpp"
 
-diffrentiel::diffrentiel(Stepper* moteurGauche, Stepper* moteurDroit)
+differentiel::differentiel(Stepper* moteurGauche, Stepper* moteurDroit)
     : StepperG(moteurGauche), StepperD(moteurDroit), readyCount(0), semG(0), semD(0) 
 {
     _positionX = _positionY = 0;
@@ -10,26 +10,26 @@ diffrentiel::diffrentiel(Stepper* moteurGauche, Stepper* moteurDroit)
     _Move = _MoveAlpha = 0;
     _deltaG = _deltaD = 0;
 
-    routineG.start(callback(this, &diffrentiel::routine_gauche));
-    routineD.start(callback(this, &diffrentiel::routine_droite));
-    threadOdometrie.start(callback(this, &diffrentiel::routine_odometrie));
+    routineG.start(callback(this, &differentiel::routine_gauche));
+    routineD.start(callback(this, &differentiel::routine_droite));
+    threadOdometrie.start(callback(this, &differentiel::routine_odometrie));
     setPositionZero();
     resetPosition();
 }
 
-void diffrentiel::run()
+void differentiel::run()
 {
     StepperG->run();
     StepperD->run();
 }
 
-void diffrentiel::stop()
+void differentiel::stop()
 {
     StepperG->stop();
     StepperD->stop();
 }
 
-void diffrentiel::setPosition(int positionX, int positionY, int Alpha)
+void differentiel::setPosition(int positionX, int positionY, int Alpha)
 {
      ScopedLock<Mutex> lock(mutexData);
 
@@ -41,14 +41,14 @@ void diffrentiel::setPosition(int positionX, int positionY, int Alpha)
     lastPosD = StepperD->getPosition();
 }
 
-void diffrentiel::setPositionZero()
+void differentiel::setPositionZero()
 {
     StepperG->setPositionZero();
     StepperD->setPositionZero();
 
 }
 
-void diffrentiel::resetPosition()
+void differentiel::resetPosition()
 {
     ScopedLock<Mutex> lock(mutexData);
     _positionX = 0;
@@ -59,7 +59,7 @@ void diffrentiel::resetPosition()
     lastPosD = StepperD->getPosition();
 }
 
-void diffrentiel::move(int Distance, int Alpha)
+void differentiel::move(int Distance, int Alpha)
 {
     float move = Distance;
     float moveAlpha = float(Alpha);
@@ -75,7 +75,7 @@ void diffrentiel::move(int Distance, int Alpha)
     flags.set(0x1 | 0x2);
 }
 
-void diffrentiel::synchroniser() {
+void differentiel::synchroniser() {
     ScopedLock<Mutex> lock(syncMutex);
     readyCount++;
     if (readyCount == 2) {  
@@ -87,7 +87,7 @@ void diffrentiel::synchroniser() {
 
 // ======================== Routines moteurs ========================= //
 
-void diffrentiel::routine_gauche()
+void differentiel::routine_gauche()
 {
     while (true) {
         flags.wait_any(0x1); // attend ordre moteur gauche
@@ -102,7 +102,7 @@ void diffrentiel::routine_gauche()
     }
 }
 
-void diffrentiel::routine_droite()
+void differentiel::routine_droite()
 {
     while (true) {
         flags.wait_any(0x2); // attend ordre moteur droit
@@ -117,7 +117,7 @@ void diffrentiel::routine_droite()
     }
 }
 
-void diffrentiel::routine_odometrie()
+void differentiel::routine_odometrie()
 {
     while (true) {
         updatePosition();
@@ -125,7 +125,7 @@ void diffrentiel::routine_odometrie()
     }
 }
 
-void diffrentiel::updatePosition()
+void differentiel::updatePosition()
 {
     ScopedLock<Mutex> lock(mutexData);
 
@@ -157,30 +157,30 @@ void diffrentiel::updatePosition()
 
 // ======================== Getters ========================= //
 
-float diffrentiel::getSpeedG()      { return StepperG->getSpeed(); }
-float diffrentiel::getSpeedD()      { return StepperD->getSpeed(); }
-int   diffrentiel::getPosG()        { return -StepperG->getPosition(); }
-int   diffrentiel::getPosD()        { return StepperD->getPosition(); }
-int   diffrentiel::getStepG()       { return StepperG->getStep(); }
-int   diffrentiel::getStepD()       { return StepperD->getStep(); }
+float differentiel::getSpeedG()      { return StepperG->getSpeed(); }
+float differentiel::getSpeedD()      { return StepperD->getSpeed(); }
+int   differentiel::getPosG()        { return -StepperG->getPosition(); }
+int   differentiel::getPosD()        { return StepperD->getPosition(); }
+int   differentiel::getStepG()       { return StepperG->getStep(); }
+int   differentiel::getStepD()       { return StepperD->getStep(); }
 
-float diffrentiel::getPositionX()   { ScopedLock<Mutex> lock(mutexData); return _positionX; }
-float diffrentiel::getPositionY()   { ScopedLock<Mutex> lock(mutexData); return _positionY; }
-float diffrentiel::getPosCibleX()   { ScopedLock<Mutex> lock(mutexData); return _cibleposX; }
-float diffrentiel::getPosCibleY()   { ScopedLock<Mutex> lock(mutexData); return _cibleposY; }
-float diffrentiel::getAlpha()       { ScopedLock<Mutex> lock(mutexData); return _Alpha; }
-float diffrentiel::getSpeed()       { ScopedLock<Mutex> lock(mutexData); return _Speed; }
-float diffrentiel::getSpeedAlpha()  { ScopedLock<Mutex> lock(mutexData); return _SpeedAlpha; }
-int   diffrentiel::getDeltaG()        { ScopedLock<Mutex> lock(mutexData); return _deltaG; }
-int   diffrentiel::getDeltaD()        { ScopedLock<Mutex> lock(mutexData); return _deltaD; }
+float differentiel::getPositionX()   { ScopedLock<Mutex> lock(mutexData); return _positionX; }
+float differentiel::getPositionY()   { ScopedLock<Mutex> lock(mutexData); return _positionY; }
+float differentiel::getPosCibleX()   { ScopedLock<Mutex> lock(mutexData); return _cibleposX; }
+float differentiel::getPosCibleY()   { ScopedLock<Mutex> lock(mutexData); return _cibleposY; }
+float differentiel::getAlpha()       { ScopedLock<Mutex> lock(mutexData); return _Alpha; }
+float differentiel::getSpeed()       { ScopedLock<Mutex> lock(mutexData); return _Speed; }
+float differentiel::getSpeedAlpha()  { ScopedLock<Mutex> lock(mutexData); return _SpeedAlpha; }
+int   differentiel::getDeltaG()        { ScopedLock<Mutex> lock(mutexData); return _deltaG; }
+int   differentiel::getDeltaD()        { ScopedLock<Mutex> lock(mutexData); return _deltaD; }
 
 
-bool diffrentiel::stopped()
+bool differentiel::stopped()
 {
     return StepperG->stopped() && StepperD->stopped();
 }
 
-bool diffrentiel::PosCibleDone()
+bool differentiel::PosCibleDone()
 {
     return StepperG->getPosCibleDone() && StepperD->getPosCibleDone();
 }
