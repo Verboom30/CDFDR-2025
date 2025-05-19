@@ -145,15 +145,15 @@ void Robotgoto(diffrentiel& robot, int positionX, int positionY, int alpha)
         if (finalAlpha < -180) finalAlpha += 360;
     }
     // 1. Rotation vers direction
-    HAL_Delay (50);
+    robot.updatePosition();
     Robotmoveto(robot,0,moveAlpha);
     
     // 2. Translation
-    HAL_Delay (50);
+    robot.updatePosition();
     Robotmoveto(robot,move,0);
 
     // 3. Rotation finale vers Alpha
-    HAL_Delay (50);
+    robot.updatePosition();
     Robotmoveto(robot,0,finalAlpha);
 
 }
@@ -221,10 +221,10 @@ void construction_gradin_niveau_2()
   StepperRM->move(-11500);
   while(!StepperRM->StepperAct->stopped());
   HAL_Delay (500);
-  StepperRM->move(-150);
+  StepperRM->move(-200);
   while(!StepperRM->StepperAct->stopped());
   Suck_Pump.pulsewidth_us(theta2pluse(180));
-  HAL_Delay (1000);
+  HAL_Delay (1500);
   StepperRM->goUp();
   StepperRG->goUp();
   StepperRD->goUp();
@@ -332,7 +332,7 @@ int main()
     switch (state)
     {
       case 0:
-        RobotDiff.setPosition(1775, 150, 0);
+        RobotDiff.setPosition(1775, 170, 180);
         if (SW_init != 1) {
           state++;
         }
@@ -340,8 +340,42 @@ int main()
 
       case 1:
         if (SW_init != 1) {
-          Robotgoto(RobotDiff,1775, 550, 90);
-          Robotgoto(RobotDiff,2225, 550, 180);
+          Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_drop_banner));
+          Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_drop_banner));
+          Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
+          Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
+          HAL_Delay (2500);
+          Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_banner));
+          Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_banner));
+          HAL_Delay (1000);
+          StepperRG->goUp();
+          StepperRD->goUp();
+          while(!(StepperRG->goUp() and StepperRD->goUp()));
+          Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_banner));
+          Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_banner));
+          HAL_Delay (500);
+          state++;
+        }
+        break;
+          
+      case 2:
+        if (SW_init != 1) {
+          Robotgoto(RobotDiff,1775, 180, 180);
+          Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_drop_banner));
+          Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_drop_banner));
+          HAL_Delay (500);
+          StepperRG->goDown();
+          StepperRD->goDown();
+          while(!(StepperRG->goDown() and StepperRD->goDown()));
+          HAL_Delay (500);
+          Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
+          Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
+          Robotgoto(RobotDiff,1775, 450, 180);
+          StepperRG->goUp();
+          StepperRD->goUp();
+          while(!(StepperRG->goUp() and StepperRD->goUp()));
+          Robotgoto(RobotDiff,1775, 750, 90);
+          Robotgoto(RobotDiff,2225, 750, 180);
           down_pince_take();
           Robotgoto(RobotDiff,2225, 325, 180);
           Robotgoto(RobotDiff,2225, 225, 180);
@@ -380,55 +414,22 @@ int main()
           construction_gradin_niveau_2();
           Robotgoto(RobotDiff,1775, 600, 180);
 
-          
+          Robotgoto(RobotDiff,2400, 600,0);
 
+          Robotgoto(RobotDiff,2500, 1500,0);
 
-
-
-          //Robotgoto(RobotDiff,2175,1400,0);
-          //Robotgoto(RobotDiff,2175,1475,0);
-          
-        
-
-
-
-          
-        
-          
-
-
-          state++;
-        }
-        break;
-          
-      case 2:
-        if (SW_init != 1) {
-          
           state++;
         }
         break;
       case 3:
         if (SW_init != 1) {
-          Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_drop_banner));
-          Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_drop_banner));
-          Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
-          Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
-          HAL_Delay (2500);
-          Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_banner));
-          Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_banner));
-          HAL_Delay (500);
-          state++;
+          
         }
         break;
       case 4:
         if (SW_init != 1) {
           
-          StepperRG->goUp();
-          StepperRD->goUp();
-          while(!(StepperRG->goUp() and StepperRD->goUp()));
-          Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_banner));
-          Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_banner));
-          HAL_Delay (500);
+         
         
           state++;
         }

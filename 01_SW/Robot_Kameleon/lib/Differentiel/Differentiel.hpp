@@ -52,6 +52,7 @@ class diffrentiel
 
     bool stopped();
     bool PosCibleDone();
+    void updatePosition();
    
 
 private : 
@@ -88,7 +89,7 @@ private :
     void synchroniser();
 
     void routine_odometrie();
-    void updatePosition();
+   
 
 };
 
