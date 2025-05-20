@@ -34,6 +34,7 @@ int state =0;
 bool StartMove = false;
 bool StopMove = false;
 
+
 void taskSensors(){
   // Serial.print("sensor1: " );
   // Serial.print(sensor1.readRangeContinuousMillimeters());
@@ -60,25 +61,73 @@ void taskSensors(){
 //   return false;
 // }
 
-void Robotmoveto(differentiel& robot, int distance, int alpha, bool stop) {
-    if(!StartMove){
-      StartMove = true;
-      robot.move(distance, alpha);
-      robot.handleRoutineGauche();         // gestion moteur gauche
-      robot.handleRoutineDroite();         // gestion moteur droite
-    }
-    if(!stop)robot.run();                         // déclenche moteurs
-    if(!robot.Running()) StartMove = false;
-}
 
+
+bool Robotmoveto(differentiel& robot, int distance, int alpha, bool stop) {
+  if(!StartMove){
+    StartMove = true;
+    robot.move(distance, alpha);
+    robot.handleRoutineGauche();         // gestion moteur gauche
+    robot.handleRoutineDroite();         // gestion moteur droite
+  }
+  if(!stop)robot.run();                         // déclenche moteurs
+  if(!robot.Running()){
+    StartMove = false;
+    return true;
+  } 
+  return false;
+}
+void Robotgoto(differentiel& robot, int positionX, int positionY, int alpha, bool stop ) {
+  float dx = positionX - robot.getPositionX();
+  float dy = positionY - robot.getPositionY();
+
+  if (dx < 0.1f && dx > -0.1f) dx = 0.0f;
+  if (dy < 0.1f && dy > -0.1f) dy = 0.0f;
+
+  int move = (int)sqrt(dx * dx + dy * dy);
+
+  float targetAlpha = (180.0f / M_PI) * atan2(dx, dy);
+  if (targetAlpha < 0.01f && targetAlpha > -0.01f) targetAlpha = 0.0f;
+
+  float moveAlpha = targetAlpha - robot.getAlpha();
+  float finalAlpha = alpha - targetAlpha;
+
+  // Normalisation des angles
+  if (moveAlpha > 180) moveAlpha -= 360;
+  if (moveAlpha < -180) moveAlpha += 360;
+
+  if (finalAlpha > 180) finalAlpha -= 360;
+  if (finalAlpha < -180) finalAlpha += 360;
+
+  // Inversion du mouvement si plus efficace
+  if (abs(moveAlpha) > 90) {
+      moveAlpha -= 180;
+      finalAlpha -= 180;
+      move = -move;
+
+      if (moveAlpha > 180) moveAlpha -= 360;
+      if (moveAlpha < -180) moveAlpha += 360;
+
+      if (finalAlpha > 180) finalAlpha -= 360;
+      if (finalAlpha < -180) finalAlpha += 360;
+  }
+
+  // Étapes de mouvement
+  Robotmoveto(robot, 0, moveAlpha,stop);
+  Robotmoveto(robot, move, 0,stop);
+  Robotmoveto(robot, 0, finalAlpha,stop);
+}
 void TaskDrive(){
 
   switch (state)
   {
   case 0 :
    //while(!MovetoPoint(int(RADIUS*(PI/180.0)*95.0/KSTP),int(RADIUS*(PI/180.0)*95.0/KSTP),false));
-   Robotmoveto(RobotDiff,1000,0,StopMove);
-   StartMove++;
+   if(digitalRead(SW_BAU) == LOW){
+    while(!Robotmoveto(RobotDiff,0,360,false));
+   }
+   
+   //StartMove++;
   break;
   case 1 :
    

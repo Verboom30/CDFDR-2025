@@ -5,15 +5,15 @@
 #include <math.h>
 #include <AccelStepper.h>
 
-#define RADIUS  84.00f // robot wheel-base radius
-#define MOTOR_STEPS   198
-#define RWHEEL  35.0f
-#define REDUC   0.5f
+#define RADIUS  37.35f // robot wheel-base radius
+#define MOTOR_STEPS   201
+#define RWHEEL  29.8f
+#define REDUC   1.0f
 #define KSTP    float((M_PI*2.0f*RWHEEL/(MOTOR_STEPS*MSTEP))*REDUC)
 #define SPEED   10000000
 #define MAX_SPEED   10000000
 #define MSTEP 8
-#define ACC    3.0f
+#define ACC    30000.0f
 
 class differentiel {
 public:
