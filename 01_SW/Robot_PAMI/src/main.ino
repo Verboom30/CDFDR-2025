@@ -6,17 +6,12 @@
 #include <VL53L0X.h>
 #include <Thread.h>
 #include <ThreadController.h>
+#include "Differentiel.h"
 
 ThreadController controller = ThreadController();
 Thread ThreadSensors = Thread();
+Thread ThreadDrive = Thread();
 
-#define PI      3.14159265
-#define RADIUS  33.0 // robot wheel-base radius
-#define RSTEP   200
-#define RWHEEL  30.0 
-#define REDUC   1.0
-#define KSTP     ((PI*2.0*RWHEEL/(RSTEP*MSTEP))*REDUC)
-#define SPEED   20000.0 // max 50000 Mstepper 16 3200Ma
 
 #define R_SENSE 3.70f // Match to your driver
                       // SilentStepStick series use 0.11
@@ -27,15 +22,73 @@ Thread ThreadSensors = Thread();
 Uart_TMC driverG(TMC_UART_RX, TMC_UART_TX, R_SENSE, 0b00);
 Uart_TMC driverD(TMC_UART_RX, TMC_UART_TX, R_SENSE, 0b01);
 
+
 // 2-wire basic config, microstepping is hardwired on the driver
 //BasicStepperDriver stepper(MOTOR_STEPS, DIR_G, STEP_G, DIR_D, STEP_D);
 AccelStepper stepperG(AccelStepper::DRIVER, STEP_G, DIR_G);
 AccelStepper stepperD(AccelStepper::DRIVER, STEP_D, DIR_D);
+differentiel RobotDiff(&stepperG,&stepperD);
 VL53L0X sensor1;
 VL53L0X sensor2;
 int state =0;
-bool SetupSpeed = false;
+bool StartMove = false;
 bool StopMove = false;
+
+void taskSensors(){
+  // Serial.print("sensor1: " );
+  // Serial.print(sensor1.readRangeContinuousMillimeters());
+  // if (sensor1.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
+  // Serial.print("  ");
+  // Serial.print("sensor2: " );
+  // Serial.print(sensor2.readRangeContinuousMillimeters());
+  // if (sensor1.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
+  // Serial.println();
+  StopMove = (sensor1.readRangeContinuousMillimeters() < 200 or sensor2.readRangeContinuousMillimeters() < 200);
+  
+
+}
+// bool MovetoPoint(int stepG, int StepD, bool stop){
+//   if (SetupSpeed == false) {
+//     stepperG.move(stepG);stepperD.move(StepD);
+//     SetupSpeed = true;
+//   }
+//   if (!stop) stepperG.run(), stepperD.run(); 
+//   if (!(stepperG.isRunning()) and !(stepperD.isRunning())) {
+//     SetupSpeed = false; 
+//     return true;
+//   } 
+//   return false;
+// }
+
+void Robotmoveto(differentiel& robot, int distance, int alpha, bool stop) {
+    if(!StartMove){
+      StartMove = true;
+      robot.move(distance, alpha);
+      robot.handleRoutineGauche();         // gestion moteur gauche
+      robot.handleRoutineDroite();         // gestion moteur droite
+    }
+    if(!stop)robot.run();                         // déclenche moteurs
+    if(!robot.Running()) StartMove = false;
+}
+
+void TaskDrive(){
+
+  switch (state)
+  {
+  case 0 :
+   //while(!MovetoPoint(int(RADIUS*(PI/180.0)*95.0/KSTP),int(RADIUS*(PI/180.0)*95.0/KSTP),false));
+   Robotmoveto(RobotDiff,1000,0,StopMove);
+   StartMove++;
+  break;
+  case 1 :
+   
+  break;
+  
+  default:
+    break;
+  }
+    
+}
 
 void setup() {
   Serial.begin(115200);
@@ -97,58 +150,17 @@ void setup() {
   if(!(driverD.setup_stepper())) { Serial.println("TMC communication error StepD !\n"); }
 
   ThreadSensors.onRun(taskSensors);
+  ThreadDrive.onRun(TaskDrive);
   controller.add(&ThreadSensors);
+  controller.add(&ThreadDrive);
   ThreadSensors.setInterval(300);
-
-  stepperG.setMaxSpeed(10000);       // Vitesse maximale en pas par seconde
-  stepperG.setAcceleration(1500);    // Accélération en pas par seconde^2
-
-  stepperD.setMaxSpeed(10000);       // Vitesse maximale en pas par seconde
-  stepperD.setAcceleration(1500);    // Accélération en pas par seconde^2
-
-}
-void taskSensors(){
-  // Serial.print("sensor1: " );
-  // Serial.print(sensor1.readRangeContinuousMillimeters());
-  // if (sensor1.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
-  // Serial.print("  ");
-  // Serial.print("sensor2: " );
-  // Serial.print(sensor2.readRangeContinuousMillimeters());
-  // if (sensor1.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
-  // Serial.println();
-  StopMove = (sensor1.readRangeContinuousMillimeters() < 200 or sensor2.readRangeContinuousMillimeters() < 200);
-  
-
-}
-bool MovetoPoint(int stepG, int StepD, bool stop){
-  if (SetupSpeed == false) {
-    stepperG.move(stepG);stepperD.move(StepD);
-    SetupSpeed = true;
-  }
-  if (!stop) stepperG.run(), stepperD.run(); 
-  if (!(stepperG.isRunning()) and !(stepperD.isRunning())) {
-    SetupSpeed = false; 
-    return true;
-  } 
-  return false;
+  ThreadDrive.setInterval(1);
 }
 
 void loop() {
   controller.run();
   digitalWrite(LED_R,StopMove);
-  switch (state)
-  {
-  case 0 :
-   while(!MovetoPoint(int(RADIUS*(PI/180.0)*95.0/KSTP),int(RADIUS*(PI/180.0)*95.0/KSTP),false));
-   while(!MovetoPoint(int(-300/KSTP),int(300/KSTP),false));
-  break;
-  case 1 :
-   
-  break;
   
-  default:
-    break;
-  }
   
   
  

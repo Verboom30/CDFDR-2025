@@ -1,4 +1,5 @@
 #include "UART_TMC.h"
+#include "Differentiel.h"
 
 bool Uart_TMC::setup_stepper(void)
 {
