@@ -145,15 +145,7 @@ bool Robotgoto(differentiel& robot, int positionX, int positionY, int alpha, boo
             if (MoveAlpha < -180) MoveAlpha += 360;
             if (FinalAlpha > 180) FinalAlpha -= 360;
             if (FinalAlpha < -180) FinalAlpha += 360;
-            if (abs(MoveAlpha) > 90) {
-                MoveAlpha -= 180;
-                FinalAlpha -= 180;
-                Move = -Move;
-                if (MoveAlpha > 180) MoveAlpha -= 360;
-                if (MoveAlpha < -180) MoveAlpha += 360;
-                if (FinalAlpha > 180) FinalAlpha -= 360;
-                if (FinalAlpha < -180) FinalAlpha += 360;
-            }
+           
             gotoState = ROTATE_TO_TARGET;
             break;
         }

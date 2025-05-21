@@ -12,7 +12,7 @@
 
 // === Threads ===
 ThreadController controller = ThreadController();
-//Thread ThreadSensors = Thread();
+Thread ThreadSensors = Thread();
 Thread ThreadDrive = Thread();
 //Thread ThreadShowPos = Thread();
 
@@ -51,11 +51,11 @@ void TaskDrive() {
       }
       break;
     case 1:
-      movementDone = Robotgoto(RobotDiff,300,300, 90,false);
+      movementDone = Robotgoto(RobotDiff,300,300, 90,StopMove);
       if(movementDone) state++;
       break;
     case 2:
-      movementDone = Robotgoto(RobotDiff,0,0, 0,false);
+      movementDone = Robotgoto(RobotDiff,0,0, 0,StopMove);
       if(movementDone) state++;
       break;
     case 3:
@@ -122,15 +122,15 @@ void setup() {
   if (!driverG.setup_stepper()) Serial.println("TMC error StepG");
   if (!driverD.setup_stepper()) Serial.println("TMC error StepD");
 
-  //ThreadSensors.onRun(taskSensors);
+  ThreadSensors.onRun(taskSensors);
   ThreadDrive.onRun(TaskDrive);
   //ThreadShowPos.onRun(TaskShowPos);
 
-  //controller.add(&ThreadSensors);
+  controller.add(&ThreadSensors);
   controller.add(&ThreadDrive);
   //controller.add(&ThreadShowPos);
 
-  //ThreadSensors.setInterval(500);
+  ThreadSensors.setInterval(300);
   //ThreadShowPos.setInterval(1);
   ThreadDrive.setInterval(1);
 
