@@ -1,70 +1,47 @@
-// === Includes ===
-#include "TMCStepper.h"
-#include <AccelStepper.h>
-#include "pinout.h"
-#include "UART_TMC.h"
+// main.ino
 #include <Wire.h>
 #include <VL53L0X.h>
+#include <AccelStepper.h>
+#include <TMCStepper.h>
 #include <Thread.h>
 #include <ThreadController.h>
 #include "Differentiel.h"
-#include <math.h>
+#include "UART_TMC.h"
+#include "pinout.h"
 
-// === Threads ===
-ThreadController controller = ThreadController();
-Thread ThreadSensors = Thread();
-Thread ThreadDrive = Thread();
-//Thread ThreadShowPos = Thread();
+#define R_SENSE 3.7f
+#define DELAY_START 500
 
-// === TMC Drivers ===
-#define R_SENSE 3.70f
 Uart_TMC driverG(TMC_UART_RX, TMC_UART_TX, R_SENSE, 0b00);
 Uart_TMC driverD(TMC_UART_RX, TMC_UART_TX, R_SENSE, 0b01);
 
-// === Motors and Robot ===
 AccelStepper stepperG(AccelStepper::DRIVER, STEP_G, DIR_G);
 AccelStepper stepperD(AccelStepper::DRIVER, STEP_D, DIR_D);
 differentiel RobotDiff(&stepperG, &stepperD);
 
-// === Sensors ===
-VL53L0X sensor1;
-VL53L0X sensor2;
+VL53L0X sensor1, sensor2;
+ThreadController controller;
+Thread ThreadSensors; 
+Thread ThreadDrive; 
+Thread ThreadShowPos;
+
+int state;
 bool StopMove = false;
+bool StartSequence = false;
+bool tiretteRemoved = false;
+bool sequenceReady = false;
+unsigned long tiretteRemovedTime = 0;
 
-// === Robot state ===
-int state = 0;
-bool StartMove = false;
-
-// === Functions ===
-void taskSensors() {
-  StopMove = (sensor1.readRangeContinuousMillimeters() < 200 || sensor2.readRangeContinuousMillimeters() < 200);
+void checkSensors() {
+  int dist1 = sensor1.readRangeContinuousMillimeters();
+  int dist2 = sensor2.readRangeContinuousMillimeters();
+  StopMove = (dist1 < 200 || dist2 < 200);
   digitalWrite(LED_R, StopMove);
 }
 
+void showPosition() {
 
-void TaskDrive() {
-  static bool movementDone = false;
-  switch (state) {
-    case 0:
-      if (digitalRead(SW_BAU) == LOW){
-        state++;
-      }
-      break;
-    case 1:
-      movementDone = Robotgoto(RobotDiff,300,300, 90,StopMove);
-      if(movementDone) state++;
-      break;
-    case 2:
-      movementDone = Robotgoto(RobotDiff,0,0, 0,StopMove);
-      if(movementDone) state++;
-      break;
-    case 3:
-    break;
-  }
-}
-
-void TaskShowPos() {
-  //RobotDiff.updatePosition();
+  RobotDiff.updatePosition();
   // Serial.print("[Position] X = ");
   // Serial.print(RobotDiff.getPositionX(), 2);
   // Serial.print(" mm | Y = ");
@@ -73,74 +50,97 @@ void TaskShowPos() {
   // Serial.print(RobotDiff.getAlpha(), 2);
   // Serial.println("°");
 
-  Serial.print(RobotDiff.getPositionX(), 2);
-  Serial.print(";");
-  Serial.print(RobotDiff.getPositionY(), 2);
-  Serial.print(";");
-  Serial.print(RobotDiff.getAlpha(), 2);
-  Serial.print("\r\n");
+  // Serial.print(RobotDiff.getPositionX(), 2);
+  // Serial.print(";");
+  // Serial.print(RobotDiff.getPositionY(), 2);
+  // Serial.print(";");
+  // Serial.print(RobotDiff.getAlpha(), 2);
+  // Serial.print("\r\n");
 }
 
-// === Setup ===
-void setup() {
-  Serial.begin(230400);
-  pinMode(LED_R, OUTPUT);
-  pinMode(LED_G, OUTPUT);
+
+
+void taskDrive() {
+  static bool movementDone = false;
+
+  if (!tiretteRemoved && digitalRead(TIRETTE) == HIGH) {
+    tiretteRemoved = true;
+    tiretteRemovedTime = millis();
+  }
+  if (tiretteRemoved && !sequenceReady && (millis() - tiretteRemovedTime >= DELAY_START)) {
+    sequenceReady = true;
+  }
+  switch (state) {
+    case 0:
+      if (sequenceReady){
+        RobotDiff.setPosition(70,1900,90);
+        state++;
+      }
+      break;
+    case 1:
+      movementDone = Robotgoto(RobotDiff,1275,1900,180,StopMove);
+      if(movementDone) state++;
+      break;
+    case 2:
+      movementDone = Robotgoto(RobotDiff,1275,1600,-90,StopMove);
+      if(movementDone) state++;
+      break;
+    case 3:
+    break;
+  }
+}
+
+void setupSensors() {
   pinMode(XSHUT_1, OUTPUT);
   pinMode(XSHUT_2, OUTPUT);
-  pinMode(TIRETTE, INPUT_PULLUP);
-  pinMode(SW_TEAM, INPUT_PULLUP);
-  pinMode(SW_BAU, INPUT_PULLUP);
-
-  digitalWrite(LED_R, LOW);
-  digitalWrite(LED_G, LOW);
-
   digitalWrite(XSHUT_1, HIGH);
   digitalWrite(XSHUT_2, LOW);
 
   Wire.begin();
   sensor1.setTimeout(500);
-  if (!sensor1.init()) {
-    Serial.println("Failed to init sensor1");
-    digitalWrite(LED_R, HIGH);
-    while (1) {}
-  }
+  sensor1.init();
   sensor1.setAddress(1);
 
   digitalWrite(XSHUT_2, HIGH);
   sensor2.setTimeout(500);
-  if (!sensor2.init()) {
-    Serial.println("Failed to init sensor2");
-    digitalWrite(LED_R, HIGH);
-    while (1) {}
-  }
+  sensor2.init();
   sensor2.setAddress(2);
 
   sensor1.startContinuous();
   sensor2.startContinuous();
+}
 
-  if (!driverG.setup_stepper()) Serial.println("TMC error StepG");
-  if (!driverD.setup_stepper()) Serial.println("TMC error StepD");
+void setup() {
+  //Serial.begin(230400);
+  pinMode(LED_R, OUTPUT);
+  pinMode(LED_G, OUTPUT);
+  pinMode(LED_B, OUTPUT);
+  pinMode(SW_BAU, INPUT_PULLUP);
+  pinMode(TIRETTE, INPUT_PULLUP);
 
-  ThreadSensors.onRun(taskSensors);
-  ThreadDrive.onRun(TaskDrive);
-  //ThreadShowPos.onRun(TaskShowPos);
+  digitalWrite(LED_R, LOW);
+  digitalWrite(LED_G, LOW);
+  digitalWrite(LED_B, LOW);
+
+  setupSensors();
+
+  driverG.setup_stepper();
+  driverD.setup_stepper();
+
+  ThreadSensors.onRun(checkSensors);
+  ThreadSensors.setInterval(300);
+
+  ThreadDrive.onRun(taskDrive);
+  ThreadDrive.setInterval(1);
+
+  ThreadShowPos.onRun(showPosition);
+  ThreadShowPos.setInterval(1);
 
   controller.add(&ThreadSensors);
   controller.add(&ThreadDrive);
-  //controller.add(&ThreadShowPos);
-
-  ThreadSensors.setInterval(300);
-  //ThreadShowPos.setInterval(1);
-  ThreadDrive.setInterval(1);
-
-  RobotDiff.setPosition(0, 0, 0);
-
- 
+  controller.add(&ThreadShowPos);
 }
 
-// === Loop ===
 void loop() {
   controller.run();
- 
 }

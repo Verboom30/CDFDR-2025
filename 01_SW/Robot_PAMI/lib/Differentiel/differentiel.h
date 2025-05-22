@@ -11,10 +11,10 @@
 #define RWHEEL  29.8f
 #define REDUC   1.0f
 #define KSTP    float((M_PI*2.0f*RWHEEL/(MOTOR_STEPS*MSTEP))*REDUC)
-#define MAX_SPEED   5000000000
-#define SPEED       MAX_SPEED
+#define MAX_SPEED   SPEED*2
+#define SPEED       20000
 #define MSTEP 8
-#define ACC    30000.0f
+#define ACC    SPEED/4.f
 
 class differentiel {
 public:

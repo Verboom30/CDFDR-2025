@@ -113,6 +113,11 @@ bool  differentiel::Running()      { return StepperG->isRunning() || StepperD->i
 
 bool Robotmoveto(differentiel& robot, int distance, int alpha, bool stop) {
     static bool setupDone = false;
+    if (distance == 0 && alpha == 0) {
+        moveState = IDLE;
+        setupDone = false;
+        return true;
+    }
     if (moveState == IDLE) {
         robot.move(distance, alpha);
         robot.handleRoutineGauche();
@@ -138,7 +143,7 @@ bool Robotgoto(differentiel& robot, int positionX, int positionY, int alpha, boo
             if (abs(dx) < 0.1f) dx = 0.0f;
             if (abs(dy) < 0.1f) dy = 0.0f;
             Move = (int)sqrt(dx * dx + dy * dy);
-            float targetAlpha = (180.0f / M_PI) * atan2(dy, dx);
+            float targetAlpha = (180.0f / M_PI) * atan2(dx, dy);
             MoveAlpha = targetAlpha - robot.getAlpha();
             FinalAlpha = alpha - targetAlpha;
             if (MoveAlpha > 180) MoveAlpha -= 360;
