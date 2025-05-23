@@ -211,8 +211,8 @@ void construction_gradin_niveau_2()
   Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
   Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
   HAL_Delay (500);
-  StepperRG->move(300);
-  StepperRD->move(300);
+  StepperRG->move(600);
+  StepperRD->move(600);
   while(!(StepperRG->StepperAct->stopped() and StepperRD->StepperAct->stopped()));
   HAL_Delay (500);
   Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_side));
@@ -224,6 +224,8 @@ void construction_gradin_niveau_2()
   StepperRM->move(-200);
   while(!StepperRM->StepperAct->stopped());
   Suck_Pump.pulsewidth_us(theta2pluse(180));
+  StepperRM->move(-200);
+  while(!StepperRM->StepperAct->stopped());
   HAL_Delay (1500);
   StepperRM->goUp();
   StepperRG->goUp();
