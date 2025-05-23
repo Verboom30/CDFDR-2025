@@ -164,11 +164,11 @@ int   differentiel::getPosD()        { return StepperD->getPosition(); }
 int   differentiel::getStepG()       { return StepperG->getStep(); }
 int   differentiel::getStepD()       { return StepperD->getStep(); }
 
-float differentiel::getPositionX()   { ScopedLock<Mutex> lock(mutexData); return _positionX; }
-float differentiel::getPositionY()   { ScopedLock<Mutex> lock(mutexData); return _positionY; }
+float differentiel::getPositionX()   { ScopedLock<Mutex> lock(mutexData); updatePosition(); return _positionX; }
+float differentiel::getPositionY()   { ScopedLock<Mutex> lock(mutexData); updatePosition(); return _positionY; }
 float differentiel::getPosCibleX()   { ScopedLock<Mutex> lock(mutexData); return _cibleposX; }
 float differentiel::getPosCibleY()   { ScopedLock<Mutex> lock(mutexData); return _cibleposY; }
-float differentiel::getAlpha()       { ScopedLock<Mutex> lock(mutexData); return _Alpha; }
+float differentiel::getAlpha()       { ScopedLock<Mutex> lock(mutexData); updatePosition(); return _Alpha; }
 float differentiel::getSpeed()       { ScopedLock<Mutex> lock(mutexData); return _Speed; }
 float differentiel::getSpeedAlpha()  { ScopedLock<Mutex> lock(mutexData); return _SpeedAlpha; }
 int   differentiel::getDeltaG()        { ScopedLock<Mutex> lock(mutexData); return _deltaG; }

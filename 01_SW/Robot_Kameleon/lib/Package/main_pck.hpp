@@ -53,4 +53,6 @@ const struct pos_hook Hook[]{
     
    
 };
+
+enum {IDLE,START_UP,CAL,WAIT_MATCH,GAME,END}FsmState;  
 #endif // __MAIN_PKG_H_
