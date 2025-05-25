@@ -7,6 +7,8 @@
 #include "LinearActuator.hpp"
 #include <inttypes.h>
 #include "Differentiel.hpp"
+#include "lidar.hpp"
+#include <cmath>
 
 //***********************************/************************************
 //                              UART_TMC                                //
@@ -71,6 +73,20 @@ int Couleur_Team = 0; // 0 bleu 1 jaune
 int offset_posX = 0;
 int offset_Alpha = 1;
 
+
+Lidar*    LidarLD19 = new Lidar(LIDAR_TX, LIDAR_RX,230400);
+LiDARFrameTypeDef LidarPoints;
+float PointLidarX =0;
+float PointLidarY =0;
+float AngleCible  =0;
+float AngleCible_Down =0;
+float AngleCible_Top  =0;
+int   NbDetecLidarPack =0;
+int   NbNoDetecLidarPack =0;
+float AngleLidar      =0;
+int   DistanceLidar   =0;
+bool Stop = false;
+
 void endMatchProcess()
 {
   end_match = true;
@@ -127,23 +143,22 @@ void Robotgoto(differentiel &robot, int positionX, int positionY, int alpha)
   }
   // 1. Rotation vers direction
   robot.updatePosition();
-  HAL_Delay(10);
+  ThisThread::sleep_for(10ms);
   Robotmoveto(robot, 0, moveAlpha);
 
   // 2. Translation
   robot.updatePosition();
-  HAL_Delay(10);
+  ThisThread::sleep_for(10ms);
   Robotmoveto(robot, move, 0);
 
   // 3. Rotation finale vers Alpha
   robot.updatePosition();
-  HAL_Delay(10);
+  ThisThread::sleep_for(10ms);
   Robotmoveto(robot, 0, finalAlpha);
 }
 void printPosition()
 {
-  En_drive_N = SW_Drive;
-  En_step_N = SW_Stepper;
+ 
   // printf pour processing
   printf("%f;%f;%f\r\n",
          RobotDiff.getPositionX(),
@@ -184,43 +199,45 @@ void construction_gradin_niveau_2()
 {
   Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
   Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
-  HAL_Delay(200);
+  ThisThread::sleep_for(200ms);
   StepperRG->move(600);
   StepperRD->move(600);
   while (!(StepperRG->StepperAct->stopped() and StepperRD->StepperAct->stopped()));
-  HAL_Delay(500);
+  ThisThread::sleep_for(500ms);
   Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_side));
   Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_side));
   StepperRM->move(-11500);
   while (!StepperRM->StepperAct->stopped());
-  HAL_Delay(200);
+  ThisThread::sleep_for(200ms);
   StepperRM->move(-200);
   while (!StepperRM->StepperAct->stopped());
   Suck_Pump.pulsewidth_us(theta2pluse(180));
   StepperRM->move(-200);
   while (!StepperRM->StepperAct->stopped());
-  HAL_Delay(1000);
+  ThisThread::sleep_for(1000ms);
   StepperRM->goUp();
   StepperRG->goUp();
   StepperRD->goUp();
   while (!(StepperRG->goUp() and StepperRD->goUp() and StepperRM->goUp()));
-  HAL_Delay(200);
+  ThisThread::sleep_for(200ms);
   StepperRG->move(-2300);
   StepperRD->move(-2300);
   while (!(StepperRG->StepperAct->stopped() and StepperRD->StepperAct->stopped()));
-  HAL_Delay(200);
+  ThisThread::sleep_for(200ms);
   Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_take));
   Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_take));
-  HAL_Delay(200);
+  ThisThread::sleep_for(200ms);
   StepperRM->move(-2500);
   while (!StepperRM->StepperAct->stopped());
-  HAL_Delay(200);
+  ThisThread::sleep_for(200ms);
   Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
   Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
   Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
   Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
+  Suck_Valve.pulsewidth_us(theta2pluse(180));
   Suck_Pump.pulsewidth_us(theta2pluse(0));
-  HAL_Delay(500);
+  ThisThread::sleep_for(1000ms);
+  Suck_Valve.pulsewidth_us(theta2pluse(0));
   StepperRM->goUp();
   while (!(StepperRM->goUp()));
   StepperRG->move(-200);
@@ -253,6 +270,101 @@ void print_lcd(void)
     }
   }
 }
+
+void ShowLidarCoord(void)
+{
+  float LidarX =0;
+  float LidarY =0;
+  while (1)
+  {
+    NbDetecLidarPack = 0;
+    NbNoDetecLidarPack =0;
+    for (uint8_t j = 0; j < NB_LIDAR_PACK_READ; j++)
+    {
+     
+      LidarPoints = LidarLD19->GetPoints();
+      for (uint8_t i = 0; i < POINT_PER_PACK; i++)
+      {
+        AngleCible = ((180/M_PI) *atan2((RobotDiff.getPosCibleX()-(RobotDiff.getPositionX())),(RobotDiff.getPosCibleY()-(RobotDiff.getPositionY()))))-RobotDiff.getAlpha();
+        //LidarPoints.point[i].intensity >100 
+        if((LidarPoints.point[i].intensity >180) and (sqrt(pow(float(RobotDiff.getPosCibleX()-(RobotDiff.getPositionX())),2.0)+pow(float(RobotDiff.getPosCibleY()-(RobotDiff.getPositionY())),2.0)) >1)){
+          //printf("%5.f;%5d\r\n",i,(LidarPoints.point[i].angle/100),LidarPoints.point[i].distance);
+
+          //printf("%f;%f;%f;%f;%f\r\n",RobotDiff.getPositionX(),RobotDiff.getPositionY(),RobotDiff.getAlpha(),PointLidarX,PointLidarY);
+          //printf("%f;%f;%f;%f;%f\r\n",RobotDiff.getPositionX(),RobotDiff.getPositionY(),RobotDiff.getAlpha(),LidarX,LidarY);
+
+          //if(LidarPoints.point[i].intensity >200)printf("%f;%f;%f;%f;%f\r\n",RobotDiff.getPositionX(),RobotDiff.getPositionY(),RobotDiff.getAlpha(),PointLidarX,PointLidarY);
+          LidarX = RobotDiff.getPositionX()+sin((M_PI/180)*(float(LidarPoints.point[i].angle/100)+RobotDiff.getAlpha()))*LidarPoints.point[i].distance;
+          LidarY = RobotDiff.getPositionY()+cos((M_PI/180)*(float(LidarPoints.point[i].angle/100)+RobotDiff.getAlpha()))*LidarPoints.point[i].distance;
+          
+        
+          //if(sqrt(pow(float(RobotDiff.getPosCibleX()-(RobotDiff.getPositionX())),2.0)+pow(float(RobotDiff.getPosCibleY()-(RobotDiff.getPositionY())),2.0)) >10.0){
+           
+          //}
+          
+         
+          //printf("module=%f\n",sqrt(pow(float(RobotDiff.getPosCibleX()-(RobotDiff.getPositionX())),2.0)+pow(float(RobotDiff.getPosCibleY()-(RobotDiff.getPositionY())),2.0)));
+       
+          
+         
+          if(AngleCible<0) AngleCible =360+AngleCible;
+          AngleCible_Down = AngleCible-LIDAR_ANGLE_MARGIN;
+          AngleCible_Top  = AngleCible+LIDAR_ANGLE_MARGIN;
+          if(AngleCible_Down<0) AngleCible_Down =360+AngleCible_Down;
+          if(AngleCible_Top>360)  AngleCible_Top  =AngleCible_Top-360;
+      
+          if(LidarX>0 and LidarX<(3000) and LidarY>0 and LidarY<(2000)){
+            if(AngleCible_Top > AngleCible_Down){
+                if(float(LidarPoints.point[i].angle/100) <= AngleCible_Top and float(LidarPoints.point[i].angle/100) >= AngleCible_Down){
+                  if(LidarPoints.point[i].distance > LIDAR_DIS_MIN and LidarPoints.point[i].distance <LIDAR_DIS_MAX){
+                    NbDetecLidarPack+=50;
+                    DistanceLidar = LidarPoints.point[i].distance ;
+                    AngleLidar    = float(LidarPoints.point[i].angle/100);
+                    PointLidarX   = LidarX;
+                    PointLidarY   = LidarY;
+                     //printf("[%2d] Dis=%5d Intsy=%5d Agl=%5.f\r\n",i,LidarPoints.point[i].distance,LidarPoints.point[i].intensity,(LidarPoints.point[i].angle/100));
+                    //printf("STOP1!=%d, SumStop=%d, distance=%d, AngleCible_Top=%f, Anglelidar=%f, AngleCible_Down=%f\n",Stop,SumStop,LidarPoints.point[i].distance,AngleCible_Top,float(LidarPoints.point[i].angle/100),AngleCible_Down);
+                  }else{
+                    NbNoDetecLidarPack++;
+                  }
+                }
+            }else{
+              if(float(LidarPoints.point[i].angle/100) <= AngleCible_Top or float(LidarPoints.point[i].angle/100) >= AngleCible_Down){
+                  if(LidarPoints.point[i].distance > LIDAR_DIS_MIN and LidarPoints.point[i].distance <LIDAR_DIS_MAX){
+                    NbDetecLidarPack+=50;
+                    DistanceLidar = LidarPoints.point[i].distance ;
+                    AngleLidar    = float(LidarPoints.point[i].angle/100);
+                    PointLidarX   = LidarX;
+                    PointLidarY   = LidarY;
+                    
+                  //printf("STOP2!=%d, SumStop=%d, distance=%d, AngleCible_Top=%f, Anglelidar=%f, AngleCible_Down=%f\n",Stop,SumStop,LidarPoints.point[i].distance,AngleCible_Top,float(LidarPoints.point[i].angle/100),AngleCible_Down);
+                  }else{
+                    NbNoDetecLidarPack++;
+                  }
+                }
+            }
+          }
+          if((NbNoDetecLidarPack+NbNoDetecLidarPack) != 0){
+            //printf("pourcentageON:=%f,pourcentageOFF=%f\n",float((NbDetecLidarPack*100)/(NbNoDetecLidarPack+NbDetecLidarPack)),float((NbNoDetecLidarPack*100)/(NbNoDetecLidarPack+NbDetecLidarPack)));
+        
+            if(float((NbDetecLidarPack*100)/(NbNoDetecLidarPack+NbDetecLidarPack))>LIDAR_PC_ON and Stop == 0){
+              Stop = true;
+            }
+            if(float((NbNoDetecLidarPack*100)/(NbNoDetecLidarPack+NbDetecLidarPack))>LIDAR_PC_OFF and Stop == 1){
+              Stop = false;
+            }
+          }
+        }else{
+          //Stop = false;
+        }
+      }
+    } 
+    
+    led_lidar =Stop;
+    
+  }
+}
+
 
 void main_thread(void)
 {
@@ -292,16 +404,16 @@ void main_thread(void)
       Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_drop_banner));
       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
-      HAL_Delay(2500);
+      ThisThread::sleep_for(2500ms);
       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_banner));
       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_banner));
-      HAL_Delay(1000);
+      ThisThread::sleep_for(1000ms);
       StepperRG->goUp();
       StepperRD->goUp();
       while (!(StepperRG->goUp() and StepperRD->goUp()));
       Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_banner));
       Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_banner));
-      HAL_Delay(500);
+      ThisThread::sleep_for(500ms);
       lcd.cls();
       lcd.printf("Calibration !\n");
       FsmState = CAL;
@@ -315,7 +427,7 @@ void main_thread(void)
       break;
 
     case WAIT_MATCH:
-      if (SW_Tirette != 1 and FsmState != END)
+      if (SW_Tirette == 1 and FsmState != END)
       {
         endMatch.attach(endMatchProcess, 100s);
         lcd.cls();
@@ -329,11 +441,11 @@ void main_thread(void)
       Robotgoto(RobotDiff, 1775, 180, 180);
       Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_drop_banner));
       Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_drop_banner));
-      HAL_Delay(500);
+      ThisThread::sleep_for(500ms);
       StepperRG->goDown();
       StepperRD->goDown();
       while (!(StepperRG->goDown() and StepperRD->goDown()));
-      HAL_Delay(500);
+      ThisThread::sleep_for(500ms);
       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
       Robotgoto(RobotDiff, 1775, 450, 180);
@@ -347,7 +459,7 @@ void main_thread(void)
       Robotgoto(RobotDiff, 2225, 225, 180);
       Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
       Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
-      HAL_Delay(500);
+      ThisThread::sleep_for(500ms);
       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
       Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
       Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
@@ -361,10 +473,10 @@ void main_thread(void)
       down_pince_take();
       Robotgoto(RobotDiff, 2700, 400, 90);
       Robotgoto(RobotDiff, 2850, 400, 90);
-      HAL_Delay(500);
+      ThisThread::sleep_for(500ms);
       Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
       Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
-      HAL_Delay(500);
+      ThisThread::sleep_for(500ms);
       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
       Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
       Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
@@ -383,10 +495,10 @@ void main_thread(void)
       Robotgoto(RobotDiff, 1900, 600, 0);
       down_pince_take();
       Robotgoto(RobotDiff, 1900, 875, 0);
-      HAL_Delay(500);
+      ThisThread::sleep_for(500ms);
       Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
       Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
-      HAL_Delay(500);
+      ThisThread::sleep_for(500ms);
       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
       Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
       Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
@@ -420,8 +532,8 @@ void main_thread(void)
 
 int main()
 {
-  Thread threadAffichage;
-  threadAffichage.start(routineAffichage);
+  //Thread threadAffichage;
+  //threadAffichage.start(routineAffichage);
 
   En_drive_N = SW_Drive;
   En_step_N = SW_Stepper;
@@ -433,40 +545,43 @@ int main()
   SW_Drive.mode(PullUp);
   SW_Stepper.mode(PullUp);
 
-  Pince_r1.period_ms(20);
-  Pince_r2.period_ms(20);
-  Pince_r3.period_ms(20);
-  Pince_r4.period_ms(20);
-  Mover_rg.period_ms(20);
-  Mover_rd.period_ms(20);
-  Hook_G.period_ms(20);
-  Hook_D.period_ms(20);
-  HAL_Delay(500);
-  TMCSerial.setup_all_stepper();
-  StepperRG->InitLinearActuator();
-  StepperRD->InitLinearActuator();
-  StepperRM->InitLinearActuator();
-  HAL_Delay(500);
-  Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
-  Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
-  Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_side));
-  Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_side));
-  HAL_Delay(500);
-  Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
-  Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
-  Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
-  Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
-  StepperRG->goUp();
-  StepperRD->goUp();
-  StepperRM->goUp();
-  while (!(StepperRG->goUp() and StepperRD->goUp() and StepperRM->goUp()));
-  Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_home));
-  Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_home));
+  // Pince_r1.period_ms(20);
+  // Pince_r2.period_ms(20);
+  // Pince_r3.period_ms(20);
+  // Pince_r4.period_ms(20);
+  // Mover_rg.period_ms(20);
+  // Mover_rd.period_ms(20);
+  // Hook_G.period_ms(20);
+  // Hook_D.period_ms(20);
+  // ThisThread::sleep_for(500ms);
+  // TMCSerial.setup_all_stepper();
+  // StepperRG->InitLinearActuator();
+  // StepperRD->InitLinearActuator();
+  // StepperRM->InitLinearActuator();
+  // ThisThread::sleep_for(500ms);
+  // Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
+  // Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
+  // Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_side));
+  // Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_side));
+  // ThisThread::sleep_for(500ms);
+  // Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
+  // Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
+  // Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
+  // Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
+  // StepperRG->goUp();
+  // StepperRD->goUp();
+  // StepperRM->goUp();
+  // while (!(StepperRG->goUp() and StepperRD->goUp() and StepperRM->goUp()));
+  // Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_home));
+  // Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_home));
 
   game_thread.start(main_thread);
 
   while (1)
   {
+
+    En_drive_N = SW_Drive;
+    En_step_N = SW_Stepper;
     if (end_match)
     {
       lcd_thread.terminate();
