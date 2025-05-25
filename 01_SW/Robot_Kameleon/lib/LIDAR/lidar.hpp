@@ -35,8 +35,9 @@ private:
     EventQueue queue;
     Thread lidar_thread;
 
-    uint8_t buffer[DATA_PACKET_SIZE * 2];
+    uint8_t buffer[DATA_PACKET_SIZE * 4];
     size_t buffer_pos;
+    uint8_t packet_buffer[DATA_PACKET_SIZE] = {0};
 
     LiDARFrameTypeDef _dataPacket;
 
