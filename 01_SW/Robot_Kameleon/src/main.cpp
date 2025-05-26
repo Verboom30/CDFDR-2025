@@ -19,9 +19,10 @@ BufferedSerial pc(USBTX, USBRX, 230400);
 //***********************************/************************************
 //                                 MOVE                                 //
 //***********************************/************************************
+bool StopLidar = false;
 Stepper StepperG(STEP_G, DIR_G);
 Stepper StepperD(STEP_D, DIR_D);
-differentiel RobotDiff(&StepperG, &StepperD);
+differentiel RobotDiff(&StepperG, &StepperD, &StopLidar);
 DigitalOut En_drive_N(ENABLE_DRIVE_N);
 DigitalOut En_step_N(ENABLE_STEP_N);
 //***********************************/************************************
@@ -78,7 +79,7 @@ int offset_Alpha = 1;
 
 Lidar*    LidarLD19 = new Lidar(LIDAR_TX, LIDAR_RX,230400);
 LidarAnalyzer LidaRayzer(LidarLD19, &RobotDiff, &led_lidar);
-LiDARFrameTypeDef LidarPoints;
+
 
 void endMatchProcess()
 {
@@ -218,10 +219,11 @@ void print_lcd(void)
 void thread_lidar() {
     while (true) {
         LidaRayzer.update();
+        //StopLidar = LidaRayzer.isObstacleDetected();
+        StopLidar = !SW_init;
         ThisThread::sleep_for(1ms);
     }
 }
-
 void main_thread(void)
 {
   FsmState = IDLE;
@@ -294,7 +296,7 @@ void main_thread(void)
       break;
 
     case GAME:
-      RobotDiff.Robotgoto(1775, 180, 180, false);
+      RobotDiff.Robotgoto(1775, 180, 180);
       Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_drop_banner));
       Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_drop_banner));
       ThisThread::sleep_for(500ms);
@@ -304,15 +306,15 @@ void main_thread(void)
       ThisThread::sleep_for(500ms);
       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
-      RobotDiff.Robotgoto(1775, 450, 180, false);
+       RobotDiff.Robotgoto(1775, 450, 180);
       StepperRG->goUp();
       StepperRD->goUp();
       while (!(StepperRG->goUp() and StepperRD->goUp()));
-      RobotDiff.Robotgoto(1775, 700, 90, SW_init);
-      RobotDiff.Robotgoto(2225, 700, 180, false);
+      RobotDiff.Robotgoto(1775, 700, 90);
+      RobotDiff.Robotgoto(2225, 700, 180);
       down_pince_take();
-      RobotDiff.Robotgoto(2225, 325, 180, false);
-      RobotDiff.Robotgoto(2225, 225, 180, false);
+      RobotDiff.Robotgoto(2225, 325, 180);
+      RobotDiff.Robotgoto(2225, 225, 180);
       Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
       Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
       ThisThread::sleep_for(500ms);
@@ -320,15 +322,15 @@ void main_thread(void)
       Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
       Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
-      RobotDiff.Robotgoto(2225, 120, 180, false);
+      RobotDiff.Robotgoto(2225, 120, 180);
       RobotDiff.setPosition(2225, 170, 180);
-      RobotDiff.Robotgoto(2225, 225, 180, false);
+      RobotDiff.Robotgoto(2225, 225, 180);
       construction_gradin_niveau_2();
-      RobotDiff.Robotgoto(2225, 325, 180, false);
-      RobotDiff.Robotgoto(2225, 400, 90, false);
+      RobotDiff.Robotgoto(2225, 325, 180);
+      RobotDiff.Robotgoto(2225, 400, 90);
       down_pince_take();
-      RobotDiff.Robotgoto(2700, 400, 90, false);
-      RobotDiff.Robotgoto(2850, 400, 90, false);
+      RobotDiff.Robotgoto(2700, 400, 90);
+      RobotDiff.Robotgoto(2850, 400, 90);
       ThisThread::sleep_for(500ms);
       Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
       Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
@@ -337,20 +339,20 @@ void main_thread(void)
       Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
       Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
-      RobotDiff.Robotgoto(2700, 400, 0, false);
-      RobotDiff.Robotgoto(2700, 400, -90, false);
-      RobotDiff.Robotgoto(2900, 400, -90, false);
+      RobotDiff.Robotgoto(2700, 400, 0);
+      RobotDiff.Robotgoto(2700, 400, -90);
+      RobotDiff.Robotgoto(2900, 400, -90);
       RobotDiff.setPosition(2850, 400, -90);
-      RobotDiff.Robotgoto(2700, 400, -90, false);
-      RobotDiff.Robotgoto(1775, 600, 180, false);
-      RobotDiff.Robotgoto(1775, 350, 180, false);
+      RobotDiff.Robotgoto(2700, 400, -90);
+      RobotDiff.Robotgoto(1775, 600, 180);
+      RobotDiff.Robotgoto(1775, 350, 180);
       construction_gradin_niveau_2();
 
       //===========================================//
-      RobotDiff.Robotgoto(1775, 600, 180, false);
-      RobotDiff.Robotgoto(1900, 600, 0, false);
+      RobotDiff.Robotgoto(1775, 600, 180);
+      RobotDiff.Robotgoto(1900, 600, 0);
       down_pince_take();
-      RobotDiff.Robotgoto(1900, 875, 0, false);
+      RobotDiff.Robotgoto(1900, 875, 0);
       ThisThread::sleep_for(500ms);
       Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
       Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
@@ -360,13 +362,13 @@ void main_thread(void)
       Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
 
-      RobotDiff.Robotgoto(1900, 750, 0, false);
-      RobotDiff.Robotgoto(1775, 600, 180, false);
-      RobotDiff.Robotgoto(1775, 450, 180, false);
+      RobotDiff.Robotgoto(1900, 750, 0);
+      RobotDiff.Robotgoto(1775, 600, 180);
+      RobotDiff.Robotgoto(1775, 450, 180);
       construction_gradin_niveau_2();
-      RobotDiff.Robotgoto(1775, 650, 180, false);
-      RobotDiff.Robotgoto(2400, 600, 0, false);
-      RobotDiff.Robotgoto(2500, 1500, 0, false);
+      RobotDiff.Robotgoto(1775, 650, 180);
+      RobotDiff.Robotgoto(2400, 600, 0);
+      RobotDiff.Robotgoto(2500, 1500, 0);
 
 
       lcd_thread.terminate();

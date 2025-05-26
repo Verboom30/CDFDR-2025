@@ -154,12 +154,28 @@ void Stepper::goesTo(int position)
     move(position-_pos);    //absolute to relative transformation   
 }
 
+void Stepper::pause()
+{
+    if (_state != STOP && _state != PAUSE) {
+        _prev_state = _state;
+        _state = PAUSE;
+        remove();  // arrête la minuterie
+    }
+}
+void Stepper::resume()
+{
+    if (_state == PAUSE) {
+        _state = _prev_state;
+        insert(us_ticker_read() + _dtn);  // important : nouveau délai
+    }
+}
+
 //***********************************/************************************
 //                          Protected Methods                           //
 //***********************************/************************************
 void Stepper::handler(void)
 {
-   
+    if (_isPaused) return;  // Ne rien faire si en pause
     
     switch(_state)
     {

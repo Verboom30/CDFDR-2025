@@ -66,6 +66,9 @@ public:
      * 
     */
     void run(void);
+
+    void pause();     // Met en pause le mouvement
+    void resume();    // Reprend le mouvement après une pause
     
     /**Set Rotation Speed
     * @param speed [steps/sec]
@@ -135,7 +138,8 @@ private:
     unsigned int _steps;                    //nbr total of steps per mov
     DigitalOut _clk;                        //output clock pin 
     DigitalOut _dir;                        //output dir pin
-    enum {STOP,ACCEL,CRUISE,DECEL}_state;  //Motor state
+    enum { STOP, ACCEL, CRUISE, DECEL, PAUSE }_state, _prev_state;
+    bool _isPaused = false;
     unsigned int _dt0;                      //initial delay [µs]
     unsigned int _dtmin;                    //delay minimum [µs]
     unsigned int _dtn;                             //current delay

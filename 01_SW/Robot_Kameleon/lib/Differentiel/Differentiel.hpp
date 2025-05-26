@@ -23,10 +23,12 @@
 class differentiel
 {
     public:
-    differentiel(Stepper* moteurGauche, Stepper* moteurDroit);
+    differentiel(Stepper* moteurGauche, Stepper* moteurDroit, bool* StopLidar);
 
     void run();
     void stop();
+    void pause();
+    void resume();
     
     void move(int distance, int Alpha); 
     void setPosition(int positionX, int positionY, int Alpha);
@@ -54,14 +56,15 @@ class differentiel
     bool PosCibleDone();
     void updatePosition();
 
-    void Robotmoveto(int distance, int alpha, bool Stop);
-    void Robotgoto(int positionX, int positionY, int alpha, bool Stop);
+    void Robotmoveto(int distance, int alpha, bool enableLidar);
+    void Robotgoto(int positionX, int positionY, int alpha);
    
 
 private : 
     // Moteurs
     Stepper* StepperG;
     Stepper* StepperD;
+    bool* _stopLidar;
 
     // Threads et synchro
     Thread routineG;

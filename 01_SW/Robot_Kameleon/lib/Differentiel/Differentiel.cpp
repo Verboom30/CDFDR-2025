@@ -1,7 +1,7 @@
 #include "Differentiel.hpp"
 
-differentiel::differentiel(Stepper* moteurGauche, Stepper* moteurDroit)
-    : StepperG(moteurGauche), StepperD(moteurDroit), readyCount(0), semG(0), semD(0) 
+differentiel::differentiel(Stepper* moteurGauche, Stepper* moteurDroit, bool* StopLidar)
+    : StepperG(moteurGauche), StepperD(moteurDroit),_stopLidar(StopLidar),  readyCount(0), semG(0), semD(0) 
 {
     _positionX = _positionY = 0;
     _cibleposX = _cibleposY = 0;
@@ -9,7 +9,7 @@ differentiel::differentiel(Stepper* moteurGauche, Stepper* moteurDroit)
     _Speed = _SpeedAlpha = 0;
     _Move = _MoveAlpha = 0;
     _deltaG = _deltaD = 0;
-
+     
     routineG.start(callback(this, &differentiel::routine_gauche));
     routineD.start(callback(this, &differentiel::routine_droite));
     threadOdometrie.start(callback(this, &differentiel::routine_odometrie));
@@ -23,6 +23,17 @@ void differentiel::run()
     StepperD->run();
 }
 
+void differentiel::pause()
+{
+    StepperG->pause();
+    StepperD->pause();
+}
+
+void differentiel::resume()
+{
+    StepperG->resume();
+    StepperD->resume();
+}
 void differentiel::stop()
 {
     StepperG->stop();
@@ -155,23 +166,17 @@ void differentiel::updatePosition()
     if (_Alpha < -180.0f) _Alpha += 360.0f;
 }
 
-void differentiel::Robotmoveto(int distance, int alpha, bool Stop)
+void differentiel::Robotmoveto(int distance, int alpha, bool enableLidar)
 {
-  
   move(distance, alpha);
   do
   {
-    if (Stop){
-        stop();
-    } else {
-        //run();
-    }
+    if(enableLidar)(*_stopLidar) ? pause() : resume();
     ThisThread::sleep_for(100ms);
   } while (!PosCibleDone());
-  // robot.stop();
 }
 
-void differentiel::Robotgoto(int positionX, int positionY, int alpha, bool Stop)
+void differentiel::Robotgoto(int positionX, int positionY, int alpha)
 {
   float dx = positionX - getPositionX();
   float dy = positionY - getPositionY();
@@ -210,19 +215,19 @@ void differentiel::Robotgoto(int positionX, int positionY, int alpha, bool Stop)
   // 1. Rotation vers direction
   updatePosition();
   ThisThread::sleep_for(10ms);
-  Robotmoveto(0, moveAlpha, Stop);
+  Robotmoveto(0, moveAlpha, false);
 
   // 2. Translation
   updatePosition();
   ThisThread::sleep_for(10ms);
   _cibleposX = positionX;
   _cibleposY = positionY;
-  Robotmoveto(move, 0, Stop);
+  Robotmoveto(move, 0, true);
 
   // 3. Rotation finale vers Alpha
   updatePosition();
   ThisThread::sleep_for(10ms);
-  Robotmoveto(0, finalAlpha, Stop);
+  Robotmoveto(0, finalAlpha, false);
 }
 
 // ======================== Getters ========================= //
