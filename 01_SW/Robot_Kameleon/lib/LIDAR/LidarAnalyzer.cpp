@@ -11,7 +11,7 @@
 LidarAnalyzer::LidarAnalyzer(Lidar* lidar, differentiel* robot, DigitalOut* status_led)
     : lidar_(lidar), robot_(robot), led_(status_led), stop_(false),
       NbDetecLidarPack(0), NbNoDetecLidarPack(0),
-      DistanceLidar(0), AngleLidar(0), PointLidarX(0), PointLidarY(0)
+      DistanceLidar(0), AngleLidar(0), AngleLidarCible(0), PointLidarX(0), PointLidarY(0)
 {}
 
 bool LidarAnalyzer::isAngleInRange(float angle, float min, float max) const {
@@ -35,11 +35,11 @@ void LidarAnalyzer::update() {
 
     if (distToTarget <= 1.0f) return;
 
-    float angleCible = atan2f(deltaX, deltaY) * 180.0f / M_PI - alpha;
-    if (angleCible < 0) angleCible += 360.0f;
+    AngleLidarCible = atan2f(deltaX, deltaY) * 180.0f / M_PI - alpha;
+    if (AngleLidarCible < 0) AngleLidarCible += 360.0f;
 
-    float angleMin = angleCible - LIDAR_ANGLE_MARGIN;
-    float angleMax = angleCible + LIDAR_ANGLE_MARGIN;
+    float angleMin = AngleLidarCible - LIDAR_ANGLE_MARGIN;
+    float angleMax = AngleLidarCible + LIDAR_ANGLE_MARGIN;
     if (angleMin < 0) angleMin += 360.0f;
     if (angleMax >= 360.0f) angleMax -= 360.0f;
 
@@ -77,10 +77,10 @@ void LidarAnalyzer::update() {
 
         if (pctOn > LIDAR_PC_ON && !stop_) {
             stop_ = true;
-            printf("[LIDAR] Obstacle détecté (%.1f%%) — Stop = TRUE\n", pctOn);
+            //printf("[LIDAR] Obstacle détecté (%.1f%%) — Stop = TRUE\n", pctOn);
         } else if ((100.0f - pctOn) > LIDAR_PC_OFF && stop_) {
             stop_ = false;
-            printf("[LIDAR] Zone dégagée — Stop = FALSE\n");
+            //printf("[LIDAR] Zone dégagée — Stop = FALSE\n");
         }
     }
 
@@ -98,6 +98,11 @@ float LidarAnalyzer::getObstacleDistance() const {
 float LidarAnalyzer::getObstacleAngle() const {
     return AngleLidar;
 }
+
+float LidarAnalyzer::getObstacleAngleCible() const {
+    return AngleLidarCible;
+}
+
 
 float LidarAnalyzer::getObstacleX() const {
     return PointLidarX;

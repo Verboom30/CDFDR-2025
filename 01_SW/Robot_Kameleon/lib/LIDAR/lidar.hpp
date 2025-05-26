@@ -45,8 +45,8 @@ private:
     void processBuffer();
     void parsePacket(const uint8_t* DataPacket);
 
-    Thread Lidar_print_thread;
-    void routine_lidar(void);
+    // Thread Lidar_print_thread;
+    // void routine_lidar(void);
 };
 
 #endif // LIDAR_HPP

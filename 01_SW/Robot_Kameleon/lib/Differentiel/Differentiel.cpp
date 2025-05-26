@@ -155,6 +155,76 @@ void differentiel::updatePosition()
     if (_Alpha < -180.0f) _Alpha += 360.0f;
 }
 
+void differentiel::Robotmoveto(int distance, int alpha, bool Stop)
+{
+  
+  move(distance, alpha);
+  do
+  {
+    if (Stop){
+        stop();
+    } else {
+        //run();
+    }
+    ThisThread::sleep_for(100ms);
+  } while (!PosCibleDone());
+  // robot.stop();
+}
+
+void differentiel::Robotgoto(int positionX, int positionY, int alpha, bool Stop)
+{
+  float dx = positionX - getPositionX();
+  float dy = positionY - getPositionY();
+ 
+
+  if (dx < 0.1f and dx > -0.1f) dx = 0.0f;
+  if (dy < 0.1f and dy > -0.1f) dy = 0.0f;
+  // printf("dx = %d,dy = %d\n",dx,dy);
+  int move = sqrt(dx * dx + dy * dy);
+  // if ( move < 0.01f) move = 0.0f;
+
+  float targetAlpha = ((180.0f / M_PI) * atan2(dx, dy));
+  if (targetAlpha < 0.01f and targetAlpha > -0.01f) targetAlpha = 0.0f;
+  float moveAlpha = targetAlpha - getAlpha();
+  float finalAlpha = alpha - targetAlpha;
+
+  // Gérer la différence d'angle pour éviter les rotations inutiles
+  // L'angle est borné entre -180° et 180°
+  if (moveAlpha > 180) moveAlpha -= 360;
+  if (moveAlpha < -180) moveAlpha += 360;
+
+  if (finalAlpha > 180) finalAlpha -= 360;
+  if (finalAlpha < -180) finalAlpha += 360;
+
+  // Si la différence d'angle est proche de 180° ou -180°, on inverse le mouvement
+  if (std::abs(moveAlpha) > 90)
+  {
+    moveAlpha -= 180;
+    finalAlpha -= 180;
+    move = -move;
+    if (moveAlpha > 180) moveAlpha -= 360;
+    if (moveAlpha < -180) moveAlpha += 360;
+    if (finalAlpha > 180) finalAlpha -= 360;
+    if (finalAlpha < -180) finalAlpha += 360;
+  }
+  // 1. Rotation vers direction
+  updatePosition();
+  ThisThread::sleep_for(10ms);
+  Robotmoveto(0, moveAlpha, Stop);
+
+  // 2. Translation
+  updatePosition();
+  ThisThread::sleep_for(10ms);
+  _cibleposX = positionX;
+  _cibleposY = positionY;
+  Robotmoveto(move, 0, Stop);
+
+  // 3. Rotation finale vers Alpha
+  updatePosition();
+  ThisThread::sleep_for(10ms);
+  Robotmoveto(0, finalAlpha, Stop);
+}
+
 // ======================== Getters ========================= //
 
 float differentiel::getSpeedG()      { return StepperG->getSpeed(); }

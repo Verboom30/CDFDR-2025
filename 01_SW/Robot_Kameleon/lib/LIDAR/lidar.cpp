@@ -5,7 +5,7 @@ Lidar::Lidar(PinName tx, PinName rx, int baud)
 {
     serial.attach(callback(this, &Lidar::on_uart_rx), SerialBase::RxIrq);
     lidar_thread.start(callback(&queue, &EventQueue::dispatch_forever));
-    Lidar_print_thread.start(callback(this, &Lidar::routine_lidar));
+    //Lidar_print_thread.start(callback(this, &Lidar::routine_lidar));
 }
 
 void Lidar::on_uart_rx()
@@ -121,27 +121,27 @@ LiDARFrameTypeDef Lidar::GetPoints(void)
     return _dataPacket;
 }
 
-void Lidar::routine_lidar(void)
-{
-  while (true) {
-    // Récupérer la dernière trame
-    LiDARFrameTypeDef frame = Lidar::GetPoints();
+// void Lidar::routine_lidar(void)
+// {
+//   while (true) {
+//     // Récupérer la dernière trame
+//     LiDARFrameTypeDef frame = Lidar::GetPoints();
 
-    // Affichage simple des distances
-    //printf("Start angle: %.2f deg\n", frame.start_angle / 100.0f);
-    for (int i = 0; i < POINT_PER_PACK; i++) {
-        printf("Point %d: angle=%.2f deg, distance=%d mm, intensity=%d\n",
-                i,
-                frame.point[i].angle / 100.0f,
-                frame.point[i].distance,
-                frame.point[i].intensity);
+//     // Affichage simple des distances
+//     //printf("Start angle: %.2f deg\n", frame.start_angle / 100.0f);
+//     for (int i = 0; i < POINT_PER_PACK; i++) {
+//         printf("Point %d: angle=%.2f deg, distance=%d mm, intensity=%d\n",
+//                 i,
+//                 frame.point[i].angle / 100.0f,
+//                 frame.point[i].distance,
+//                 frame.point[i].intensity);
 
-        //printf("%.2f;%5d\r\n",frame.point[i].angle/100.0f,frame.point[i].distance);
-    }
-    printf("-----\n");
+//         //printf("%.2f;%5d\r\n",frame.point[i].angle/100.0f,frame.point[i].distance);
+//     }
+//     printf("-----\n");
 
     
 
-    ThisThread::sleep_for(1ms); 
-  }   
-}
+//     ThisThread::sleep_for(1ms); 
+//   }   
+// }

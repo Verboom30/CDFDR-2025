@@ -53,6 +53,9 @@ class differentiel
     bool stopped();
     bool PosCibleDone();
     void updatePosition();
+
+    void Robotmoveto(int distance, int alpha, bool Stop);
+    void Robotgoto(int positionX, int positionY, int alpha, bool Stop);
    
 
 private : 

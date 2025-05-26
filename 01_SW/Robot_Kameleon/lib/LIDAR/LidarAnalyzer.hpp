@@ -15,6 +15,7 @@ public:
     float getObstacleAngle() const;
     float getObstacleX() const;
     float getObstacleY() const;
+    float getObstacleAngleCible() const;
 
 private:
     Lidar* lidar_;
@@ -26,6 +27,7 @@ private:
     int NbNoDetecLidarPack;
     float DistanceLidar;
     float AngleLidar;
+    float AngleLidarCible;
     float PointLidarX;
     float PointLidarY;
 
