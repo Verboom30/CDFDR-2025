@@ -95,7 +95,7 @@ void LidarAnalyzer::update() {
                 stableStopCounter_--;
             }
         }
-        printf("[LIDAR] stableStopCounter_ (%d)\n", stableStopCounter_);
+        //printf("[LIDAR] stableStopCounter_ (%d)\n", stableStopCounter_);
 
         if (stableStopCounter_ >= STOP_ON_THRESHOLD && !stop_) {
             stop_ = true;

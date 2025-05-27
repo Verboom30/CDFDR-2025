@@ -20,6 +20,7 @@ BufferedSerial pc(USBTX, USBRX, 230400);
 //                                 MOVE                                 //
 //***********************************/************************************
 bool StopLidar = false;
+bool Fin_de_match = false;
 Stepper StepperG(STEP_G, DIR_G);
 Stepper StepperD(STEP_D, DIR_D);
 differentiel RobotDiff(&StepperG, &StepperD, &StopLidar);
@@ -393,7 +394,7 @@ int main()
   Thread lidarAnalyzer_thread;
   //threadAffichage.start(routineAffichage);
   
-
+ 
   En_drive_N = SW_Drive;
   En_step_N = SW_Stepper;
 
@@ -403,36 +404,37 @@ int main()
   SW_Tirette.mode(PullUp);
   SW_Drive.mode(PullUp);
   SW_Stepper.mode(PullUp);
-
-  Pince_r1.period_ms(20);
-  Pince_r2.period_ms(20);
-  Pince_r3.period_ms(20);
-  Pince_r4.period_ms(20);
-  Mover_rg.period_ms(20);
-  Mover_rd.period_ms(20);
-  Hook_G.period_ms(20);
-  Hook_D.period_ms(20);
-  ThisThread::sleep_for(500ms);
-  TMCSerial.setup_all_stepper();
-  StepperRG->InitLinearActuator();
-  StepperRD->InitLinearActuator();
-  StepperRM->InitLinearActuator();
-  ThisThread::sleep_for(500ms);
-  Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
-  Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
-  Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_side));
-  Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_side));
-  ThisThread::sleep_for(500ms);
-  Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
-  Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
-  Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
-  Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
-  StepperRG->goUp();
-  StepperRD->goUp();
-  StepperRM->goUp();
-  while (!(StepperRG->goUp() and StepperRD->goUp() and StepperRM->goUp()));
-  Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_home));
-  Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_home));
+  if (SW_bau ==0 ) {
+    Pince_r1.period_ms(20);
+    Pince_r2.period_ms(20);
+    Pince_r3.period_ms(20);
+    Pince_r4.period_ms(20);
+    Mover_rg.period_ms(20);
+    Mover_rd.period_ms(20);
+    Hook_G.period_ms(20);
+    Hook_D.period_ms(20);
+    ThisThread::sleep_for(500ms);
+    TMCSerial.setup_all_stepper();
+    StepperRG->InitLinearActuator();
+    StepperRD->InitLinearActuator();
+    StepperRM->InitLinearActuator();
+    ThisThread::sleep_for(500ms);
+    Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
+    Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
+    Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_side));
+    Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_side));
+    ThisThread::sleep_for(500ms);
+    Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
+    Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
+    Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
+    Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
+    StepperRG->goUp();
+    StepperRD->goUp();
+    StepperRM->goUp();
+    while (!(StepperRG->goUp() and StepperRD->goUp() and StepperRM->goUp()));
+    Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_home));
+    Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_home));
+  }
 
   game_thread.start(main_thread);
   lidarAnalyzer_thread.start(thread_lidar);
@@ -440,15 +442,34 @@ int main()
   while (1)
   {
 
-    En_drive_N = SW_Drive;
-    En_step_N = SW_Stepper;
-    if (end_match)
+    if (Fin_de_match == false) {
+      En_drive_N = SW_Drive;
+      En_step_N = SW_Stepper;
+    }
+    
+    if ((end_match or SW_bau == 1) and Fin_de_match == false)
     {
-      end_match = 0;
+      Fin_de_match = true;
+      if (SW_bau == 1) {
+        En_drive_N = 1;
+        En_step_N = 1;
+        Pince_r1 = 0.0;
+        Pince_r2 = 0.0;
+        Pince_r3 = 0.0;
+        Pince_r4 = 0.0;
+        Mover_rg = 0.0;
+        Mover_rd = 0.0;
+        Hook_G = 0.0;
+        Hook_D = 0.0;
+        Suck_Pump = 0.0;
+        Suck_Valve = 0.0;
+       
+      }
       lcd_thread.terminate();
       game_thread.terminate();
       lcd.cls();
-      lcd.printf("END TIMOUT !\n");
+      if(SW_bau)  lcd.printf("Arret D'urgence !\n");
+      if(end_match)  lcd.printf("END TIMOUT !\n");
       lcd.locate(0, 1);
       lcd.printf("Score :%d\n", score);
     }
