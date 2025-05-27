@@ -40,16 +40,15 @@ void differentiel::stop()
     StepperD->stop();
 }
 
-void differentiel::setPosition(int positionX, int positionY, int Alpha)
+void differentiel::setPosition(int positionX, int positionY, int Alpha, bool team)
 {
      ScopedLock<Mutex> lock(mutexData);
 
-    _positionX = positionX;
+    _positionX = team == 1  ? abs(3000-positionX) : positionX;
     _positionY = positionY;
-    _cibleposX = positionX;
-    _cibleposY = positionY;
+    _cibleposX = _positionX;
+    _cibleposY = _positionY;
     _Alpha = Alpha;
-
     lastPosG = -StepperG->getPosition();
     lastPosD = StepperD->getPosition();
 }
@@ -178,13 +177,14 @@ void differentiel::Robotmoveto(int distance, int alpha, bool enableLidar)
   } while (!PosCibleDone());
 }
 
-void differentiel::Robotgoto(int positionX, int positionY, int alpha)
+void differentiel::Robotgoto(int positionX, int positionY, int alpha, bool team)
 {
-  float dx = positionX - getPositionX();
+    
+  float dx = team == 1  ? abs(3000-positionX) - getPositionX() : positionX - getPositionX();
   float dy = positionY - getPositionY();
-  _cibleposX = positionX;
+  _cibleposX = team == 1  ? abs(3000-positionX) : positionX;
   _cibleposY = positionY;
-
+   
   if (dx < 0.1f and dx > -0.1f) dx = 0.0f;
   if (dy < 0.1f and dy > -0.1f) dy = 0.0f;
   // printf("dx = %d,dy = %d\n",dx,dy);
@@ -194,7 +194,7 @@ void differentiel::Robotgoto(int positionX, int positionY, int alpha)
   float targetAlpha = ((180.0f / M_PI) * atan2(dx, dy));
   if (targetAlpha < 0.01f and targetAlpha > -0.01f) targetAlpha = 0.0f;
   float moveAlpha = targetAlpha - getAlpha();
-  float finalAlpha = alpha - targetAlpha;
+  float finalAlpha = team == 1  ? (alpha*-1.0) - targetAlpha : alpha - targetAlpha;
 
   // Gérer la différence d'angle pour éviter les rotations inutiles
   // L'angle est borné entre -180° et 180°

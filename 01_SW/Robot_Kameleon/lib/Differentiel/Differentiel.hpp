@@ -31,7 +31,7 @@ class differentiel
     void resume();
     
     void move(int distance, int Alpha); 
-    void setPosition(int positionX, int positionY, int Alpha);
+    void setPosition(int positionX, int positionY, int Alpha, bool team);
     void setPositionZero();
     void resetPosition(); 
 
@@ -57,7 +57,7 @@ class differentiel
     void updatePosition();
 
     void Robotmoveto(int distance, int alpha, bool enableLidar);
-    void Robotgoto(int positionX, int positionY, int alpha);
+    void Robotgoto(int positionX, int positionY, int alpha, bool team);
    
 
 private : 

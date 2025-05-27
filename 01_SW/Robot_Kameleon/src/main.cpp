@@ -21,6 +21,7 @@ BufferedSerial pc(USBTX, USBRX, 230400);
 //***********************************/************************************
 bool StopLidar = false;
 bool Fin_de_match = false;
+bool   Couleur_Team = 0; // false bleu true jaune
 Stepper StepperG(STEP_G, DIR_G);
 Stepper StepperD(STEP_D, DIR_D);
 differentiel RobotDiff(&StepperG, &StepperD, &StopLidar);
@@ -73,7 +74,6 @@ Thread lcd_thread;
 Thread game_thread;
 
 int score = 0;
-int Couleur_Team = 0; // 0 bleu 1 jaune
 int offset_posX = 0;
 int offset_Alpha = 1;
 
@@ -94,22 +94,22 @@ float theta2pluse(int theta)
 void printPosition()
 {
  
-  // printf pour processing
-  // printf("%f;%f;%f\r\n",
-  //       RobotDiff.getPositionX(),
-  //       RobotDiff.getPositionY(),
-  //       RobotDiff.getAlpha());
+  //printf pour processing
+  printf("%f;%f;%f\r\n",
+        RobotDiff.getPositionX(),
+        RobotDiff.getPositionY(),
+        RobotDiff.getAlpha());
   
-  printf("%d;%d;%d;%f;%f;%f;%f;%f;%f\r\n",
-        LidaRayzer.isObstacleDetected(),
-        int(RobotDiff.getPositionX()),
-        int(RobotDiff.getPositionY()),
-        RobotDiff.getAlpha(),
-        LidaRayzer.getObstacleX(),
-        LidaRayzer.getObstacleY(),
-        RobotDiff.getPosCibleX(),
-        RobotDiff.getPosCibleY(),
-        LidaRayzer.getObstacleAngleCible());
+  // printf("%d;%d;%d;%f;%f;%f;%f;%f;%f\r\n",
+  //       LidaRayzer.isObstacleDetected(),
+  //       int(RobotDiff.getPositionX()),
+  //       int(RobotDiff.getPositionY()),
+  //       RobotDiff.getAlpha(),
+  //       LidaRayzer.getObstacleX(),
+  //       LidaRayzer.getObstacleY(),
+  //       RobotDiff.getPosCibleX(),
+  //       RobotDiff.getPosCibleY(),
+  //       LidaRayzer.getObstacleAngleCible());
 
   // printf("[Position] X = %.2f mm | Y = %.2f mm | Angle = %.2f°\n",
   //        RobotDiff.getPositionX(),
@@ -230,7 +230,7 @@ void main_thread(void)
   lcd.printf("Wait Calibration\n");
   lcd.locate(0, 1);
   Couleur_Team = !SW_team;
-  if (Couleur_Team == 0)
+  if (Couleur_Team == false)
   {
     lcd.printf("Team Blue\n");
     offset_posX = 0;
@@ -278,7 +278,7 @@ void main_thread(void)
       break;
 
     case CAL:
-      RobotDiff.setPosition(1775, 170, 180);
+      RobotDiff.setPosition(1775, 170, 180, Couleur_Team);
       FsmState = WAIT_MATCH;
       lcd.cls();
       lcd.printf("Wait Match !\n");
@@ -296,7 +296,7 @@ void main_thread(void)
       break;
 
     case GAME:
-      RobotDiff.Robotgoto(1775, 180, 180);
+      RobotDiff.Robotgoto(1775, 180, 180, Couleur_Team);
       Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_drop_banner));
       Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_drop_banner));
       ThisThread::sleep_for(500ms);
@@ -306,15 +306,15 @@ void main_thread(void)
       ThisThread::sleep_for(500ms);
       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
-       RobotDiff.Robotgoto(1775, 450, 180);
+       RobotDiff.Robotgoto(1775, 450, 180, Couleur_Team);
       StepperRG->goUp();
       StepperRD->goUp();
       while (!(StepperRG->goUp() and StepperRD->goUp()));
-      RobotDiff.Robotgoto(1775, 700, 90);
-      RobotDiff.Robotgoto(2225, 700, 180);
+      RobotDiff.Robotgoto(1775, 700, 90, Couleur_Team);
+      RobotDiff.Robotgoto(2225, 700, 180, Couleur_Team);
       down_pince_take();
-      RobotDiff.Robotgoto(2225, 325, 180);
-      RobotDiff.Robotgoto(2225, 225, 180);
+      RobotDiff.Robotgoto(2225, 325, 180, Couleur_Team);
+      RobotDiff.Robotgoto(2225, 225, 180, Couleur_Team);
       Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
       Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
       ThisThread::sleep_for(500ms);
@@ -322,15 +322,15 @@ void main_thread(void)
       Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
       Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
-      RobotDiff.Robotgoto(2225, 120, 180);
-      RobotDiff.setPosition(2225, 170, 180);
-      RobotDiff.Robotgoto(2225, 225, 180);
+      RobotDiff.Robotgoto(2225, 120, 180, Couleur_Team);
+      RobotDiff.setPosition(2225, 170, 180, Couleur_Team);
+      RobotDiff.Robotgoto(2225, 225, 180, Couleur_Team);
       construction_gradin_niveau_2();
-      RobotDiff.Robotgoto(2225, 325, 180);
-      RobotDiff.Robotgoto(2225, 400, 90);
+      RobotDiff.Robotgoto(2225, 325, 180, Couleur_Team);
+      RobotDiff.Robotgoto(2225, 400, 90, Couleur_Team);
       down_pince_take();
-      RobotDiff.Robotgoto(2700, 400, 90);
-      RobotDiff.Robotgoto(2850, 400, 90);
+      RobotDiff.Robotgoto(2700, 400, 90, Couleur_Team);
+      RobotDiff.Robotgoto(2850, 400, 90, Couleur_Team);
       ThisThread::sleep_for(500ms);
       Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
       Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
@@ -339,20 +339,20 @@ void main_thread(void)
       Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
       Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
-      RobotDiff.Robotgoto(2700, 400, 0);
-      RobotDiff.Robotgoto(2700, 400, -90);
-      RobotDiff.Robotgoto(2900, 400, -90);
-      RobotDiff.setPosition(2850, 400, -90);
-      RobotDiff.Robotgoto(2700, 400, -90);
-      RobotDiff.Robotgoto(1775, 600, 180);
-      RobotDiff.Robotgoto(1775, 350, 180);
+      RobotDiff.Robotgoto(2700, 400, 0, Couleur_Team);
+      RobotDiff.Robotgoto(2700, 400, -90, Couleur_Team);
+      RobotDiff.Robotgoto(2900, 400, -90, Couleur_Team);
+      Couleur_Team ? RobotDiff.setPosition(2850, 400, 90, Couleur_Team) : RobotDiff.setPosition(2850, 400, -90, Couleur_Team);
+      RobotDiff.Robotgoto(2700, 400, -90, Couleur_Team);
+      RobotDiff.Robotgoto(1775, 600, 180, Couleur_Team);
+      RobotDiff.Robotgoto(1775, 350, 180, Couleur_Team);
       construction_gradin_niveau_2();
 
       //===========================================//
-      RobotDiff.Robotgoto(1775, 600, 180);
-      RobotDiff.Robotgoto(1900, 600, 0);
+      RobotDiff.Robotgoto(1775, 600, 180, Couleur_Team);
+      RobotDiff.Robotgoto(1900, 600, 0, Couleur_Team);
       down_pince_take();
-      RobotDiff.Robotgoto(1900, 875, 0);
+      RobotDiff.Robotgoto(1900, 875, 0, Couleur_Team);
       ThisThread::sleep_for(500ms);
       Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
       Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
@@ -362,13 +362,13 @@ void main_thread(void)
       Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
 
-      RobotDiff.Robotgoto(1900, 750, 0);
-      RobotDiff.Robotgoto(1775, 600, 180);
-      RobotDiff.Robotgoto(1775, 450, 180);
+      RobotDiff.Robotgoto(1900, 750, 0, Couleur_Team);
+      RobotDiff.Robotgoto(1775, 600, 180, Couleur_Team);
+      RobotDiff.Robotgoto(1775, 450, 180, Couleur_Team);
       construction_gradin_niveau_2();
-      RobotDiff.Robotgoto(1775, 650, 180);
-      RobotDiff.Robotgoto(2400, 600, 0);
-      RobotDiff.Robotgoto(2500, 1500, 0);
+      RobotDiff.Robotgoto(1775, 650, 180, Couleur_Team);
+      RobotDiff.Robotgoto(2400, 600, 0, Couleur_Team);
+      RobotDiff.Robotgoto(2500, 1500, 0, Couleur_Team);
 
 
       lcd_thread.terminate();
@@ -390,9 +390,9 @@ void main_thread(void)
 
 int main()
 {
-  //Thread threadAffichage;
+  Thread threadAffichage;
   Thread lidarAnalyzer_thread;
-  //threadAffichage.start(routineAffichage);
+  threadAffichage.start(routineAffichage);
   
  
   En_drive_N = SW_Drive;
