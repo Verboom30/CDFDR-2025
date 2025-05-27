@@ -219,8 +219,7 @@ void print_lcd(void)
 void thread_lidar() {
     while (true) {
         LidaRayzer.update();
-        //StopLidar = LidaRayzer.isObstacleDetected();
-        StopLidar = !SW_init;
+        StopLidar = LidaRayzer.isObstacleDetected();
         ThisThread::sleep_for(1ms);
     }
 }
@@ -390,9 +389,9 @@ void main_thread(void)
 
 int main()
 {
-  Thread threadAffichage;
+  //Thread threadAffichage;
   Thread lidarAnalyzer_thread;
-  threadAffichage.start(routineAffichage);
+  //threadAffichage.start(routineAffichage);
   
 
   En_drive_N = SW_Drive;
@@ -437,7 +436,7 @@ int main()
 
   game_thread.start(main_thread);
   lidarAnalyzer_thread.start(thread_lidar);
-
+  RobotDiff.setPosition(1775, 170, 180);
 
   while (1)
   {
