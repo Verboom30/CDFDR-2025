@@ -211,7 +211,7 @@ void print_lcd(void)
     {
       lcd.locate(0, 1);
       lcd.printf("Time :%d\n", int(endMatch.remaining_time().count()) / 1000000);
-      lcd.locate(7, 0);
+      lcd.locate(6, 0);
       lcd.printf("Score :%d\n", score);
     }
   }
@@ -289,7 +289,7 @@ void main_thread(void)
       {
         endMatch.attach(endMatchProcess, 100s);
         lcd.cls();
-        lcd.printf("GAME !\n");
+        lcd.printf("GAME!\n");
         lcd_thread.start(print_lcd);
         FsmState = GAME; // Lancement du match !
       }
@@ -306,7 +306,8 @@ void main_thread(void)
       ThisThread::sleep_for(500ms);
       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
-       RobotDiff.Robotgoto(1775, 450, 180, Couleur_Team);
+      score+=20;
+      RobotDiff.Robotgoto(1775, 450, 180, Couleur_Team);
       StepperRG->goUp();
       StepperRD->goUp();
       while (!(StepperRG->goUp() and StepperRD->goUp()));
@@ -326,6 +327,7 @@ void main_thread(void)
       RobotDiff.setPosition(2225, 170, 180, Couleur_Team);
       RobotDiff.Robotgoto(2225, 225, 180, Couleur_Team);
       construction_gradin_niveau_2();
+      score+=12;
       RobotDiff.Robotgoto(2225, 325, 180, Couleur_Team);
       RobotDiff.Robotgoto(2225, 400, 90, Couleur_Team);
       down_pince_take();
@@ -347,6 +349,7 @@ void main_thread(void)
       RobotDiff.Robotgoto(1775, 600, 180, Couleur_Team);
       RobotDiff.Robotgoto(1775, 350, 180, Couleur_Team);
       construction_gradin_niveau_2();
+      score+=12;
 
       //===========================================//
       RobotDiff.Robotgoto(1775, 600, 180, Couleur_Team);
@@ -366,17 +369,23 @@ void main_thread(void)
       RobotDiff.Robotgoto(1775, 600, 180, Couleur_Team);
       RobotDiff.Robotgoto(1775, 450, 180, Couleur_Team);
       construction_gradin_niveau_2();
+      score+=12;
       RobotDiff.Robotgoto(1775, 650, 180, Couleur_Team);
       RobotDiff.Robotgoto(2400, 600, 0, Couleur_Team);
       RobotDiff.Robotgoto(2500, 1500, 0, Couleur_Team);
-
-
+      score+=10;
+      //Score PAMI
+      score+=10;  //PAMI font la fête.
+      score+=5;   //Superstar de l’équipe est valide sur scène à la fin du match
+      score+=5*2; //5 points par zone de la fosse occupée par au moins une groupie de l’équipe à la fin du match.
+      score+=15;  //X points pour les zones de scène libre derrière la superstar en fin de match, le nombre de point dépenddu numéro indiqué sur la plus haute zone libre, entre 0 et 15.
+      
       lcd_thread.terminate();
       lcd.cls();
       lcd.printf("END !\n");
       lcd.locate(0, 1);
       lcd.printf("Time :%d\n", int(endMatch.remaining_time().count()) / 1000000);
-      lcd.locate(7, 0);
+      lcd.locate(6, 0);
       lcd.printf("Score :%d\n", score);
       FsmState = END;
       break;
