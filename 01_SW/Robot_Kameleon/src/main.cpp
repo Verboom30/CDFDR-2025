@@ -436,7 +436,6 @@ int main()
 
   game_thread.start(main_thread);
   lidarAnalyzer_thread.start(thread_lidar);
-  RobotDiff.setPosition(1775, 170, 180);
 
   while (1)
   {

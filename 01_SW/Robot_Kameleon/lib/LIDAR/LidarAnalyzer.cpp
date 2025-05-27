@@ -2,7 +2,7 @@
 #include <cmath>
 
 #define LIDAR_DIS_MIN        200.0f
-#define LIDAR_DIS_MAX        700.0f
+#define LIDAR_DIS_MAX        800.0f
 #define LIDAR_ANGLE_MARGIN   45.0f
 #define NB_LIDAR_PACK_READ   (LIDAR_ANGLE_MARGIN * 1)
 #define LIDAR_PC_ON          5.0f
@@ -26,14 +26,18 @@ void LidarAnalyzer::update() {
     float posX   = robot_->getPositionX();
     float posY   = robot_->getPositionY();
     float alpha  = robot_->getAlpha();
-    float cibleX = 1775;
-    float cibleY = 1000;
+    float cibleX = robot_->getPosCibleX();
+    float cibleY = robot_->getPosCibleY();
 
     float deltaX = cibleX - posX;
     float deltaY = cibleY - posY;
     float distToTarget = hypotf(deltaX, deltaY);
+    printf("[LIDAR] cibleX (%f) cibleY(%f)\n", cibleX,cibleY);
 
-    //if (distToTarget <= 1.0f) return;
+    if (distToTarget <= 1.0f){
+        stop_ = false;
+        return;
+    }  
 
     AngleLidarCible = atan2f(deltaX, deltaY) * 180.0f / M_PI - alpha;
     if (AngleLidarCible < 0) AngleLidarCible += 360.0f;
@@ -51,17 +55,19 @@ void LidarAnalyzer::update() {
             float angleDeg = pt.angle / 100.0f;
 
             //if (pt.intensity <= 180) continue;
+          
+           
+            if (pt.distance <= LIDAR_DIS_MIN || pt.distance >= LIDAR_DIS_MAX) {
+                NbNoDetecLidarPack++;
+                continue;
+            }
+
             if (!isAngleInRange(angleDeg, angleMin, angleMax)) continue;
             float globalAngleRad = (angleDeg + alpha) * M_PI / 180.0f;
             float lidarX = posX + sinf(globalAngleRad) * pt.distance;
             float lidarY = posY + cosf(globalAngleRad) * pt.distance;
 
             if (lidarX < 0 || lidarX > 3000 || lidarY < 0 || lidarY > 2000) continue;
-           
-            if (pt.distance <= LIDAR_DIS_MIN || pt.distance >= LIDAR_DIS_MAX) {
-                NbNoDetecLidarPack++;
-                continue;
-            }
 
             
             //printf("%.2f;%5d\r\n",points.point[i].angle/100.0f,points.point[i].distance);
@@ -82,7 +88,7 @@ void LidarAnalyzer::update() {
 
         if (detection) {
             if (stableStopCounter_ < STOP_ON_THRESHOLD) {
-                stableStopCounter_+=15;
+                stableStopCounter_+=20;
             }
         } else {
             if (stableStopCounter_ > -STOP_OFF_THRESHOLD) {

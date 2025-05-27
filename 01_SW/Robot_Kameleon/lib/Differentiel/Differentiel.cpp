@@ -46,6 +46,8 @@ void differentiel::setPosition(int positionX, int positionY, int Alpha)
 
     _positionX = positionX;
     _positionY = positionY;
+    _cibleposX = positionX;
+    _cibleposY = positionY;
     _Alpha = Alpha;
 
     lastPosG = -StepperG->getPosition();
@@ -180,7 +182,8 @@ void differentiel::Robotgoto(int positionX, int positionY, int alpha)
 {
   float dx = positionX - getPositionX();
   float dy = positionY - getPositionY();
- 
+  _cibleposX = positionX;
+  _cibleposY = positionY;
 
   if (dx < 0.1f and dx > -0.1f) dx = 0.0f;
   if (dy < 0.1f and dy > -0.1f) dy = 0.0f;
@@ -220,8 +223,6 @@ void differentiel::Robotgoto(int positionX, int positionY, int alpha)
   // 2. Translation
   updatePosition();
   ThisThread::sleep_for(10ms);
-  _cibleposX = positionX;
-  _cibleposY = positionY;
   Robotmoveto(move, 0, true);
 
   // 3. Rotation finale vers Alpha
