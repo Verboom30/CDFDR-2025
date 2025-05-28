@@ -399,9 +399,9 @@ void main_thread(void)
 
 int main()
 {
-  Thread threadAffichage;
+  //Thread threadAffichage;
   Thread lidarAnalyzer_thread;
-  threadAffichage.start(routineAffichage);
+  //threadAffichage.start(routineAffichage);
   
  
   En_drive_N = SW_Drive;
