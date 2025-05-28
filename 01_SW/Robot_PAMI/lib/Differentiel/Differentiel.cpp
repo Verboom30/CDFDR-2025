@@ -83,11 +83,11 @@ void differentiel::updatePosition() {
     if (_Alpha < -180.0f) _Alpha += 360.0f;
 }
 
-void differentiel::setPosition(int x, int y, int Alpha) {
+void differentiel::setPosition(int x, int y, int Alpha, bool team) {
     updatePosition();
-    _positionX = x;
+    _positionX = (team == 1)  ? abs(3000-x) : x;
     _positionY = y;
-    _Alpha = Alpha;
+    _Alpha = (team == 1) ? (Alpha*-1.0) : Alpha ;
     lastPosG = StepperG->currentPosition();
     lastPosD = StepperD->currentPosition();
 }
@@ -134,18 +134,18 @@ bool Robotmoveto(differentiel& robot, int distance, int alpha, bool stop) {
     return false;
 }
 
-bool Robotgoto(differentiel& robot, int positionX, int positionY, int alpha, bool stop) {
+bool Robotgoto(differentiel& robot, int positionX, int positionY, int alpha, bool stop, bool team) {
     switch (gotoState) {
         case GOTO_IDLE: {
             //robot.updatePosition();
-            float dx = positionX - robot.getPositionX();
+            float dx = (team == 1)  ? abs(3000-positionX) -  robot.getPositionX() : positionX -  robot.getPositionX();
             float dy = positionY - robot.getPositionY();
             if (abs(dx) < 0.1f) dx = 0.0f;
             if (abs(dy) < 0.1f) dy = 0.0f;
             Move = (int)sqrt(dx * dx + dy * dy);
             float targetAlpha = (180.0f / M_PI) * atan2(dx, dy);
             MoveAlpha = targetAlpha - robot.getAlpha();
-            FinalAlpha = alpha - targetAlpha;
+            FinalAlpha = (team == 1)  ? (alpha*-1.0) - targetAlpha : alpha - targetAlpha;
             if (MoveAlpha > 180) MoveAlpha -= 360;
             if (MoveAlpha < -180) MoveAlpha += 360;
             if (FinalAlpha > 180) FinalAlpha -= 360;

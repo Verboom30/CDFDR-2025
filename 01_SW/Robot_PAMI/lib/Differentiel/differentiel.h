@@ -13,7 +13,7 @@
 #define KSTP    float((M_PI*2.0f*RWHEEL/(MOTOR_STEPS*MSTEP))*REDUC)
 #define MAX_SPEED   SPEED*2
 #define SPEED       20000
-#define MSTEP 8
+#define MSTEP 2
 #define ACC    SPEED/4.f
 
 class differentiel {
@@ -25,7 +25,7 @@ public:
     void handleRoutineGauche();
     void handleRoutineDroite();
     void updatePosition();
-    void setPosition(int x, int y, int Alpha);
+    void setPosition(int x, int y, int Alpha, bool team);
     void setPositionZero();
     void resetPosition();
     float getPositionX();
@@ -52,6 +52,6 @@ enum MoveState { IDLE, MOVING };
 enum GotoState { GOTO_IDLE, ROTATE_TO_TARGET, FORWARD, ROTATE_FINAL };
 
 bool Robotmoveto(differentiel& robot, int distance, int alpha, bool stop);
-bool Robotgoto(differentiel& robot, int positionX, int positionY, int alpha, bool stop = false);
+bool Robotgoto(differentiel& robot, int positionX, int positionY, int alpha, bool stop, bool team);
 
 #endif

@@ -8,9 +8,13 @@
 #include "Differentiel.h"
 #include "UART_TMC.h"
 #include "pinout.h"
+#include <Servo.h>
+
+Servo myservo;  // create servo object to control a servo
 
 #define R_SENSE 3.7f
 #define DELAY_START 500
+#define DELAY_END 100000
 
 Uart_TMC driverG(TMC_UART_RX, TMC_UART_TX, R_SENSE, 0b00);
 Uart_TMC driverD(TMC_UART_RX, TMC_UART_TX, R_SENSE, 0b01);
@@ -27,16 +31,40 @@ Thread ThreadShowPos;
 
 int state;
 bool StopMove = false;
+bool LatchBAU = false;
+bool EndMatch = false;
+bool CouleurTeam = false; // False team Bleu, True team Jaune
 bool StartSequence = false;
 bool tiretteRemoved = false;
 bool sequenceReady = false;
 unsigned long tiretteRemovedTime = 0;
+unsigned long servoStartTime = 0;
+
+
+bool nonBlockingDelay(unsigned long duration, bool reset = false) {
+  static unsigned long startTime = 0;
+  static bool waiting = false;
+
+  if (reset) {
+    startTime = millis();
+    waiting = true;
+    return false;
+  }
+
+  if (waiting && (millis() - startTime >= duration)) {
+    waiting = false;
+    return true; // Delay terminé
+  }
+
+  return false; // Delay encore en cours
+}
 
 void checkSensors() {
   int dist1 = sensor1.readRangeContinuousMillimeters();
   int dist2 = sensor2.readRangeContinuousMillimeters();
-  StopMove = (dist1 < 200 || dist2 < 200);
-  digitalWrite(LED_R, StopMove);
+  StopMove = (dist1 < 200 || dist2 < 200) or LatchBAU or EndMatch;
+  digitalWrite(LED_R, (StopMove or LatchBAU) and !EndMatch ); //BAU LED Rouge
+  digitalWrite(LED_B, StopMove and !LatchBAU);//Detection obstacle LED Violette
 }
 
 void showPosition() {
@@ -50,18 +78,34 @@ void showPosition() {
   // Serial.print(RobotDiff.getAlpha(), 2);
   // Serial.println("°");
 
-  // Serial.print(RobotDiff.getPositionX(), 2);
-  // Serial.print(";");
-  // Serial.print(RobotDiff.getPositionY(), 2);
-  // Serial.print(";");
-  // Serial.print(RobotDiff.getAlpha(), 2);
-  // Serial.print("\r\n");
+  Serial.print(RobotDiff.getPositionX(), 2);
+  Serial.print(";");
+  Serial.print(RobotDiff.getPositionY(), 2);
+  Serial.print(";");
+  Serial.print(RobotDiff.getAlpha(), 2);
+  Serial.print("\r\n");
 }
 
 
 
 void taskDrive() {
   static bool movementDone = false;
+  if(digitalRead(SW_BAU) == LOW and tiretteRemoved) LatchBAU = true;
+ 
+  if (!tiretteRemoved) {
+    if (digitalRead(SW_TEAM) == HIGH) {
+        CouleurTeam = true;
+        digitalWrite(LED_R, HIGH);
+        digitalWrite(LED_G, HIGH);
+        digitalWrite(LED_B, LOW);
+    }else{
+        CouleurTeam = false;
+        digitalWrite(LED_R, LOW);
+        digitalWrite(LED_G, LOW);
+        digitalWrite(LED_B, HIGH);
+    }
+    myservo.write(60);
+  }
 
   if (!tiretteRemoved && digitalRead(TIRETTE) == HIGH) {
     tiretteRemoved = true;
@@ -69,21 +113,32 @@ void taskDrive() {
   }
   if (tiretteRemoved && !sequenceReady && (millis() - tiretteRemovedTime >= DELAY_START)) {
     sequenceReady = true;
+    digitalWrite(LED_R, LOW);
+    digitalWrite(LED_G, LOW);
+    digitalWrite(LED_B, LOW);
+  }
+
+  if (tiretteRemoved && sequenceReady && (millis() - tiretteRemovedTime >= DELAY_END)) {
+    EndMatch = true;
   }
   switch (state) {
     case 0:
       if (sequenceReady){
-        RobotDiff.setPosition(70,1900,90);
+        RobotDiff.setPosition(2930,1900,-90,CouleurTeam);
         state++;
       }
       break;
     case 1:
-      movementDone = Robotgoto(RobotDiff,1275,1900,180,StopMove);
+      movementDone = Robotgoto(RobotDiff,1725,1900,-180,StopMove, CouleurTeam);
       if(movementDone) state++;
       break;
     case 2:
-      movementDone = Robotgoto(RobotDiff,1275,1600,-90,StopMove);
-      if(movementDone) state++;
+        myservo.write(0);
+        delay(500);
+        myservo.write(60); 
+        delay(500);
+      // movementDone = Robotgoto(RobotDiff,1725,1600,90,StopMove, CouleurTeam);
+      // if(movementDone) state++;
       break;
     case 3:
     break;
@@ -117,6 +172,7 @@ void setup() {
   pinMode(LED_B, OUTPUT);
   pinMode(SW_BAU, INPUT_PULLUP);
   pinMode(TIRETTE, INPUT_PULLUP);
+  pinMode(SW_TEAM, INPUT_PULLUP);
 
   digitalWrite(LED_R, LOW);
   digitalWrite(LED_G, LOW);
@@ -126,19 +182,21 @@ void setup() {
 
   driverG.setup_stepper();
   driverD.setup_stepper();
+  delay(500);
+  myservo.attach(SERVO_1);  // attaches the servo on pin 9 to the servo object
 
   ThreadSensors.onRun(checkSensors);
-  ThreadSensors.setInterval(300);
+  ThreadSensors.setInterval(500);
 
   ThreadDrive.onRun(taskDrive);
   ThreadDrive.setInterval(1);
 
-  ThreadShowPos.onRun(showPosition);
-  ThreadShowPos.setInterval(1);
+  //ThreadShowPos.onRun(showPosition);
+  //ThreadShowPos.setInterval(1);
 
   controller.add(&ThreadSensors);
   controller.add(&ThreadDrive);
-  controller.add(&ThreadShowPos);
+  //controller.add(&ThreadShowPos);
 }
 
 void loop() {
