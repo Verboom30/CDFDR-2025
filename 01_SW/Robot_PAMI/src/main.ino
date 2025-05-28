@@ -38,7 +38,10 @@ bool StartSequence = false;
 bool tiretteRemoved = false;
 bool sequenceReady = false;
 unsigned long tiretteRemovedTime = 0;
+
 unsigned long servoStartTime = 0;
+const long interval = 1000; // intervalle en millisecondes
+bool ServoState = false;
 
 
 bool nonBlockingDelay(unsigned long duration, bool reset = false) {
@@ -133,10 +136,23 @@ void taskDrive() {
       if(movementDone) state++;
       break;
     case 2:
-        myservo.write(0);
-        delay(500);
-        myservo.write(60); 
-        delay(500);
+        unsigned long currentMillis = millis();
+        if (currentMillis - servoStartTime >= interval) {
+          servoStartTime = currentMillis;  
+          if(ServoState == true){
+            ServoState = false;
+          }else{
+            ServoState = true;
+          }
+          if(!LatchBAU){
+            if(ServoState == true){
+              myservo.write(0);
+            
+            }else{
+              myservo.write(60);
+            }
+          }  
+        }
       // movementDone = Robotgoto(RobotDiff,1725,1600,90,StopMove, CouleurTeam);
       // if(movementDone) state++;
       break;
