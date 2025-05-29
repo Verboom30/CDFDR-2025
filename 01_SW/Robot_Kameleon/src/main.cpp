@@ -143,6 +143,7 @@ void routineAffichage()
 
 void construction_gradin_niveau_2()
 {
+  Suck_Valve.pulsewidth_us(theta2pluse(0));
   Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_up));
   Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_up));
   ThisThread::sleep_for(200ms);
@@ -180,10 +181,9 @@ void construction_gradin_niveau_2()
   Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
   Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
   Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
-  Suck_Valve.pulsewidth_us(theta2pluse(180));
   Suck_Pump.pulsewidth_us(theta2pluse(0));
+  Suck_Valve.pulsewidth_us(theta2pluse(180));
   ThisThread::sleep_for(1000ms);
-  Suck_Valve.pulsewidth_us(theta2pluse(0));
   StepperRM->goUp();
   while (!(StepperRM->goUp()));
   StepperRG->move(-200);
@@ -224,7 +224,7 @@ void thread_lidar() {
         ThisThread::sleep_for(1ms);
     }
 }
-void main_thread(void)
+void main_thread(void) 
 {
   FsmState = IDLE;
   lcd.printf("Wait Calibration\n");
@@ -372,13 +372,9 @@ void main_thread(void)
       score+=12;
       RobotDiff.Robotgoto(1775, 650, 180, Couleur_Team);
       RobotDiff.Robotgoto(2400, 600, 0, Couleur_Team);
+      while(int(endMatch.remaining_time().count()) / 1000000 > 10);
       RobotDiff.Robotgoto(2500, 1500, 0, Couleur_Team);
       score+=10;
-      //Score PAMI
-      score+=10;  //PAMI font la fête.
-      score+=5;   //Superstar de l’équipe est valide sur scène à la fin du match
-      score+=5*2; //5 points par zone de la fosse occupée par au moins une groupie de l’équipe à la fin du match.
-      score+=15;  //X points pour les zones de scène libre derrière la superstar en fin de match, le nombre de point dépenddu numéro indiqué sur la plus haute zone libre, entre 0 et 15.
       
       lcd_thread.terminate();
       lcd.cls();
