@@ -14,6 +14,13 @@
 #define MAX_SPEED   SPEED*2
 
 #define PAMI_3
+#define DELAY_START 85000
+#define DELAY_END 100000
+
+//#define DEBUG
+
+
+
 
 #ifdef PAMI_1 
 #define SPEED       20000

@@ -13,10 +13,7 @@
  Servo myservo;  // create servo object to control a servo
 
 #define R_SENSE 3.7f
-#define DELAY_START 85000
-#define DELAY_END 100000
 
-//#define DEBUG
 
 Uart_TMC driverG(TMC_UART_RX, TMC_UART_TX, R_SENSE, 0b00);
 Uart_TMC driverD(TMC_UART_RX, TMC_UART_TX, R_SENSE, 0b01);
@@ -105,7 +102,7 @@ void movementPAMI1(){
       break;
     case 1:
       if (sequenceReady){
-        movementDone = Robotmoveto(RobotDiff,1275, converalphaTeam(0, CouleurTeam),StopMove);
+        movementDone = Robotmoveto(RobotDiff,1175, converalphaTeam(0, CouleurTeam),StopMove);
         if(movementDone) state++;
       }
       break;
@@ -119,7 +116,7 @@ void movementPAMI1(){
         if(movementDone)  state++;
       break;
     case 4:
-      movementDone = Robotmoveto(RobotDiff,350, converalphaTeam(0, CouleurTeam),StopMove);
+      movementDone = Robotmoveto(RobotDiff,380, converalphaTeam(0, CouleurTeam),StopMove);
       if(movementDone) state++;
        
       break;
@@ -193,7 +190,7 @@ void movementPAMI3(){
       if(movementDone) state++;
       break;
     case 5:
-      movementDone = Robotmoveto(RobotDiff,950, converalphaTeam(0, CouleurTeam),StopMove);
+      movementDone = Robotmoveto(RobotDiff,1100, converalphaTeam(0, CouleurTeam),StopMove);
       if(movementDone) state++;
        break;
     break;
