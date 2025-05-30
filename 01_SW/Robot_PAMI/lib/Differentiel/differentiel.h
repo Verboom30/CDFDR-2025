@@ -12,7 +12,18 @@
 #define REDUC   1.0f
 #define KSTP    float((M_PI*2.0f*RWHEEL/(MOTOR_STEPS*MSTEP))*REDUC)
 #define MAX_SPEED   SPEED*2
-#define SPEED       50000
+
+#define PAMI_3
+
+#ifdef PAMI_1 
+#define SPEED       20000
+#endif
+#ifdef PAMI_2 
+#define SPEED       30000
+#endif
+#ifdef PAMI_3 
+#define SPEED       30000
+#endif
 #define MSTEP 2
 #define ACC    SPEED/4.f
 

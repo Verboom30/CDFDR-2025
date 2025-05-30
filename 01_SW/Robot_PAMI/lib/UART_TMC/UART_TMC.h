@@ -5,7 +5,7 @@
 // Motor steps per revolution. Most steppers are 200 steps or 1.8 degrees/step
 #define RPM 50
 
-#define RMSCURRENT 2500       // RMS current of Stepper Coil in mA
+#define RMSCURRENT 5000       // RMS current of Stepper Coil in mA
 #define TOFF 5               // Enables driver in software - 3, 5
 #define EN_SPREADCYCLE false // Toggle spreadCycle on TMC2208/2209/2224: default false, true: much faster!!!!
 #define PWM_AUTOSCALE true   // Needed for stealthChop
