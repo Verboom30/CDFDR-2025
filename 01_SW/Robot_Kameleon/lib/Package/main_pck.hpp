@@ -46,10 +46,11 @@ const struct pos_bras Bras[]{
 struct pos_hook {
     int hook_up;
     int hook_down;
+    int hook_take;
 };
 const struct pos_hook Hook[]{
-    {65,155}, //Hook G
-    {145,55}, //Hook D
+    {65,155,152}, //Hook G
+    {145,55,58}, //Hook D
     
    
 };

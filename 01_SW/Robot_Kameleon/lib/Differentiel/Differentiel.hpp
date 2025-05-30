@@ -15,10 +15,10 @@
 #define RWHEEL  35.0f
 #define REDUC   0.5f
 #define KSTP    float((M_PI*2.0f*RWHEEL/(RSTEP*MSTEP_DRIVE))*REDUC)
-#define SPEED   3500.0f // max 50000 Mstepper 16 3200Ma
+#define SPEED   1500.0f // max 50000 Mstepper 16 3200Ma
 #define MSTEP_DRIVE 4
-#define ACC    4.0f
-#define DEC    4.0f
+#define ACC    3.0f
+#define DEC    3.0f
 
 class differentiel
 {

@@ -12,6 +12,7 @@
 #include <cmath>
 
 //#define DEBUG
+#define LIDAR
 
 #define NORMALSPEED  1.0f
 #define SLOWSPEED    0.4f
@@ -225,7 +226,7 @@ void print_lcd(void)
 void thread_lidar() {
     while (true) {
         LidaRayzer.update();
-        #ifndef DEBUG
+        #ifdef LIDAR
          StopLidar = LidaRayzer.isObstacleDetected();
         #endif
         ThisThread::sleep_for(1ms);
@@ -332,6 +333,8 @@ void main_thread(void)
       Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
       Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
+      Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_take));
+      Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_take));
       RobotDiff.Robotgoto(2225, 120, 180, Couleur_Team, NORMALSPEED);
       RobotDiff.setPosition(2225, 170, 180, Couleur_Team);
       RobotDiff.Robotgoto(2225, 225, 180, Couleur_Team, NORMALSPEED);
@@ -340,7 +343,7 @@ void main_thread(void)
       RobotDiff.Robotgoto(2225, 325, 180, Couleur_Team, NORMALSPEED);
       RobotDiff.Robotgoto(2225, 400, 90, Couleur_Team, NORMALSPEED);
       down_pince_take();
-      RobotDiff.Robotgoto(2700, 400, 90, Couleur_Team, SLOWSPEED);
+      RobotDiff.Robotgoto(2700, 400, 90, Couleur_Team, SLOWSPEED);  
       RobotDiff.Robotgoto(2850, 400, 90, Couleur_Team, SLOWSPEED);
       ThisThread::sleep_for(500ms);
       Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
@@ -350,6 +353,8 @@ void main_thread(void)
       Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
       Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
+      Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_take));
+      Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_take));
       RobotDiff.Robotgoto(2700, 400, 0, Couleur_Team, NORMALSPEED);
       RobotDiff.Robotgoto(2700, 400, -90, Couleur_Team, NORMALSPEED);
       RobotDiff.Robotgoto(2900, 400, -90, Couleur_Team, SLOWSPEED);
@@ -364,7 +369,7 @@ void main_thread(void)
       RobotDiff.Robotgoto(1775, 600, 180, Couleur_Team, NORMALSPEED);
       RobotDiff.Robotgoto(1900, 600, 0, Couleur_Team, NORMALSPEED);
       down_pince_take();
-      RobotDiff.Robotgoto(1900, 875, 0, Couleur_Team, SLOWSPEED);
+      RobotDiff.Robotgoto(1900, 925, 0, Couleur_Team, SLOWSPEED);
       ThisThread::sleep_for(500ms);
       Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
       Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
@@ -373,6 +378,8 @@ void main_thread(void)
       Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
       Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
+      Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_take));
+      Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_take));
 
       RobotDiff.Robotgoto(1900, 750, 0, Couleur_Team, NORMALSPEED);
       RobotDiff.Robotgoto(1775, 600, 180, Couleur_Team, NORMALSPEED);
@@ -380,53 +387,32 @@ void main_thread(void)
       construction_gradin_niveau_2();
       score+=12;
       RobotDiff.Robotgoto(1775, 650, 180, Couleur_Team, NORMALSPEED);
-    
+      RobotDiff.Robotgoto(2400, 600, 0, Couleur_Team, NORMALSPEED);
      
       //===========================================//
-      RobotDiff.Robotgoto(2400, 1325,90, Couleur_Team, SLOWSPEED);
-      down_pince_take();
-      RobotDiff.Robotgoto(2700, 1325,90, Couleur_Team, SLOWSPEED);
-      RobotDiff.Robotgoto(2850, 1325,90, Couleur_Team, SLOWSPEED);
-      ThisThread::sleep_for(500ms);
-      Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
-      Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
-      ThisThread::sleep_for(500ms);
-      Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
-      Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
-      Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
-      Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
-      RobotDiff.Robotgoto(2700, 1325,0, Couleur_Team, NORMALSPEED);
-      construction_gradin_niveau_2();
-     
-      //===========================================//
-      //RobotDiff.Robotgoto(2700, 1125,-90, Couleur_Team);
-      // RobotDiff.Robotgoto(2175, 1225,0, Couleur_Team);
+      // RobotDiff.Robotgoto(2400, 1325,90, Couleur_Team, SLOWSPEED);
       // down_pince_take();
-      // RobotDiff.Robotgoto(2175, 1650,0, Couleur_Team);
-      // RobotDiff.Robotgoto(2175, 1725,0, Couleur_Team);
+      // RobotDiff.Robotgoto(2700, 1325,90, Couleur_Team, SLOWSPEED);
+      // RobotDiff.Robotgoto(2850, 1325,90, Couleur_Team, SLOWSPEED);
+      // ThisThread::sleep_for(500ms);
+      // Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
+      // Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
+      // ThisThread::sleep_for(500ms);
       // Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
       // Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
       // Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
       // Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
-      // RobotDiff.Robotgoto(2175,1650,0, Couleur_Team);
-      // Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
-      // Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
-      // ThisThread::sleep_for(250ms);
-      // RobotDiff.Robotgoto(2700,1000,0, Couleur_Team);
+      // Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_take));
+      // Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_take));
+      // RobotDiff.Robotgoto(2700, 1325,0, Couleur_Team, NORMALSPEED);
+      // construction_gradin_niveau_2();
       //===========================================//
-
+    
 
       while(int(endMatch.remaining_time().count()) / 1000000 > 10);
-      RobotDiff.Robotgoto(2700, 1800,0, Couleur_Team, SLOWSPEED);
+      RobotDiff.Robotgoto(2500, 1500, 0, Couleur_Team,NORMALSPEED);
       score+=10;
-      score+=12;
-      RobotDiff.Robotgoto(2700, 1750,0, Couleur_Team, SLOWSPEED);
-
-      //===========================================//
-      
-      //RobotDiff.Robotgoto(2500, 1500, 0, Couleur_Team);
-     
-      
+    
       lcd_thread.terminate();
       lcd.cls();
       lcd.printf("END !\n");
