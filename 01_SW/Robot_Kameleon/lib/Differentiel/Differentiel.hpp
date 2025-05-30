@@ -15,10 +15,10 @@
 #define RWHEEL  35.0f
 #define REDUC   0.5f
 #define KSTP    float((M_PI*2.0f*RWHEEL/(RSTEP*MSTEP_DRIVE))*REDUC)
-#define SPEED   1500.0f // max 50000 Mstepper 16 3200Ma
+#define SPEED   3500.0f // max 50000 Mstepper 16 3200Ma
 #define MSTEP_DRIVE 4
-#define ACC    3.0f
-#define DEC    3.0f
+#define ACC    4.0f
+#define DEC    4.0f
 
 class differentiel
 {
@@ -30,7 +30,7 @@ class differentiel
     void pause();
     void resume();
     
-    void move(int distance, int Alpha); 
+    void move(int distance, int Alpha, float coefSpeed); 
     void setPosition(int positionX, int positionY, int Alpha, bool team);
     void setPositionZero();
     void resetPosition(); 
@@ -56,8 +56,8 @@ class differentiel
     bool PosCibleDone();
     void updatePosition();
 
-    void Robotmoveto(int distance, int alpha, bool enableLidar);
-    void Robotgoto(int positionX, int positionY, int alpha, bool team);
+    void Robotmoveto(int distance, int alpha, bool enableLidar,float coefSpeed );
+    void Robotgoto(int positionX, int positionY, int alpha, bool team, float coefSpeed);
    
 
 private : 

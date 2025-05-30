@@ -71,7 +71,7 @@ void differentiel::resetPosition()
     lastPosD = StepperD->getPosition();
 }
 
-void differentiel::move(int Distance, int Alpha)
+void differentiel::move(int Distance, int Alpha, float coefSpeed)
 {
     float move = Distance;
     float moveAlpha = float(Alpha);
@@ -80,8 +80,8 @@ void differentiel::move(int Distance, int Alpha)
         ScopedLock<Mutex> lock(mutexData);
         _Move = move;
         _MoveAlpha = moveAlpha;
-        _Speed = (abs(_Move) / (abs(_Move) + abs(_MoveAlpha))) * SPEED;
-        _SpeedAlpha = (abs(_MoveAlpha) / (abs(_Move) + abs(_MoveAlpha))) * (SPEED * 0.5f);
+        _Speed = (abs(_Move) / (abs(_Move) + abs(_MoveAlpha))) * SPEED * coefSpeed;
+        _SpeedAlpha = (abs(_MoveAlpha) / (abs(_Move) + abs(_MoveAlpha))) * (SPEED * 0.5f *coefSpeed);
     }
 
     flags.set(0x1 | 0x2);
@@ -167,9 +167,9 @@ void differentiel::updatePosition()
     if (_Alpha < -180.0f) _Alpha += 360.0f;
 }
 
-void differentiel::Robotmoveto(int distance, int alpha, bool enableLidar)
+void differentiel::Robotmoveto(int distance, int alpha, bool enableLidar, float coefspeed)
 {
-  move(distance, alpha);
+  move(distance, alpha, coefspeed);
   do
   {
     if(enableLidar)(*_stopLidar) ? pause() : resume();
@@ -177,7 +177,7 @@ void differentiel::Robotmoveto(int distance, int alpha, bool enableLidar)
   } while (!PosCibleDone());
 }
 
-void differentiel::Robotgoto(int positionX, int positionY, int alpha, bool team)
+void differentiel::Robotgoto(int positionX, int positionY, int alpha, bool team, float coefSpeed)
 {
     
   float dx = team == 1  ? abs(3000-positionX) - getPositionX() : positionX - getPositionX();
@@ -218,17 +218,17 @@ void differentiel::Robotgoto(int positionX, int positionY, int alpha, bool team)
   // 1. Rotation vers direction
   updatePosition();
   ThisThread::sleep_for(10ms);
-  Robotmoveto(0, moveAlpha, false);
+  Robotmoveto(0, moveAlpha, false, coefSpeed);
 
   // 2. Translation
   updatePosition();
   ThisThread::sleep_for(10ms);
-  Robotmoveto(move, 0, true);
+  Robotmoveto(move, 0, true, coefSpeed);
 
   // 3. Rotation finale vers Alpha
   updatePosition();
   ThisThread::sleep_for(10ms);
-  Robotmoveto(0, finalAlpha, false);
+  Robotmoveto(0, finalAlpha, false, coefSpeed);
 }
 
 // ======================== Getters ========================= //
