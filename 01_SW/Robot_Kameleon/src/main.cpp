@@ -11,7 +11,7 @@
 #include "LidarAnalyzer.hpp"
 #include <cmath>
 
-//#define DEBUG
+#define DEBUG
 //#define LIDAR
 
 #define NORMALSPEED  1.0f
@@ -230,8 +230,12 @@ void separation_gradin_niveau_2()
   Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_take));
   Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_take));
   ThisThread::sleep_for(200ms);
-  StepperRM->move(-2500);
+  StepperRM->move(-1500);
   while (!StepperRM->StepperAct->stopped());
+  StepperRG->move(-500);
+  StepperRD->move(-500);
+  StepperRM->move(-1800);
+  while (!(StepperRG->StepperAct->stopped() and StepperRD->StepperAct->stopped() and StepperRM->StepperAct->stopped()));
   ThisThread::sleep_for(200ms);
   Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
   Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
@@ -240,9 +244,20 @@ void separation_gradin_niveau_2()
   ThisThread::sleep_for(1000ms);
   StepperRM->goUp();
   while (!(StepperRM->goUp()));
-  StepperRG->move(500);
-  StepperRD->move(500);
+  Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
+  Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
+  ThisThread::sleep_for(500ms);
+  StepperRG->move(-800);
+  StepperRD->move(-800);
   while (!(StepperRG->StepperAct->stopped() and StepperRD->StepperAct->stopped()));
+  ThisThread::sleep_for(500ms);
+  Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
+  Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
+  ThisThread::sleep_for(500ms);
+  StepperRG->move(1600);
+  StepperRD->move(1600);
+  while (!(StepperRG->StepperAct->stopped() and StepperRD->StepperAct->stopped()));
+  ThisThread::sleep_for(500ms);
 }
 
 void down_pince_take()
@@ -254,6 +269,7 @@ void down_pince_take()
   StepperRG->goDown();
   StepperRD->goDown();
   while (!(StepperRG->goDown() and StepperRD->goDown()));
+  ThisThread::sleep_for(200ms);
 }
 
 void print_lcd(void)
@@ -314,28 +330,30 @@ void main_thread(void)
       break;
 
     case START_UP:
-      down_pince_take();
-      // Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_drop_banner));
-      // Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_drop_banner));
-      // Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
-      // Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
-      // ThisThread::sleep_for(2500ms);
-      // Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_banner));
-      // Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_banner));
-      // ThisThread::sleep_for(1000ms);
-      // StepperRG->goUp();
-      // StepperRD->goUp();
-      // while (!(StepperRG->goUp() and StepperRD->goUp()));
-      // Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_banner));
-      // Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_banner));
-      // ThisThread::sleep_for(500ms);
+      //down_pince_take();
+      // StepperRM->move(-10500);
+      // while (!(StepperRM->StepperAct->stopped()));
+      Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_drop_banner));
+      Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_drop_banner));
+      Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
+      Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
+      ThisThread::sleep_for(2500ms);
+      Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_banner));
+      Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_banner));
+      ThisThread::sleep_for(1000ms);
+      StepperRG->goUp();
+      StepperRD->goUp();
+      while (!(StepperRG->goUp() and StepperRD->goUp()));
+      Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_banner));
+      Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_banner));
+      ThisThread::sleep_for(500ms);
       lcd.cls();
       lcd.printf("Calibration !\n");
       FsmState = CAL;
       break;
 
     case CAL:
-      RobotDiff.setPosition(1775, 170, 180, Couleur_Team);
+      RobotDiff.setPosition(1775, 95, 180, Couleur_Team);
       FsmState = WAIT_MATCH;
       lcd.cls();
       lcd.printf("Wait Match !\n");
@@ -353,52 +371,46 @@ void main_thread(void)
       break;
 
     case GAME:
-      // RobotDiff.Robotmoveto(100, 0, false, NORMALSPEED);
-      // RobotDiff.setPosition(1775, 170, 180, Couleur_Team);
-      // RobotDiff.Robotgoto(1775, 180, 180, Couleur_Team, NORMALSPEED);
-      // Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_drop_banner));
-      // Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_drop_banner));
-      // ThisThread::sleep_for(500ms);
-      // StepperRG->goDown();
-      // StepperRD->goDown();
-      // while (!(StepperRG->goDown() and StepperRD->goDown()));
-      // ThisThread::sleep_for(500ms);
-      // Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
-      // Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
-      // score+=20;
-      // RobotDiff.Robotgoto(1775, 450, 180, Couleur_Team, NORMALSPEED);
-      // RobotDiff.Robotgoto(1775, 600, 180, Couleur_Team, NORMALSPEED);
-      // RobotDiff.Robotgoto(1900, 600, 0, Couleur_Team, NORMALSPEED);
-      // down_pince_take();
-      // RobotDiff.Robotgoto(1900, 925, 0, Couleur_Team, SLOWSPEED);
-      // ThisThread::sleep_for(500ms);
-      // Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
-      // Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
-      // ThisThread::sleep_for(500ms);
-      // Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
-      // Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
-      // Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
-      // Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
-      // Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_take));
-      // Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_take));
-      // //construction gradin N°1
-      // RobotDiff.Robotgoto(1900, 750, 0, Couleur_Team, NORMALSPEED);
-      // RobotDiff.Robotgoto(1775, 450, 180, Couleur_Team, NORMALSPEED);
-      // RobotDiff.Robotgoto(1775, 300, 180, Couleur_Team, NORMALSPEED);
 
+      //DROP BANNER
+      RobotDiff.Robotmoveto(100, 0, false, NORMALSPEED);
+      RobotDiff.setPosition(1775, 95, 180, Couleur_Team);
+      RobotDiff.Robotgoto(1775, 180, 180, Couleur_Team, NORMALSPEED);
+      Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_drop_banner));
+      Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_drop_banner));
+      ThisThread::sleep_for(500ms);
+      StepperRG->goDown();
+      StepperRD->goDown();
+      while (!(StepperRG->goDown() and StepperRD->goDown()));
+      ThisThread::sleep_for(500ms);
+      Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
+      Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
+      score+=20;
+      //Prise l'élement de jeu central
+      RobotDiff.Robotgoto(1775, 450, 180, Couleur_Team, NORMALSPEED);
+      RobotDiff.Robotgoto(1775, 600, 180, Couleur_Team, NORMALSPEED);
+      RobotDiff.Robotgoto(1900, 600, 0, Couleur_Team, NORMALSPEED);
+      down_pince_take();
+      //construction gradin N°1
+      //RobotDiff.Robotgoto(1900, 750, 0, Couleur_Team, NORMALSPEED);
+      RobotDiff.Robotgoto(1900, 925, 0, Couleur_Team, SLOWSPEED);
+      ThisThread::sleep_for(500ms);
+      Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
+      Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
+      ThisThread::sleep_for(500ms);
       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
       Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
       Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
       Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_take));
       Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_take));
-      
 
-      
+      RobotDiff.Robotgoto(1900, 750, 0, Couleur_Team, NORMALSPEED);
+      RobotDiff.Robotgoto(1725, 600, 180, Couleur_Team, NORMALSPEED);
+      RobotDiff.Robotgoto(1725, 250, 180, Couleur_Team, NORMALSPEED);
 
-      
       separation_gradin_niveau_2();
-      RobotDiff.Robotgoto(1775, 350, 180, Couleur_Team, SLOWSPEED);
+      RobotDiff.Robotgoto(1725, 400, 180, Couleur_Team, SLOWSPEED);
       StepperRG->goDown();
       StepperRD->goDown();
       while (!(StepperRG->goDown() and StepperRD->goDown()));
@@ -408,7 +420,93 @@ void main_thread(void)
       StepperRD->move(-500);
       while (!(StepperRG->StepperAct->stopped() and StepperRD->StepperAct->stopped()));
 
-      RobotDiff.Robotgoto(1775, 550, 180, Couleur_Team, SLOWSPEED);
+      RobotDiff.Robotgoto(1725, 550, 180, Couleur_Team, SLOWSPEED);
+
+      //construction gradin N°2
+
+      RobotDiff.Robotgoto(1725, 700, 90, Couleur_Team, NORMALSPEED);
+      RobotDiff.Robotgoto(2225, 700, 180, Couleur_Team, NORMALSPEED);
+      down_pince_take();
+      RobotDiff.Robotgoto(2225, 325, 180, Couleur_Team, SLOWSPEED);
+      RobotDiff.Robotgoto(2225, 225, 180, Couleur_Team, SLOWSPEED);
+      Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_down));
+      Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_down));
+      ThisThread::sleep_for(500ms);
+      Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
+      Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_close));
+      Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_close));
+      Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
+      Hook_G.pulsewidth_us(theta2pluse(Hook[0].hook_take));
+      Hook_D.pulsewidth_us(theta2pluse(Hook[1].hook_take));
+      RobotDiff.Robotgoto(2225, 120, 180, Couleur_Team, NORMALSPEED);
+      RobotDiff.setPosition(2225, 170, 180, Couleur_Team);
+      RobotDiff.Robotgoto(2225, 225, 180, Couleur_Team, NORMALSPEED);
+      separation_gradin_niveau_2();
+      StepperRM->move(-1000);
+      while (!(StepperRM->StepperAct->stopped()));
+      ThisThread::sleep_for(200ms);
+      
+      RobotDiff.Robotgoto(2225, 700, -90, Couleur_Team, NORMALSPEED);
+      RobotDiff.Robotgoto(1725, 700, 180, Couleur_Team, NORMALSPEED);
+      RobotDiff.Robotgoto(1725, 400, 180, Couleur_Team, SLOWSPEED);
+      StepperRG->move(-500);
+      StepperRD->move(-500);
+      while (!(StepperRG->StepperAct->stopped() and StepperRD->StepperAct->stopped()));
+      ThisThread::sleep_for(500ms);
+      Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
+      Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
+      ThisThread::sleep_for(200ms);
+      StepperRG->move(-200);
+      StepperRD->move(-200);
+      while (!(StepperRG->StepperAct->stopped() and StepperRD->StepperAct->stopped()));
+      ThisThread::sleep_for(200ms);
+      RobotDiff.Robotgoto(1725, 550, 180, Couleur_Team, SLOWSPEED);
+      StepperRG->goDown();
+      StepperRD->goDown();
+      while (!(StepperRG->goDown() and StepperRD->goDown()));
+      StepperRM->move(-10500);
+      while (!(StepperRM->StepperAct->stopped()));
+      
+      RobotDiff.Robotgoto(1725, 325, 180, Couleur_Team, SLOWSPEED);
+      Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_close));
+      Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_close));
+      ThisThread::sleep_for(200ms);
+      StepperRM->move(-2700);
+      while (!(StepperRM->StepperAct->stopped()));
+      Suck_Valve.pulsewidth_us(theta2pluse(0));
+      Suck_Pump.pulsewidth_us(theta2pluse(180));
+      ThisThread::sleep_for(1000ms);
+      StepperRM->move(-50);
+      while (!(StepperRM->StepperAct->stopped()));
+      StepperRG->move(11000);
+      StepperRD->move(11000);
+      StepperRM->move(11000);
+      while (!(StepperRG->StepperAct->stopped() and StepperRD->StepperAct->stopped() and StepperRM->StepperAct->stopped()));
+      ThisThread::sleep_for(1000ms);
+      RobotDiff.Robotgoto(1725, 225, 180, Couleur_Team, SLOWSPEED);
+      Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
+      Pince_r2.pulsewidth_us(theta2pluse(Pince[1].pince_open));
+      Pince_r3.pulsewidth_us(theta2pluse(Pince[2].pince_open));
+      Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
+      ThisThread::sleep_for(200ms);
+      Suck_Valve.pulsewidth_us(theta2pluse(180));
+      Suck_Pump.pulsewidth_us(theta2pluse(0));
+      StepperRM->move(500);
+      StepperRG->move(-800);
+      StepperRD->move(-800);
+      while (!(StepperRG->StepperAct->stopped() and StepperRD->StepperAct->stopped() and StepperRM->StepperAct->stopped()));
+      ThisThread::sleep_for(500ms);
+      RobotDiff.Robotgoto(1725, 400, 180, Couleur_Team, SLOWSPEED);
+      
+
+
+      
+
+
+  
+
+
+
 
 
 

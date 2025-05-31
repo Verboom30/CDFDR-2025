@@ -49,8 +49,8 @@ struct pos_hook {
     int hook_take;
 };
 const struct pos_hook Hook[]{
-    {65,155,152}, //Hook G
-    {145,55,58}, //Hook D
+    {55,155,152}, //Hook G
+    {155,55,58}, //Hook D
     
    
 };
