@@ -375,7 +375,7 @@ void main_thread(void)
       //DROP BANNER
       RobotDiff.Robotmoveto(100, 0, false, NORMALSPEED);
       RobotDiff.setPosition(1775, 95, 180, Couleur_Team);
-      RobotDiff.Robotgoto(1775, 180, 180, Couleur_Team, NORMALSPEED);
+      RobotDiff.Robotgoto(1775, 105, 180, Couleur_Team, NORMALSPEED);
       Mover_rg.pulsewidth_us(theta2pluse(Bras[0].bras_drop_banner));
       Mover_rd.pulsewidth_us(theta2pluse(Bras[1].bras_drop_banner));
       ThisThread::sleep_for(500ms);
@@ -457,10 +457,10 @@ void main_thread(void)
       Pince_r1.pulsewidth_us(theta2pluse(Pince[0].pince_open));
       Pince_r4.pulsewidth_us(theta2pluse(Pince[3].pince_open));
       ThisThread::sleep_for(200ms);
-      StepperRG->move(-200);
-      StepperRD->move(-200);
+      StepperRG->move(-500);
+      StepperRD->move(-500);
       while (!(StepperRG->StepperAct->stopped() and StepperRD->StepperAct->stopped()));
-      ThisThread::sleep_for(200ms);
+      ThisThread::sleep_for(500ms);
       RobotDiff.Robotgoto(1725, 550, 180, Couleur_Team, SLOWSPEED);
       StepperRG->goDown();
       StepperRD->goDown();

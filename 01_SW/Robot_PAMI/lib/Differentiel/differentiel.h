@@ -13,7 +13,7 @@
 #define KSTP    float((M_PI*2.0f*RWHEEL/(MOTOR_STEPS*MSTEP))*REDUC)
 #define MAX_SPEED   SPEED*2
 
-#define PAMI_3
+#define PAMI_2
 #define DELAY_START 85000
 #define DELAY_END 100000
 

@@ -21,7 +21,7 @@ struct pos_pince {
 };
 
 const struct pos_pince Pince[]{
-    {170, 150,130}, //Pince R1
+    {165, 140,130}, //Pince R1
     {70, 60,0},  //Pince R2
     {180, 160,0},   //Pince R3
     {90, 70,50}, //Pince R4
